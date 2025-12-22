@@ -9,6 +9,12 @@ This monorepo contains related Morphio projects for AI-powered content generatio
 | **morphio-io** | Full-stack web application (FastAPI + Next.js) | `morphio-io/` |
 | **morphio-core** | Standalone Python library for audio/LLM/security utilities | `morphio-core/` |
 
+## Documentation
+
+- **[Shared Docs](./docs/)** - Cross-cutting guides
+- **[Using morphio-core](./docs/using-morphio-core.md)** - How to use morphio-core in your own projects
+- **[Architecture](./docs/architecture.md)** - How morphio-io uses morphio-core via adapters
+
 ## Quick Start
 
 ```bash
