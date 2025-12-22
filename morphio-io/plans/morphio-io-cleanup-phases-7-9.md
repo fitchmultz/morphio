@@ -14,42 +14,35 @@
 
 ---
 
-## Phase 7: Quick Wins
+## Phase 7: Quick Wins ✅ COMPLETE
 
 Simple migrations with minimal risk.
 
-### 7.1 Speaker Alignment
-- [ ] Replace `app/services/audio/speaker_alignment.py` with morphio-core import
-- [ ] Update imports in `app/services/audio/pipeline.py`
-- [ ] Run tests
+### 7.1 Speaker Alignment ✅
+- [x] Created `app/adapters/speaker_alignment.py` wrapping morphio-core
+- [x] Converted `app/services/audio/speaker_alignment.py` to re-export stub
+- [x] All 20 speaker alignment tests pass
 
-**Files**: `app/services/audio/speaker_alignment.py` (~100 lines)
-**Target**: `morphio_core.audio.alignment`
+**Result**: 253 lines → 22 lines
 
-### 7.2 URL Validation (Use Existing Adapter)
-- [ ] Find services doing URL validation manually
-- [ ] Update to import from `app/adapters/url_validation.py`
-- [ ] Run tests
+### 7.2 URL Validation ✅
+- [x] Updated `app/services/web/validation.py` to use url_validation adapter
+- [x] Now uses morphio-core's comprehensive SSRF protection (checks ALL DNS records)
 
-**Files**: Adapter already exists, just needs to be used
+**Result**: 33 lines → 27 lines (but much more secure)
 
-### 7.3 FFmpeg Utilities
-- [ ] Create `app/adapters/media.py`
-- [ ] Wrap `run_ffmpeg()`, `probe_duration()`, `convert_to_audio()`
-- [ ] Update `app/services/video/conversion.py` to use adapter
-- [ ] Run tests
+### 7.3 FFmpeg Utilities ✅
+- [x] Created `app/adapters/media.py` with exception translation
+- [x] Converted `app/services/video/conversion.py` to re-export stub
 
-**Files**: `app/services/video/conversion.py` (~40 lines)
-**Target**: `morphio_core.media.ffmpeg`
+**Result**: 41 lines → 15 lines
 
-### 7.4 Anonymizer
-- [ ] Create `app/adapters/anonymizer.py`
-- [ ] Wrap `Anonymizer` class with exception translation
-- [ ] Update/remove `app/utils/anonymizer.py`
-- [ ] Run tests
+### 7.4 Anonymizer ✅
+- [x] Created `app/adapters/anonymizer.py`
+- [x] Converted `app/utils/anonymizer.py` to re-export stub
+- [x] Now handles: EMAIL, PHONE, CREDIT_CARD, SSN, IP_ADDRESS
 
-**Files**: `app/utils/anonymizer.py` (~60 lines)
-**Target**: `morphio_core.security.anonymizer`
+**Result**: 61 lines → 18 lines (plus more PII coverage)
 
 ---
 

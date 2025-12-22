@@ -1,32 +1,27 @@
-import ipaddress
-import logging
-import re
-import socket
+"""
+URL validation for web scraping - re-exports from morphio-core adapter.
 
-logger = logging.getLogger(__name__)
+This module provides SSRF protection by checking if URLs resolve to
+private/local/reserved IPs. Uses morphio-core's URLValidator which
+resolves ALL DNS records and checks each IP.
+"""
+
+from ...adapters.url_validation import is_url_safe
 
 
 def is_private_or_local_address(url: str) -> bool:
     """
     Check if URL resolves to a private/local/reserved IP.
 
-    :param url: The URL to check
-    :return: True if the URL resolves to a private, local, or reserved IP address; False otherwise
+    Uses morphio-core's URLValidator which resolves ALL DNS A/AAAA records
+    and checks each IP against private, loopback, link-local, reserved,
+    and multicast ranges.
+
+    Args:
+        url: The URL to check
+
+    Returns:
+        True if the URL resolves to a private/local/reserved IP, False if safe
     """
-    try:
-        pattern = r"^(?:http[s]?://)?([^:/]+)"
-        match = re.match(pattern, url.lower())
-        if not match:
-            return True
-        hostname = match.group(1)
-        ip = socket.gethostbyname(hostname)
-        ip_addr = ipaddress.ip_address(ip)
-        return (
-            ip_addr.is_loopback
-            or ip_addr.is_private
-            or ip_addr.is_link_local
-            or ip_addr.is_reserved
-            or ip_addr.is_multicast
-        )
-    except Exception:
-        return True
+    # is_url_safe returns True if safe, we want True if blocked
+    return not is_url_safe(url)
