@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "mcp__RepoPrompt__get_file_tree"
+      "mcp__RepoPrompt__get_file_tree",
+      "Bash(make help:*)",
+      "Bash(make:*)"
     ]
   }
 }
