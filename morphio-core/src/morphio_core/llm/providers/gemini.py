@@ -1,12 +1,20 @@
 """Google Gemini provider implementation."""
 
+import logging
 from collections.abc import AsyncIterator
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import SecretStr
 
 from ...exceptions import LLMProviderError
 from ..types import GenerationResult, Message, StreamDelta, StreamDone, StreamEvent, Usage
+
+logger = logging.getLogger(__name__)
+
+# Valid thinking levels for Gemini models
+ThinkingLevel = Literal["high", "medium", "low", "minimal"]
+VALID_THINKING_LEVELS = {"high", "medium", "low", "minimal"}
+PRO_THINKING_LEVELS = {"high", "low"}  # Pro models only support these
 
 
 class GeminiProvider:
@@ -81,6 +89,59 @@ class GeminiProvider:
         system_instruction = "\n\n".join(system_parts) if system_parts else None
         return contents, system_instruction
 
+    def _build_config(
+        self,
+        *,
+        temperature: float,
+        max_tokens: int,
+        system_instruction: str | None,
+        thinking_level: str | None,
+        model: str,
+    ) -> Any:
+        """Build Gemini config with optional thinking level.
+
+        Args:
+            temperature: Generation temperature
+            max_tokens: Maximum output tokens
+            system_instruction: System prompt
+            thinking_level: Thinking level ("high", "medium", "low", "minimal")
+            model: Model name for validation
+
+        Returns:
+            GenerateContentConfig
+        """
+        from google.genai import types  # type: ignore[import-not-found]
+
+        config_params: dict[str, Any] = {
+            "temperature": temperature,
+            "max_output_tokens": max_tokens,
+        }
+
+        if system_instruction:
+            config_params["system_instruction"] = system_instruction
+
+        if thinking_level:
+            level = thinking_level.lower()
+            if level not in VALID_THINKING_LEVELS:
+                logger.warning(
+                    f"Invalid thinking_level '{thinking_level}', ignoring. "
+                    f"Valid values: {VALID_THINKING_LEVELS}"
+                )
+            else:
+                # Check Pro model restrictions
+                if "pro" in model.lower() and level not in PRO_THINKING_LEVELS:
+                    logger.warning(
+                        f"Gemini Pro models only support {PRO_THINKING_LEVELS}, "
+                        f"got '{level}'. Defaulting to 'high'."
+                    )
+                    level = "high"
+
+                config_params["thinking_config"] = types.ThinkingConfig(
+                    thinking_level=level.upper()
+                )
+
+        return types.GenerateContentConfig(**config_params)
+
     async def generate(
         self,
         messages: list[Message],
@@ -88,10 +149,22 @@ class GeminiProvider:
         model: str | None = None,
         max_tokens: int | None = None,
         temperature: float | None = None,
+        thinking_level: str | None = None,
+        **kwargs: Any,  # Accept and ignore unknown kwargs
     ) -> GenerationResult:
-        """Generate a completion from messages."""
-        from google.genai import types  # type: ignore[import-not-found]
+        """Generate a completion from messages.
 
+        Args:
+            messages: Conversation messages
+            model: Model override (uses provider default if None)
+            max_tokens: Max tokens override
+            temperature: Temperature override
+            thinking_level: Thinking level for Gemini models ("high", "medium", "low", "minimal")
+            **kwargs: Ignored (for provider compatibility)
+
+        Returns:
+            GenerationResult with content and usage info
+        """
         client = self._ensure_client()
 
         model = model or self._default_model
@@ -101,16 +174,13 @@ class GeminiProvider:
         contents, system_instruction = self._convert_messages(messages)
 
         try:
-            config = types.GenerateContentConfig(
+            config = self._build_config(
                 temperature=temperature,
-                max_output_tokens=max_tokens,
+                max_tokens=max_tokens,
+                system_instruction=system_instruction,
+                thinking_level=thinking_level,
+                model=model,
             )
-            if system_instruction:
-                config = types.GenerateContentConfig(
-                    system_instruction=system_instruction,
-                    temperature=temperature,
-                    max_output_tokens=max_tokens,
-                )
 
             response = await client.aio.models.generate_content(
                 model=model,
@@ -145,10 +215,22 @@ class GeminiProvider:
         model: str | None = None,
         max_tokens: int | None = None,
         temperature: float | None = None,
+        thinking_level: str | None = None,
+        **kwargs: Any,  # Accept and ignore unknown kwargs
     ) -> AsyncIterator[StreamEvent]:
-        """Stream a completion from messages."""
-        from google.genai import types  # type: ignore[import-not-found]
+        """Stream a completion from messages.
 
+        Args:
+            messages: Conversation messages
+            model: Model override (uses provider default if None)
+            max_tokens: Max tokens override
+            temperature: Temperature override
+            thinking_level: Thinking level for Gemini models ("high", "medium", "low", "minimal")
+            **kwargs: Ignored (for provider compatibility)
+
+        Yields:
+            StreamDelta for content chunks, StreamDone at end
+        """
         client = self._ensure_client()
 
         model = model or self._default_model
@@ -158,16 +240,13 @@ class GeminiProvider:
         contents, system_instruction = self._convert_messages(messages)
 
         try:
-            config = types.GenerateContentConfig(
+            config = self._build_config(
                 temperature=temperature,
-                max_output_tokens=max_tokens,
+                max_tokens=max_tokens,
+                system_instruction=system_instruction,
+                thinking_level=thinking_level,
+                model=model,
             )
-            if system_instruction:
-                config = types.GenerateContentConfig(
-                    system_instruction=system_instruction,
-                    temperature=temperature,
-                    max_output_tokens=max_tokens,
-                )
 
             stream = await client.aio.models.generate_content_stream(
                 model=model,

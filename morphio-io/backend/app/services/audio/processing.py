@@ -29,7 +29,7 @@ from ...utils.enums import JobStatus, UsageType
 from ...utils.error_handlers import ApplicationException
 from ...utils.file_utils import compute_file_hash, compute_hash
 from ...utils.job_utils import enqueue_task
-from ...utils.youtube_utils import download_video_via_ytdlp
+from ...adapters.video import download_video_via_ytdlp
 from ..generation import generate_content_from_transcript, save_generated_content
 from ..job import get_job_status, update_job_status
 from ..template import load_template

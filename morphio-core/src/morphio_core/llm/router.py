@@ -1,7 +1,7 @@
 """LLM router for multi-provider support."""
 
 from collections.abc import AsyncIterator
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import SecretStr
 
@@ -114,6 +114,7 @@ class LLMRouter:
         model: str | None = None,
         max_tokens: int | None = None,
         temperature: float | None = None,
+        **provider_kwargs: Any,
     ) -> GenerationResult:
         """Generate a completion from messages.
 
@@ -123,6 +124,10 @@ class LLMRouter:
             model: Model override
             max_tokens: Max tokens override
             temperature: Temperature override
+            **provider_kwargs: Provider-specific arguments passed through to provider.
+                Examples:
+                - thinking_level: For Gemini models ("high", "medium", "low", "minimal")
+                - reasoning_effort: For OpenAI o1/o3 models ("low", "medium", "high")
 
         Returns:
             GenerationResult with content and usage info
@@ -133,6 +138,7 @@ class LLMRouter:
             model=model,
             max_tokens=max_tokens,
             temperature=temperature,
+            **provider_kwargs,
         )
 
     async def stream(
@@ -143,6 +149,7 @@ class LLMRouter:
         model: str | None = None,
         max_tokens: int | None = None,
         temperature: float | None = None,
+        **provider_kwargs: Any,
     ) -> AsyncIterator[StreamEvent]:
         """Stream a completion from messages.
 
@@ -152,6 +159,10 @@ class LLMRouter:
             model: Model override
             max_tokens: Max tokens override
             temperature: Temperature override
+            **provider_kwargs: Provider-specific arguments passed through to provider.
+                Examples:
+                - thinking_level: For Gemini models ("high", "medium", "low", "minimal")
+                - reasoning_effort: For OpenAI o1/o3 models ("low", "medium", "high")
 
         Yields:
             StreamDelta for content chunks, StreamDone at end
@@ -162,6 +173,7 @@ class LLMRouter:
             model=model,
             max_tokens=max_tokens,
             temperature=temperature,
+            **provider_kwargs,
         ):
             yield event
 

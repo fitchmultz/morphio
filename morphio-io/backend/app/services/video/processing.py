@@ -35,7 +35,7 @@ from ...utils.error_handlers import ApplicationException
 from ...utils.file_utils import compute_file_hash, compute_hash, delete_file
 from ...utils.job_utils import enqueue_task
 from ...utils.transcription_utils import clean_transcription
-from ...utils.youtube_utils import (
+from ...adapters.video import (
     download_video_via_ytdlp,
     get_yt_video_id,
     is_supported_video_url,
