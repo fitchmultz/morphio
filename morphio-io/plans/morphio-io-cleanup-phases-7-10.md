@@ -1,4 +1,4 @@
-# Morphio-IO Cleanup: Phases 7-9
+# Morphio-IO Cleanup: Phases 7-10
 
 > Continuation of [extract-morphio-core-library.md](./extract-morphio-core-library.md)
 >
@@ -121,6 +121,40 @@ Major refactor of generation services.
 
 ---
 
+## Phase 10: Monorepo Cleanup
+
+Organize morphio-all as a proper monorepo now that morphio-io and morphio-core are unified.
+
+### 10.1 Root Makefile
+- [ ] Create root `Makefile` with unified commands:
+  - `make dev` - Start morphio-io dev environment
+  - `make test` - Run all tests (morphio-core + morphio-io)
+  - `make lint` - Lint everything
+  - `make check` - Full CI check
+- [ ] Delegate to child Makefiles/commands
+
+### 10.2 Update Root README
+- [ ] Rewrite `README.md` to describe monorepo structure
+- [ ] Document relationship between morphio-core and morphio-io
+- [ ] Add quick start for both projects
+- [ ] Remove outdated standalone app description
+
+### 10.3 Verify Docker Configuration
+- [ ] Check `morphio-io/docker-compose.yml` paths work from new location
+- [ ] Update any hardcoded paths if needed
+- [ ] Test `docker-compose up` works
+
+### 10.4 Clean Up Artifacts
+- [ ] Remove any orphaned config files
+- [ ] Ensure `.gitignore` covers all needed patterns
+- [ ] Clean up any broken symlinks or references
+
+### 10.5 Workspace Configuration (Optional)
+- [ ] Consider uv workspace for shared dependencies
+- [ ] Or keep projects independent (current approach)
+
+---
+
 ## Estimated Effort
 
 | Phase | Effort | Lines Removed |
@@ -128,4 +162,5 @@ Major refactor of generation services.
 | 7 | 4-6 hrs | ~250 |
 | 8 | 8-12 hrs | ~500 |
 | 9 | 8-12 hrs | ~350 |
-| **Total** | **20-30 hrs** | **~1,100** |
+| 10 | 2-4 hrs | N/A (organization) |
+| **Total** | **22-34 hrs** | **~1,100** |
