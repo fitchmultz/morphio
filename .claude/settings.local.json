@@ -3,7 +3,9 @@
     "allow": [
       "mcp__RepoPrompt__get_file_tree",
       "Bash(make help:*)",
-      "Bash(make:*)"
+      "Bash(make:*)",
+      "mcp__RepoPrompt__file_search",
+      "mcp__RepoPrompt__read_file"
     ]
   }
 }
