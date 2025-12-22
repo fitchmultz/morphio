@@ -1,0 +1,148 @@
+name: CI / CD – Backend + Frontend + Images
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*.*.*' ]
+  pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_OWNER: ${{ github.repository_owner }}
+
+jobs:
+  backend-checks:
+    name: Backend • Ruff + ty + Lock drift
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh -s -- -y
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Sync (frozen) with dev deps
+        working-directory: backend
+        run: |
+          uv venv .venv
+          UV_PROJECT_ENVIRONMENT=.venv uv sync --dev --frozen
+
+      - name: Ruff (lint)
+        working-directory: backend
+        run: uv run ruff check .
+
+      - name: Ruff (format check)
+        working-directory: backend
+        run: uv run ruff format --check .
+
+      - name: ty (type check)
+        working-directory: backend
+        run: uv run ty check
+
+  frontend-checks:
+    name: Frontend • Biome + TypeScript
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Enable Corepack and pin pnpm
+        working-directory: frontend
+        run: |
+          corepack enable
+          corepack prepare pnpm@9.0.0 --activate
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Biome (lint + format check)
+        working-directory: frontend
+        run: pnpm biome ci .
+
+      - name: TypeScript
+        working-directory: frontend
+        run: pnpm type-check
+
+  docker-build-push:
+    name: Docker • Build and (conditionally) Push
+    needs: [ backend-checks, frontend-checks ]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: api
+            dockerfile: backend/Dockerfile.api
+            image: ghcr.io/${{ github.repository_owner }}/morphio-io-backend-api
+            context: .
+          - name: worker-ml
+            dockerfile: backend/Dockerfile.worker-ml
+            image: ghcr.io/${{ github.repository_owner }}/morphio-io-worker-ml
+            context: .
+          - name: crawler
+            dockerfile: backend/Dockerfile.crawler
+            image: ghcr.io/${{ github.repository_owner }}/morphio-io-crawler
+            context: .
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ matrix.image }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=tag
+            type=sha,format=short
+          labels: |
+            org.opencontainers.image.source=${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          provenance: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+

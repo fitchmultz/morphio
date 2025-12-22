@@ -1,0 +1,4 @@
+{
+  "name": "Email Newsletter",
+  "template_content": "Below is textual content. Convert it into a well-structured email newsletter. Ensure that the tone is friendly but informative and professional. Use short, engaging paragraphs and proper formatting to grab attention. Include a relevant subject line suggestion at the top of the transformation. Also, introduce a call-to-action (CTA) near the end if the content offers a product, idea, or event.\n\nTranscript:\n{transcript}\n\nPlease format the output in valid Markdown format, including the suggested subject line at the top."
+}

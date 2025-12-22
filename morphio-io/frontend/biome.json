@@ -1,0 +1,39 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.3.10/schema.json",
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git",
+		"useIgnoreFile": true
+	},
+	"files": {
+		"includes": [
+			"src/**/*.ts",
+			"src/**/*.tsx",
+			"src/**/*.js",
+			"src/**/*.jsx",
+			"*.json",
+			"!.next",
+			"!node_modules",
+			"!coverage",
+			"!dist",
+			"!next.config.mjs",
+			"!tailwind.config.ts",
+			"!postcss.config.mjs",
+			"!jest.config.mjs",
+			"!jest.config.simple.mjs",
+			"!src/__mocks__",
+			"!next-env.d.ts",
+			"!eslint.config.js",
+			"!src/client/**/*.gen.ts"
+		]
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"style": {
+				"noDefaultExport": "off"
+			}
+		}
+	}
+}

@@ -1,0 +1,61 @@
+name: Docker Build and Publish Backend to GHCR
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - dev2
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4.2.2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3.3.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PAT }}
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3.3.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GHCR_PAT }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3.6.0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.10.0
+
+      - name: Build and push backend Docker image to GHCR
+        uses: docker/build-push-action@v6.15.0
+        with:
+          context: .
+          file: ./backend/Dockerfile
+          push: true
+          # platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
+          tags: ghcr.io/${{ github.repository_owner }}/morphio-io-backend:${{ github.ref == 'refs/heads/main' && 'latest' || github.ref_name }}
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/morphio-io-backend:cache
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/morphio-io-backend:cache,mode=max
+
+      - name: Trigger Portainer Stack Update
+        run: |
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL }}
+          elif [ "${{ github.ref_name }}" = "dev" ]; then
+            curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL_DEV }}
+          elif [ "${{ github.ref_name }}" = "dev2" ]; then
+            curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL_DEV2 }}
+          fi

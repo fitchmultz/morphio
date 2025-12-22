@@ -1,0 +1,4 @@
+{
+  "name": "Press Release",
+  "template_content": "Below is content from an event announcement. Convert it into a formal press release. Start with a strong headline and opening paragraph summarizing the main highlight(s) of the event or news. Follow proper press release structure: headline, sub-headline (optional), lead (intros), body with supporting details, and end with contact info or availability of further info.\n\nBe concise and factual while establishing credibility and avoiding excessive informality.\n\nTranscript:\n{transcript}\n\nPlease format the output in valid Markdown format."
+}

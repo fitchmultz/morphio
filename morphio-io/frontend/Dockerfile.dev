@@ -1,0 +1,22 @@
+FROM node:22-alpine
+
+WORKDIR /app
+
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+# Copy dependency files
+COPY frontend/package.json frontend/pnpm-lock.yaml ./
+
+# Install with pnpm store cache
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
+    pnpm install --frozen-lockfile
+
+# Copy source
+COPY frontend/ ./
+
+EXPOSE 3005 9229
+
+ENV WATCHPACK_POLLING=true \
+    CHOKIDAR_USEPOLLING=true
+
+CMD ["pnpm", "dev"]

@@ -1,0 +1,34 @@
+[sources.docker]
+  type = "docker_logs"
+  docker_host = "unix:///var/run/docker.sock"
+  # Only collect our stack containers
+  include_containers = ["morphio-io-backend", "morphio-io-frontend", "morphio-io-worker-ml", "morphio-io-crawler"]
+
+[transforms.parse]
+  type = "remap"
+  inputs = ["docker"]
+  source = '''
+  .container = .container_name
+  # Docker json-file driver wraps stdout as a line in .message or .log; extract JSON if present
+  msg = .message ?? .log
+  if is_string(msg) {
+    parsed, err = parse_json(msg)
+    if err == null { . = merge(., parsed) } else { .message = msg }
+  }
+  del(.log)
+  del(.message)
+  '''
+
+[sinks.opensearch]
+  type = "elasticsearch"
+  inputs = ["parse"]
+  endpoint = "${OPENSEARCH_ENDPOINT}"
+  mode = "bulk"
+  auth.strategy = "basic"
+  auth.user = "${OPENSEARCH_USER}"
+  auth.password = "${OPENSEARCH_PASSWORD}"
+  bulk.action = "index"
+  index = "morphio-%Y-%m-%d"
+  request.retry_max_attempts = 5
+  request.rate_limit_duration_secs = 1
+

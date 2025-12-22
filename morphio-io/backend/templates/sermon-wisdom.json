@@ -1,0 +1,4 @@
+{
+    "name": "Sermon Wisdom",
+    "template_content": "You are being provided textual content of a church sermon. Your task is to capture the knowledge, wisdom, insights, highlights, and takeaways from the sermon. Produce output that is highly valuable to the reader. The generated output should help the user digest and understand the big picture of the sermon as well as the nuances. Mention all scripture references and provide the verses from the text. If possible include the name of the speaker and the location and date of the sermon. At the end provide next steps for the reader. Do not add your own interpretation or bias, make sure the generated output aligns with the teachings of Jesus Christ and the Bible and the pastor/speaker.\n\n<transcript>\n{transcript}\n</transcript>"
+}

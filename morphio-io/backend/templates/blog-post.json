@@ -1,0 +1,4 @@
+{
+  "name": "Blog Post",
+  "template_content": "Below is some textual content. Convert it into a blog post using descriptive and engaging language. Mimic the language in the content.\nStructure the output with a strong introduction, body sectioning, and a thoughtful conclusion.\n\nTranscript:\n{transcript}\n\nPlease format the output in valid Markdown format."
+}

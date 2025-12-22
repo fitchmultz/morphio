@@ -1,0 +1,129 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.api
+    container_name: morphio-io-backend
+    environment:
+      - APP_ENV=production
+    ports:
+      - '8000:8000'
+    depends_on:
+      redis:
+        condition: service_healthy
+      worker-ml:
+        condition: service_healthy
+      crawler:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    secrets:
+      - SECRET_KEY
+      - JWT_SECRET_KEY
+      - OPENAI_API_KEY
+      - ANTHROPIC_API_KEY
+      - STRIPE_SECRET_KEY
+      - STRIPE_WEBHOOK_SECRET
+      - DATABASE_URL
+      - REDIS_URL
+
+  worker-ml:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.worker-ml
+    container_name: morphio-io-worker-ml
+    environment:
+      - WHISPER_MODEL=small
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8001/health/"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  crawler:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.crawler
+    container_name: morphio-io-crawler
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8002/health/"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    image: ghcr.io/${IMAGE_OWNER:-your-org}/morphio-io-frontend:latest
+    container_name: morphio-io-frontend
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL:-http://backend:8000}
+    ports:
+      - '3500:3000'
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:alpine
+    container_name: morphio-io-redis
+    command: ["sh", "-lc", "redis-server --appendonly yes --requirepass \"$$(cat /run/secrets/redis_password)\""]
+    ports:
+      - '6379:6379'
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "$(cat /run/secrets/redis_password)", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    secrets:
+      - redis_password
+
+  vector:
+    image: timberio/vector:0.40.0-debian
+    container_name: morphio-io-vector
+    environment:
+      - OPENSEARCH_ENDPOINT=${OPENSEARCH_ENDPOINT}
+      - OPENSEARCH_USER=${OPENSEARCH_USER}
+      - OPENSEARCH_PASSWORD=${OPENSEARCH_PASSWORD}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./vector/vector.toml:/etc/vector/vector.toml:ro
+    depends_on:
+      backend:
+        condition: service_started
+      frontend:
+        condition: service_started
+      worker-ml:
+        condition: service_started
+      crawler:
+        condition: service_started
+    restart: unless-stopped
+
+secrets:
+  SECRET_KEY:
+    file: ./secrets/SECRET_KEY
+  JWT_SECRET_KEY:
+    file: ./secrets/JWT_SECRET_KEY
+  OPENAI_API_KEY:
+    file: ./secrets/OPENAI_API_KEY
+  ANTHROPIC_API_KEY:
+    file: ./secrets/ANTHROPIC_API_KEY
+  STRIPE_SECRET_KEY:
+    file: ./secrets/STRIPE_SECRET_KEY
+  STRIPE_WEBHOOK_SECRET:
+    file: ./secrets/STRIPE_WEBHOOK_SECRET
+  DATABASE_URL:
+    file: ./secrets/DATABASE_URL
+  REDIS_URL:
+    file: ./secrets/REDIS_URL
+  redis_password:
+    file: ./secrets/REDIS_PASSWORD

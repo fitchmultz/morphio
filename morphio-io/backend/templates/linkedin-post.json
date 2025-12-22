@@ -1,0 +1,4 @@
+{
+  "name": "LinkedIn Post",
+  "template_content": "Below is some textual content. Convert it into a LinkedIn post intending to engage a professional network. Summarize key insights, ensure the output is concise and carries a conversational but professional tone. Split main thoughts into short paragraphs and include 1-2 relevant hashtags at the end.\n\nMake sure this piece encourages interaction (engagement with questions, opinions, etc.), especially on industry knowledge sharing or thought leadership tone.\n\nTranscript:\n{transcript}\n\nPlease format the output in valid Markdown format."
+}

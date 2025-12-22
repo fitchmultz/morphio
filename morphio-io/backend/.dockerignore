@@ -1,0 +1,151 @@
+# Docker specific (keep these first for better performance)
+.docker/
+docker-compose*.yml
+docker-compose.override.yml
+Dockerfile*
+.dockerignore
+
+# Version control
+.git/
+.gitignore
+.gitattributes
+.github/
+.gitlab-ci.yml
+
+# Dependencies
+**/node_modules/
+**/.npm/
+**/.yarn/
+**/.pnpm/
+**/venv/
+**/.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+pnpm-debug.log*
+
+# Build and output
+**/.next/
+**/dist/
+**/build/
+**/out/
+**/__pycache__/
+**/*.py[cod]
+**/*.so
+**/.nuxt/
+**/.output/
+**/.cache/
+**/*.tgz
+
+# Environment and configs
+**/.env*
+!.env.example
+**/docker.env
+**/*.env
+**/.aws/
+**/.ssh/
+
+# IDE and editor
+**/.idea/
+**/.vscode/
+**/.vs/
+**/*.swp
+**/*.swo
+**/*.swn
+**/*.bak
+**/*.tmp
+**/*.temp
+
+# Logs and debugging
+**/*.log
+**/logs/
+**/.debug/
+**/debug/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing and coverage
+**/.pytest_cache/
+**/.coverage
+**/coverage/
+**/htmlcov/
+**/.nyc_output/
+**/test-results/
+**/.cypress/
+**/cypress/videos/
+**/cypress/screenshots/
+
+# Media and large files
+**/*.mp3
+**/*.wav
+**/*.mp4
+**/*.webm
+**/*.ogg
+**/*.flac
+**/*.mkv
+**/*.jpg
+**/*.jpeg
+**/*.png
+**/*.gif
+**/*.svg
+**/*.avi
+**/*.mov
+**/*.webp
+**/*.ico
+
+# Database files
+**/*.db
+**/*.sqlite
+**/*.sqlite3
+**/*.sqlite-journal
+
+# ML Models and data
+**/mlx_models/
+**/*.npz
+**/*.h5
+**/*.pkl
+**/*.model
+**/saved_models/
+**/checkpoints/
+
+# Documentation
+**/*.md
+**/docs/
+**/docs-backend/
+**/documentation/
+!README.md
+!LICENSE.md
+
+# Project specific
+**/sys_prompts/
+**/test_videos/
+**/backend/src/uploads/
+**/instance/
+**/output_files/
+**/scripts/generate_context/*_context.txt
+**/*_context.txt
+**/zignore/
+
+# Jupyter
+**/.ipynb_checkpoints/
+**/*.ipynb
+
+# OS generated
+**/.DS_Store
+**/Thumbs.db
+**/*.directory
+**/desktop.ini
+
+# Temp and cache
+**/.tmp/
+**/.temp/
+**/.cache/
+**/*.bak
+**/*.swp
+**/*.swo

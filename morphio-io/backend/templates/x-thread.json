@@ -1,0 +1,4 @@
+{
+    "name": "X Thread",
+    "template_content": "Below is some textual content. Summarize it into a Twitter (X) thread format, breaking key points into several tweets. Keep the tone conversational, but crafted to engage and surprise the audience. Use hooks like \"Here's what you need to know:\" to grab attention and invite followers to the thread. Make sure to add a couple hashtags at the end of the thread for reach.\n\nEach tweet should be succinct and contribute to a cohesive story or argument.\n\nTranscript:\n{transcript}\n\nPlease format the output in valid Markdown format. Each line break represents a new tweet in the thread."
+}

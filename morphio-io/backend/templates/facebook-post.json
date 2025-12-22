@@ -1,0 +1,4 @@
+{
+  "name": "Facebook Post",
+  "template_content": "Below is some textual content. Convert it into a Facebook post intended for personal or wide-audience engagement. Summarize key points in a tone that is casual, friendly, and approachable. Keep sentences relatively short. Include an emoji or two to make the post feel more lighthearted.\n\nConsider encouraging feedback or comments from friends or followers, relevant to the subject matter. If applicable, suggest including a call to action.\n\nTranscript:\n{transcript}\n\nPlease format the output in valid Markdown format."
+}

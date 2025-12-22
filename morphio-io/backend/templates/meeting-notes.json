@@ -1,0 +1,4 @@
+{
+  "name": "Meeting Notes",
+  "template_content": "Below is some textual content. Summarize it into concise meeting notes. Use bullet points to break down key points across the topics discussed. Highlight main takeaways, decisions, and follow-up action items.\n\nBe sure to keep the tone professional and straightforward.\n\nTranscript:\n{transcript}\n\nPlease format the output in valid Markdown format using bullet points and sub-headings where appropriate."
+}

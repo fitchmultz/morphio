@@ -1,0 +1,29 @@
+# Python-related
+__pycache__/
+*.py[cod]
+
+# Environment and configuration
+stack.env
+.env
+.venv
+env/
+venv/
+
+# Data and databases
+output_files/
+*.db
+*.sqlite*
+
+# IDE and editor files
+.vscode/
+.idea/
+*.bak
+*.swp
+*.tmp
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

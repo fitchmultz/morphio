@@ -1,0 +1,4 @@
+{
+    "name": "Top Tips",
+    "template_content": "Below is textual content. Summarize the key points into a top-tips guide format with short, actionable points. Organize them into a list like \"Top X Tips\" or \"The Best Ways To Do X\". Keep the tone energetic and engaging, like the narrator is speaking directly to the reader.\n\nEnsure that each point is concise and follows a clear structure: Tip #, explanation, optional caveat or note.\n\nTranscript:\n{transcript}\n\nPlease format the output in valid Markdown list format."
+}

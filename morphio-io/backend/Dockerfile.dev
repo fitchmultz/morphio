@@ -1,0 +1,36 @@
+FROM python:3.13-slim
+
+WORKDIR /app
+
+# Install uv from official image
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
+# UV optimization flags
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy
+
+# Install system dependencies with cache
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends \
+    curl ffmpeg
+
+# Copy dependency files
+COPY backend/pyproject.toml backend/uv.lock ./
+
+# Install dependencies with cache mount (sharing=locked for exclusive access)
+RUN --mount=type=cache,target=/root/.cache/uv,sharing=locked \
+    uv sync --frozen --no-install-project
+
+# Copy source
+COPY backend/ ./
+
+# Copy dev entrypoint
+COPY backend/docker-entrypoint.dev.sh /docker-entrypoint.dev.sh
+RUN chmod +x /docker-entrypoint.dev.sh
+
+EXPOSE 8005 5678
+
+ENV WATCHFILES_FORCE_POLLING=true
+
+CMD ["/docker-entrypoint.dev.sh"]

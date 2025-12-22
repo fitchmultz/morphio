@@ -1,0 +1,4 @@
+{
+  "name": "Product Description",
+  "template_content": "Below is textual content. Convert it into an attractive and to-the-point product description that highlights the key features and benefits. Use concise language to summarize the product or service, touching on its selling points like benefits, use cases, and any specifics that highlight the unique value.\n\nMaintain a tone of authority and excitement.\n\nTranscript:\n{transcript}\n\nPlease format the output in valid Markdown format."
+}

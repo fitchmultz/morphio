@@ -1,0 +1,5 @@
+{
+  "name": "Formatted Markdown",
+  "template_content": "Your task is to take the provided transcription and format it into clean, well-structured markdown. The output should be properly formatted markdown that is easy to read and well-organized.\n\nGuidelines:\n- Use appropriate markdown headings (##, ###) to structure the content logically\n- Break long paragraphs into readable sections\n- Use bullet points or numbered lists where appropriate\n- Add emphasis (bold or italic) to highlight key concepts or important information\n- Ensure proper spacing between sections\n- Convert any code snippets or technical terms into proper markdown code blocks or inline code if needed\n- Create a clear hierarchy with main topics as larger headings and subtopics as smaller headings\n- If the transcript appears to have natural sections or topics, organize them accordingly\n\nFocus on creating professional, readable markdown that maintains the original content while making it more structured and visually organized.\n\nTranscript:\n{transcript}\n\nPlease format the output as valid, well-structured markdown."
+}
+

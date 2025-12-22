@@ -1,0 +1,58 @@
+# Project: Morphio - AI-Powered Content Generation Platform
+# ===============================
+
+## TECHNICAL GUIDELINES
+ALWAYS USE pnpm for frontend
+After making frontend changes run `pnpm tlc` from the frontend directory to check for lint and type issues
+PRODUCTION DOMAIN: https://morphio.io (frontend) https://api.morphio.io (backend)
+Production sits behind nginx. See nginx-frontend.conf and nginx-backend.conf in project root.
+Use global styling in the frontend. Tailwindcss v4+. globals.css is in frontend/src/app/globals.css
+
+## PROJECT STRUCTURE
+- Frontend: React/Next.js 15+ application with TypeScript and React 19
+  - State management: Zustand
+  - Data fetching: React Query
+  - Located in `frontend/` directory
+- Backend: FastAPI Python service accessible at api.morphio.io
+  - Python 3.11+
+  - Database: SQLAlchemy ORM with likely PostgreSQL (SQLite in development)
+  - Caching/Queue: Redis
+  - Located in `backend/` directory
+  - API structure follows RESTful principles with route organization in `app/routes/`
+- Configuration: Nginx for both frontend and backend routing
+- DevOps: Docker containerization with docker-compose orchestration
+
+## PROJECT CONTEXT
+Morphio is a full-stack web application designed for creating, managing, and processing content with AI integration. Key features include:
+
+1. User authentication and profile management
+2. Content creation and management with template system
+3. Media processing (audio, video, web) for AI-driven content generation
+4. Comment system with hierarchical structure
+5. Admin panel for usage stats and subscription management
+6. Log analysis with pattern recognition
+7. Data anonymization for sensitive information
+
+The application uses a modern tech stack with NextJS frontend and FastAPI backend, leveraging AI capabilities for content processing and generation. The infrastructure is containerized with Docker and uses Redis for caching and job queuing.
+
+## DEVELOPMENT WORKFLOW
+1. Use pnpm for package management in the frontend
+2. Run type and lint checks with `pnpm tlc` before committing changes
+3. Follow Tailwind CSS styling practices
+4. Be aware of Nginx configuration when making deployment-related changes
+5. Backend development workflow:
+   - FastAPI routes organized in `app/routes/`
+   - SQLAlchemy models in `app/models/`
+   - Business logic in `app/services/`
+   - Utilities and helpers in `app/utils/`
+   - Tests with pytest in `tests/` directory
+6. Containerization with Docker for both frontend and backend
+7. ENV files for configuration (.env.local for frontend, .env for backend)
+
+## POTENTIAL USE CASES
+- Educational platform for processing lectures and generating study materials
+- Marketing automation for content creation across platforms
+- Journalism aid for transcription and article generation
+- E-commerce content generation for product descriptions
+- Personal knowledge management from media sources
+- Corporate training and documentation generation

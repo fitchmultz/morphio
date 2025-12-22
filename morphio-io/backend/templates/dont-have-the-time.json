@@ -1,0 +1,4 @@
+{
+  "name": "Don't Have the Time",
+  "template_content": "You're being given text that I simply don't have the time to process myself. The text may be a video transcript, scraped webpage, or any other form of textual content. Your task is to EXTRACT EVERYTHING of VALUE from the text, so that I can learn as much as, if not more, if I had consumed the content and taken detailed notes myself. Use quotes and be specific when referencing the text. Pay close attention to detail and nuance. At the end, provide insight on whether the content is worth my time to watch/read or if I should just read your summary. Thank you in advance.\n\n{transcript}\n"
+}

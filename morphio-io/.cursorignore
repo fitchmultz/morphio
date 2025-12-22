@@ -1,0 +1,25 @@
+# Ignore common media files
+*.{avi,flv,m4a,m4v,mkv,mov,mp3,mp4,mpeg,mpg,mxf,ogm,ogg,ogv,wav,webm,wmv}
+
+# Ignore database files
+*.{db,db3,sqlite,sqlite3}
+
+# Ignore Python bytecode and cache
+__pycache__/
+
+# Ignore system and temporary files
+*.{DS_Store,swn,swo,swp,tmp}
+
+# Ignore development directories and files
+.next/
+.venv/
+node_modules/
+output_files/
+test_videos/
+uploads/
+
+# Include files that should be indexed
+code_summary.txt
+log_files/
+
+!**/.env**

@@ -1,0 +1,69 @@
+# Dependencies
+**/node_modules/
+**/__pycache__/
+**/.pytest_cache/
+**/.venv/
+**/venv/
+**/log_files/
+**/.dev
+
+# Build outputs
+**/.next/
+**/build/
+**/dist/
+**/*.pyc
+
+# Environment & Secrets
+**/.env*
+!.env.example
+**/*.env
+!stack.env
+
+# Database files
+**/*.db
+**/*.sqlite
+**/*.sqlite3
+
+# Media & Large files
+**/*.mp3
+**/*.mp4
+**/*.wav
+**/*.webm
+**/*.ogg
+**/*.flac
+**/*.mkv
+**/*.avi
+**/*.mov
+**/*.m4a
+
+# Project-specific directories
+**/backend/tests/performance/benchmark_results/
+**/backend/src/uploads/
+**/output_files/
+**/upload_files/
+**/sys_prompts/
+**/test_videos/
+**/mlx_models/
+**/instance/
+**/zignore/
+
+# Context & summary files
+**/scripts/generate_context/*_context.txt
+**/*_context.txt
+**/tree.txt
+**/code_summary.txt
+
+# IDE & System files
+**/.idea/
+**/*.swp
+**/*.swo
+**/.DS_Store
+**/Thumbs.db
+
+# Temp files
+**/*.log
+!**/log_files/**/**/*.log
+**/*.tmp
+**/.temp/
+**/.tmp/
+.repoprompt/filepartitions*

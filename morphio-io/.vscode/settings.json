@@ -1,0 +1,67 @@
+{
+  // Python - Use project's .venv (uv creates it at backend/.venv)
+  "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/bin/python",
+
+  // Python - Let ty use project config
+  // pyproject.toml handles: analysis excludes, type checking mode, etc.
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.diagnosticMode": "workspace",
+
+  // Python Testing - Use project's pytest config
+  // pytest.ini_options in pyproject.toml handles: testpaths, pythonpath, etc.
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.cwd": "${workspaceFolder}/backend",
+
+  // Python Linting - Ruff uses pyproject.toml config
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+
+  // TypeScript - Use project's tsconfig.json (auto-detected from frontend/)
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.preferences.includePackageJsonAutoImports": "auto",
+
+  // Biome for TypeScript/JavaScript
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports.biome": "explicit"
+    }
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports.biome": "explicit"
+    }
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true
+  },
+  "[json]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true
+  },
+
+  // File associations
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+
+  // Tailwind CSS IntelliSense (reads from Tailwind config automatically)
+  "tailwindCSS.experimental.classRegex": [
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["cn\\(([^)]*)\\)", "(?:'|\"|`)([^\"'`]*)(?:'|\"|`)"]
+  ]
+}

@@ -1,0 +1,122 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile.dev
+    container_name: morphio-dev-frontend
+    ports:
+      - "3005:3005"
+      - "9229:9229"  # Node debugger
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - frontend_node_modules:/app/node_modules
+      - frontend_next:/app/.next
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_BASE_URL=http://localhost:8005
+      - WATCHPACK_POLLING=true
+    depends_on:
+      backend:
+        condition: service_healthy
+    develop:
+      watch:
+        - path: ./frontend/src
+          action: sync
+          target: /app/src
+        - path: ./frontend/public
+          action: sync
+          target: /app/public
+        - path: ./frontend/package.json
+          action: rebuild
+        - path: ./frontend/pnpm-lock.yaml
+          action: rebuild
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.dev
+    platform: linux/amd64  # Required: torchcodec lacks Linux ARM64 wheel
+    container_name: morphio-dev-backend
+    ports:
+      - "8005:8005"
+      - "5678:5678"  # Python debugger
+    volumes:
+      - ./backend/app:/app/app
+      - ./backend/db:/app/db
+      - backend_venv:/app/.venv
+    environment:
+      - APP_ENV=development
+      - APP_PORT=8005
+      - REDIS_URL=redis://redis:6379
+      - WORKER_ML_URL=http://worker-ml:8001
+      - CRAWLER_URL=http://crawler:8002
+      - WATCHFILES_FORCE_POLLING=true
+    env_file:
+      - path: .env
+        required: false
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8005/health/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    develop:
+      watch:
+        - path: ./backend/app
+          action: sync
+          target: /app/app
+        - path: ./backend/pyproject.toml
+          action: rebuild
+        - path: ./backend/uv.lock
+          action: rebuild
+
+  redis:
+    image: redis:alpine
+    container_name: morphio-dev-redis
+    command: redis-server
+    ports:
+      - "6384:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  worker-ml:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.worker-ml
+    platform: linux/amd64  # Required: torch/torchcodec lack Linux ARM64 wheels
+    container_name: morphio-dev-worker-ml
+    environment:
+      - WHISPER_MODEL=${WHISPER_MODEL:-small}
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8001/health/"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  crawler:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.crawler
+    platform: linux/amd64  # Required: torchcodec lacks Linux ARM64 wheel
+    container_name: morphio-dev-crawler
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8002/health/"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  frontend_node_modules:
+  frontend_next:
+  backend_venv:
+  sqlite_data:
+  redisdata:

@@ -1,0 +1,106 @@
+# Version control
+.git
+.gitignore
+
+# Development environments and cache
+.venv
+venv
+env
+node_modules
+**/node_modules
+**/.venv
+**/venv
+__pycache__
+*.py[cod]
+.env*
+!.env.example
+!.env.production
+.cache
+.npm
+.pytest_cache
+.ruff_cache
+.cursor
+.claude
+perf
+.coverage
+coverage
+.nyc_output
+
+# Build artifacts
+.next
+**/.next
+dist
+build
+*.egg-info
+
+# IDE and system files
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Media and uploads
+mlx_models
+uploads
+**/uploads
+log_files
+**/log_files
+*.npz
+*.mp4
+*.wav
+*.mp3
+*.webm
+*.ogg
+*.flac
+*.mkv
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.svg
+*.avi
+*.mov
+*.tgz
+
+# Test and documentation
+tests
+**/tests
+test_videos
+test_files
+**/test_files
+*.md
+docs
+docs-backend
+
+# Logs and temporary files
+*.log
+logs
+*.tmp
+*.temp
+
+# Project specific
+sys_prompts
+instance
+scripts/generate_context
+*_context.txt
+zignore
+
+# ML model caches (large files)
+*.onnx
+*.safetensors
+*.bin
+*.pt
+*.pth
+huggingface
+.cache/huggingface
+**/.cache
+
+# Docker files
+Dockerfile
+docker-compose.yml
+docker.env
+
+# Database files (but keep db/ for alembic migrations)
+*.db
+*.sqlite
+backend/db/morphio_io.db

@@ -1,0 +1,180 @@
+name: Release – Build, Pin Digests, Publish
+
+on:
+  push:
+    tags: [ 'v*.*.*' ]
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_OWNER: ${{ github.repository_owner }}
+
+jobs:
+  build-api:
+    runs-on: ubuntu-latest
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
+      version: ${{ steps.meta.outputs.version }}
+      image: ${{ steps.meta.outputs.tags }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - name: Login GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Docker meta (api)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/morphio-io-backend-api
+          tags: |
+            type=ref,event=tag
+      - name: Build & Push (api)
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: backend/Dockerfile.api
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          provenance: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  build-worker:
+    runs-on: ubuntu-latest
+    needs: build-api
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
+      image: ${{ steps.meta.outputs.tags }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - name: Login GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Docker meta (worker-ml)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/morphio-io-worker-ml
+          tags: |
+            type=ref,event=tag
+      - name: Build & Push (worker-ml)
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: backend/Dockerfile.worker-ml
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          provenance: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  build-crawler:
+    runs-on: ubuntu-latest
+    needs: build-api
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
+      image: ${{ steps.meta.outputs.tags }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - name: Login GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Docker meta (crawler)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/morphio-io-crawler
+          tags: |
+            type=ref,event=tag
+      - name: Build & Push (crawler)
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: backend/Dockerfile.crawler
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          provenance: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  assemble:
+    runs-on: ubuntu-latest
+    needs: [build-api, build-worker, build-crawler]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Write docker-compose.release.yml (pinned)
+        run: |
+          API_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/morphio-io-backend-api@${{ needs.build-api.outputs.digest }}"
+          WORKER_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/morphio-io-worker-ml@${{ needs.build-worker.outputs.digest }}"
+          CRAWLER_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/morphio-io-crawler@${{ needs.build-crawler.outputs.digest }}"
+          cat > docker-compose.release.yml <<EOF
+          services:
+            backend:
+              image: ${API_IMAGE}
+              environment:
+                - APP_ENV=production
+              ports: ["8000:8000"]
+              depends_on:
+                redis: { condition: service_healthy }
+                worker-ml: { condition: service_healthy }
+                crawler: { condition: service_healthy }
+            worker-ml:
+              image: ${WORKER_IMAGE}
+            crawler:
+              image: ${CRAWLER_IMAGE}
+            redis:
+              image: redis:alpine
+              healthcheck:
+                test: ["CMD", "redis-cli", "ping"]
+                interval: 10s
+                timeout: 5s
+                retries: 5
+          EOF
+      - name: Generate SBOM (api)
+        uses: anchore/sbom-action@v0
+        with:
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/morphio-io-backend-api@${{ needs.build-api.outputs.digest }}
+          artifact-name: sbom-api.spdx.json
+      - name: Generate SBOM (worker-ml)
+        uses: anchore/sbom-action@v0
+        with:
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/morphio-io-worker-ml@${{ needs.build-worker.outputs.digest }}
+          artifact-name: sbom-worker-ml.spdx.json
+      - name: Generate SBOM (crawler)
+        uses: anchore/sbom-action@v0
+        with:
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/morphio-io-crawler@${{ needs.build-crawler.outputs.digest }}
+          artifact-name: sbom-crawler.spdx.json
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            docker-compose.release.yml
+            sbom-api.spdx.json
+            sbom-worker-ml.spdx.json
+            sbom-crawler.spdx.json
+

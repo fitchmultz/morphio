@@ -1,0 +1,330 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+@plugin '@tailwindcss/forms';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --color-primary-50: #eef2ff;
+  --color-primary-100: #e0e7ff;
+  --color-primary-200: #c7d2fe;
+  --color-primary-300: #a5b4fc;
+  --color-primary-400: #818cf8;
+  --color-primary-500: #6366f1;
+  --color-primary-600: #4f46e5;
+  --color-primary-700: #4338ca;
+  --color-primary-800: #3730a3;
+  --color-primary-900: #312e81;
+  --color-primary-950: #1e1b4b;
+
+  --color-secondary-50: #fdf2f8;
+  --color-secondary-100: #fce7f3;
+  --color-secondary-200: #fbcfe8;
+  --color-secondary-300: #f9a8d4;
+  --color-secondary-400: #f472b6;
+  --color-secondary-500: #ec4899;
+  --color-secondary-600: #db2777;
+  --color-secondary-700: #be185d;
+  --color-secondary-800: #9d174d;
+  --color-secondary-900: #831843;
+  --color-secondary-950: #500724;
+
+  --color-background-light: #ffffff;
+  --color-background-dark: #0f172a;
+
+  --color-foreground-light: #1e293b;
+  --color-foreground-dark: #e2e8f0;
+
+  --background-image-gradient-radial: radial-gradient(var(--tw-gradient-stops));
+  --background-image-gradient-conic: conic-gradient(
+    from 180deg at 50% 50%,
+    var(--tw-gradient-stops)
+  );
+
+  --transition-property-height: height;
+
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+  --scale-group-hover: 1;
+}
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+@utility text-balance {
+  text-wrap: balance;
+}
+
+@utility focus-ring-primary {
+  /* Custom focus styles */
+  @apply focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900;
+}
+
+@utility focus-ring-secondary {
+  @apply focus:outline-hidden focus:ring-2 focus:ring-red-500 dark:focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900;
+}
+
+@utility card {
+  /* Card styles */
+  @apply bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xs;
+}
+
+@utility card-hover {
+  @apply hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200;
+}
+
+@utility morphio-card {
+  @apply bg-white dark:bg-gray-800 shadow-xl rounded-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden transform transition-all duration-300 hover:shadow-2xl hover:-translate-y-1;
+}
+
+@utility morphio-modal {
+  @apply bg-white dark:bg-gray-800 shadow-xl rounded-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden;
+}
+
+@utility morphio-card-header {
+  @apply px-8 py-6 border-b border-gray-200/50 dark:border-gray-700/50 bg-linear-to-r from-transparent via-gray-50/30 dark:via-gray-800/30 to-transparent;
+}
+
+@utility morphio-modal-header {
+  @apply px-8 py-6 border-b border-gray-200/50 dark:border-gray-700/50 bg-white dark:bg-gray-800;
+}
+
+@utility morphio-input {
+  @apply w-full px-4 py-3.5 bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700/50 rounded-xl focus:ring-2 focus:ring-blue-500/40 dark:focus:ring-blue-400/50 focus:border-transparent placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-gray-200 shadow-xs hover:bg-white dark:hover:bg-gray-900/60 transition-all duration-200;
+}
+
+@utility morphio-button {
+  @apply px-6 py-3.5 bg-linear-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 focus:ring-2 focus:ring-blue-500/40 dark:focus:ring-blue-400/50 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none;
+}
+
+@utility morphio-button-secondary {
+  @apply px-6 py-3.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100 font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 focus:ring-2 focus:ring-gray-500/40 dark:focus:ring-gray-400/50 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none;
+}
+
+/*
+ * TYPOGRAPHY SYSTEM
+ *
+ * For consistent text styling across the application, use these utility classes:
+ *
+ * - morphio-h1: Main page headings (largest)
+ * - morphio-h2: Section headings
+ * - morphio-h3: Subsection headings
+ * - morphio-h4: Card headings
+ * - morphio-h5: Small headings
+ * - morphio-body: Regular paragraph text
+ * - morphio-body-lg: Larger paragraph text
+ * - morphio-body-sm: Smaller paragraph text
+ * - morphio-caption: Caption text
+ * - morphio-overline: Small uppercase text (often used above headings)
+ * - morphio-title: Special gradient title (use sparingly for emphasis)
+ * - morphio-subtitle: Subtitle text that follows a title
+ * - morphio-text: Basic text with proper colors
+ * - morphio-link: Clickable link text
+ *
+ * Examples:
+ * <h1 className="morphio-h1">Page Title</h1>
+ * <h2 className="morphio-h2">Section Title</h2>
+ * <p className="morphio-body">Regular paragraph text.</p>
+ * <a href="#" className="morphio-link">Click here</a>
+ */
+
+@utility morphio-title {
+  @apply text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400;
+}
+
+@utility morphio-subtitle {
+  @apply text-xl font-semibold text-gray-900 dark:text-gray-100;
+}
+
+@utility morphio-text {
+  @apply text-gray-600 dark:text-gray-300;
+}
+
+@utility morphio-link {
+  @apply text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors duration-200;
+}
+
+@utility morphio-icon-button {
+  @apply p-2.5 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-500/40 dark:focus:ring-blue-400/50 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900;
+}
+
+/* Extended text typography system */
+@utility morphio-h1 {
+  @apply text-4xl md:text-5xl font-extrabold bg-clip-text text-transparent bg-linear-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 leading-tight;
+}
+
+@utility morphio-h2 {
+  @apply text-3xl md:text-4xl font-bold text-gray-900 dark:text-white leading-tight;
+}
+
+@utility morphio-h3 {
+  @apply text-2xl md:text-3xl font-semibold text-gray-800 dark:text-gray-100 leading-snug;
+}
+
+@utility morphio-h4 {
+  @apply text-xl md:text-2xl font-medium text-gray-800 dark:text-gray-100 leading-snug;
+}
+
+@utility morphio-h5 {
+  @apply text-lg md:text-xl font-medium text-gray-700 dark:text-gray-200 leading-normal;
+}
+
+@utility morphio-body {
+  @apply text-base text-gray-600 dark:text-gray-300 leading-relaxed;
+}
+
+@utility morphio-body-lg {
+  @apply text-lg text-gray-600 dark:text-gray-300 leading-relaxed;
+}
+
+@utility morphio-body-sm {
+  @apply text-sm text-gray-600 dark:text-gray-300 leading-normal;
+}
+
+@utility morphio-caption {
+  @apply text-sm text-gray-500 dark:text-gray-400 leading-normal;
+}
+
+@utility morphio-overline {
+  @apply text-xs uppercase tracking-wider font-medium text-gray-500 dark:text-gray-400;
+}
+
+@layer utilities {
+  :root {
+    --background: #ffffff;
+    --foreground: #171717;
+    --card-background: rgba(255, 255, 255, 0.9);
+    --card-background-hover: rgba(255, 255, 255, 0.95);
+    --card-border: rgba(229, 231, 235, 0.5);
+    --input-background: rgba(255, 255, 255, 0.9);
+    --input-border: rgb(229, 231, 235);
+    --input-focus-ring: rgba(59, 130, 246, 0.4);
+    --gradient-start: #3b82f6;
+    --gradient-end: #8b5cf6;
+    /* Toast colors */
+    --toast-success-bg: rgba(220, 252, 231, 0.95);
+    --toast-success-border: rgba(134, 239, 172, 0.6);
+    --toast-error-bg: rgba(254, 226, 226, 0.95);
+    --toast-error-border: rgba(248, 113, 113, 0.6);
+    --toast-info-bg: rgba(224, 242, 254, 0.95);
+    --toast-info-border: rgba(125, 211, 252, 0.6);
+    --toast-warning-bg: rgba(255, 237, 213, 0.95);
+    --toast-warning-border: rgba(251, 191, 36, 0.6);
+  }
+
+  .dark {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+    --card-background: rgba(31, 41, 55, 0.5);
+    --card-background-hover: rgba(31, 41, 55, 0.6);
+    --card-border: rgba(75, 85, 99, 0.5);
+    --input-background: rgba(17, 24, 39, 0.5);
+    --input-border: rgba(75, 85, 99, 0.5);
+    --input-focus-ring: rgba(96, 165, 250, 0.5);
+    --gradient-start: #60a5fa;
+    --gradient-end: #a78bfa;
+    /* Toast colors for dark mode */
+    --toast-success-bg: rgba(22, 101, 52, 0.85);
+    --toast-success-border: rgba(74, 222, 128, 0.6);
+    --toast-error-bg: rgba(127, 29, 29, 0.85);
+    --toast-error-border: rgba(248, 113, 113, 0.6);
+    --toast-info-bg: rgba(12, 74, 110, 0.85);
+    --toast-info-border: rgba(125, 211, 252, 0.6);
+    --toast-warning-bg: rgba(120, 53, 15, 0.85);
+    --toast-warning-border: rgba(251, 191, 36, 0.6);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not(.light) {
+      --background: #0a0a0a;
+      --foreground: #ededed;
+      --input-text: #ffffff;
+      --input-placeholder: #9ca3af;
+      --primary-color: #6366f1;
+      --secondary-color: #f87171;
+    }
+  }
+
+  body {
+    color: var(--foreground);
+    background: var(--background);
+    font-family: 'Inter', Arial, Helvetica, sans-serif;
+  }
+
+  /* Add smooth transitions for theme changes */
+  *,
+  *::before,
+  *::after {
+    transition-property:
+      background-color, border-color, color, fill, stroke, opacity, box-shadow,
+      transform;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+  }
+
+  /* Disable transitions on page load */
+  .no-transitions * {
+    transition: none !important;
+  }
+
+  /* Toast Notification Styling */
+  .Toastify__toast {
+    border-radius: 1rem !important;
+    padding: 16px !important;
+    font-family: 'Inter', Arial, Helvetica, sans-serif !important;
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid transparent;
+    backdrop-filter: blur(8px);
+  }
+
+  .Toastify__toast--success {
+    background-color: var(--toast-success-bg) !important;
+    border-color: var(--toast-success-border) !important;
+  }
+
+  .Toastify__toast--error {
+    background-color: var(--toast-error-bg) !important;
+    border-color: var(--toast-error-border) !important;
+  }
+
+  .Toastify__toast--info {
+    background-color: var(--toast-info-bg) !important;
+    border-color: var(--toast-info-border) !important;
+  }
+
+  .Toastify__toast--warning {
+    background-color: var(--toast-warning-bg) !important;
+    border-color: var(--toast-warning-border) !important;
+  }
+
+  .Toastify__progress-bar {
+    height: 4px !important;
+    opacity: 0.7 !important;
+  }
+
+  .Toastify__close-button {
+    color: currentColor !important;
+    opacity: 0.6 !important;
+  }
+
+  .Toastify__close-button:hover {
+    opacity: 1 !important;
+  }
+}

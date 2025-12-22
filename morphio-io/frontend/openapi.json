@@ -1,0 +1,5268 @@
+{
+	"openapi": "3.1.0",
+	"info": {
+		"title": "Morphio.io API",
+		"description": "This API will blow your mind",
+		"version": "1.0.0"
+	},
+	"paths": {
+		"/auth/login": {
+			"post": {
+				"tags": ["auth", "Authentication"],
+				"summary": "Login",
+				"operationId": "login",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserLogin"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"description": "Successful Login",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AuthTokenResponse"
+								},
+								"example": {
+									"access_token": "xxx",
+									"user": {
+										"id": 1,
+										"email": "user1@example.com",
+										"display_name": "user1"
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/logout": {
+			"post": {
+				"tags": ["auth", "Authentication"],
+				"summary": "Logout",
+				"operationId": "logout",
+				"responses": {
+					"200": {
+						"description": "Successfully Logged Out",
+						"content": {
+							"application/json": {
+								"schema": {},
+								"example": {
+									"status": "success",
+									"message": "Logged out successfully."
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				]
+			}
+		},
+		"/auth/register": {
+			"post": {
+				"tags": ["auth", "Authentication"],
+				"summary": "Register",
+				"operationId": "register",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserCreate"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"201": {
+						"description": "User registered successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AuthTokenResponse"
+								},
+								"example": {
+									"status": "success",
+									"message": "User registered successfully",
+									"data": {
+										"access_token": "xxx",
+										"user": {
+											"id": 1,
+											"email": "some@example.com",
+											"display_name": "NewUser"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Email already registered"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Registration disabled",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Registration is currently disabled"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/change-password": {
+			"post": {
+				"tags": ["auth", "Authentication"],
+				"summary": "Change Password",
+				"operationId": "change_password",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ChangePasswordRequest"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"description": "Password Changed Successfully",
+						"content": {
+							"application/json": {
+								"schema": {},
+								"example": {
+									"status": "success",
+									"message": "Password updated successfully."
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Incorrect current password"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				]
+			}
+		},
+		"/auth/refresh-token": {
+			"post": {
+				"tags": ["auth", "Authentication"],
+				"summary": "Refresh Token",
+				"operationId": "refresh_token",
+				"responses": {
+					"200": {
+						"description": "Successful Response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AuthTokenResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/csrf-token": {
+			"get": {
+				"tags": ["auth", "Authentication"],
+				"summary": "Get Csrf Token",
+				"description": "Generate a CSRF token and set it in a cookie.\nReturns the token in the response body for AJAX requests.",
+				"operationId": "get_csrf_token",
+				"responses": {
+					"200": {
+						"description": "CSRF Token",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/CsrfTokenResponse"
+								},
+								"example": {
+									"status": "success",
+									"message": "CSRF token generated",
+									"data": {
+										"csrf_token": "abc123"
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/content/save-content": {
+			"post": {
+				"tags": ["Content", "Content"],
+				"summary": "Save Content",
+				"operationId": "save_content",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ContentCreate"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"description": "Successful Response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseModel_ContentOut_"
+								}
+							}
+						}
+					},
+					"201": {
+						"description": "Content saved successfully",
+						"content": {
+							"application/json": {
+								"example": {
+									"status": "success",
+									"message": "Content saved successfully",
+									"data": {
+										"id": 1,
+										"title": "My Awesome Content",
+										"content": "This is some great content!",
+										"created_at": "2023-04-01T12:00:00Z",
+										"updated_at": "2023-04-01T12:00:00Z"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request"
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				]
+			}
+		},
+		"/content/get-contents": {
+			"get": {
+				"tags": ["Content", "Content"],
+				"summary": "Get Contents",
+				"operationId": "list_contents",
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "page",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "integer",
+							"minimum": 1,
+							"default": 1,
+							"title": "Page"
+						}
+					},
+					{
+						"name": "per_page",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "integer",
+							"maximum": 100,
+							"minimum": 1,
+							"default": 5,
+							"title": "Per Page"
+						}
+					},
+					{
+						"name": "template_id",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"type": "integer"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"description": "Filter by template ID",
+							"title": "Template Id"
+						},
+						"description": "Filter by template ID"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Contents retrieved successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseModel_PaginatedResponse_ContentOut__"
+								},
+								"example": {
+									"status": "success",
+									"message": "Contents retrieved successfully",
+									"data": {
+										"items": [
+											{
+												"id": 1,
+												"title": "Content 1",
+												"content": "Body of content 1",
+												"created_at": "2023-04-01T12:00:00Z",
+												"updated_at": "2023-04-01T12:00:00Z"
+											}
+										],
+										"total": 10,
+										"page": 1,
+										"per_page": 2
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/content/get-content/{content_id}": {
+			"get": {
+				"tags": ["Content", "Content"],
+				"summary": "Get Content",
+				"operationId": "get_content",
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "content_id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"title": "Content Id"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Content retrieved successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContentOut"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found"
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/content/update-content/{content_id}": {
+			"put": {
+				"tags": ["Content", "Content"],
+				"summary": "Update Content",
+				"operationId": "update_content",
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "content_id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"title": "Content Id"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ContentUpdate"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Content updated successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContentOut"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request"
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found"
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/content/update-multiple-contents": {
+			"put": {
+				"tags": ["Content", "Content"],
+				"summary": "Update Multiple Contents",
+				"operationId": "update_multiple_contents",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"items": {
+									"$ref": "#/components/schemas/ContentUpdate"
+								},
+								"type": "array",
+								"title": "Contents"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"description": "Contents updated successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/ContentOut"
+									},
+									"type": "array",
+									"title": "Response Update Multiple Contents"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request"
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				]
+			}
+		},
+		"/content/update-title/{content_id}": {
+			"put": {
+				"tags": ["Content", "Content"],
+				"summary": "Update Content Title Route",
+				"operationId": "update_content_title",
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "content_id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"title": "Content Id"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ContentTitleUpdate"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Content title updated successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseModel_ContentOut_"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request"
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found"
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/content/delete-content/{content_id}": {
+			"delete": {
+				"tags": ["Content", "Content"],
+				"summary": "Delete Content",
+				"operationId": "delete_content",
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "content_id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"title": "Content Id"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Content deleted successfully",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Content not found or unauthorized"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/content/{content_id}/comments": {
+			"post": {
+				"tags": ["Content", "Content"],
+				"summary": "Create Comment Route",
+				"operationId": "create_comment",
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "content_id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"title": "Content Id"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CommentCreate"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Successful Response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseModel_CommentOut_"
+								}
+							}
+						}
+					},
+					"201": {
+						"description": "Comment created successfully",
+						"content": {
+							"application/json": {
+								"example": {
+									"status": "success",
+									"message": "Comment created successfully",
+									"data": {
+										"id": 1,
+										"content_id": 1,
+										"user_id": 1,
+										"text": "Great content!",
+										"created_at": "2025-02-19T12:00:00Z",
+										"author_display_name": "User1"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request"
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Content not found"
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			},
+			"get": {
+				"tags": ["Content", "Content"],
+				"summary": "Get Comments",
+				"operationId": "list_comments",
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "content_id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"title": "Content Id"
+						}
+					},
+					{
+						"name": "page",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "integer",
+							"minimum": 1,
+							"default": 1,
+							"title": "Page"
+						}
+					},
+					{
+						"name": "per_page",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "integer",
+							"maximum": 100,
+							"minimum": 1,
+							"default": 10,
+							"title": "Per Page"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Comments retrieved successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseModel_List_CommentOut__"
+								},
+								"example": {
+									"status": "success",
+									"message": "Comments retrieved successfully",
+									"data": [
+										{
+											"id": 1,
+											"content_id": 1,
+											"user_id": 1,
+											"text": "Great content!",
+											"created_at": "2025-02-19T12:00:00Z",
+											"author_display_name": "User1"
+										}
+									]
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Content not found"
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/content/comments/{comment_id}": {
+			"put": {
+				"tags": ["Content", "Content"],
+				"summary": "Update Comment Route",
+				"operationId": "update_comment",
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "comment_id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"title": "Comment Id"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CommentUpdate"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Comment updated successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseModel_CommentOut_"
+								},
+								"example": {
+									"status": "success",
+									"message": "Comment updated successfully",
+									"data": {
+										"id": 1,
+										"content_id": 1,
+										"user_id": 1,
+										"text": "Updated comment!",
+										"created_at": "2025-02-19T12:00:00Z",
+										"updated_at": "2025-02-19T12:01:00Z",
+										"author_display_name": "User1"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request"
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Comment not found or unauthorized"
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"tags": ["Content", "Content"],
+				"summary": "Delete Comment Route",
+				"operationId": "delete_comment",
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "comment_id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"title": "Comment Id"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Comment deleted successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseModel_NoneType_"
+								},
+								"example": {
+									"status": "success",
+									"message": "Comment deleted successfully"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Comment not found or unauthorized"
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/content/{content_id}/conversations": {
+			"get": {
+				"tags": ["Content", "Content"],
+				"summary": "List Content Conversations",
+				"operationId": "list_content_conversations",
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "content_id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"title": "Content Id"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Conversations retrieved successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseModel_List_ConversationSummary__"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Content not found"
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/content/{content_id}/conversations/{conversation_id}": {
+			"get": {
+				"tags": ["Content", "Content"],
+				"summary": "Get Conversation Thread",
+				"operationId": "get_conversation_thread",
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "content_id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"title": "Content Id"
+						}
+					},
+					{
+						"name": "conversation_id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"title": "Conversation Id"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Conversation retrieved successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseModel_ConversationThreadOut_"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Conversation not found"
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"tags": ["Content", "Content"],
+				"summary": "Delete Conversation Route",
+				"operationId": "delete_conversation",
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "content_id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"title": "Content Id"
+						}
+					},
+					{
+						"name": "conversation_id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"title": "Conversation Id"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Conversation deleted successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseModel_NoneType_"
+								},
+								"example": {
+									"status": "success",
+									"message": "Conversation deleted successfully"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Conversation not found or unauthorized"
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/content/{content_id}/conversation": {
+			"post": {
+				"tags": ["Content", "Content"],
+				"summary": "Continue Content Conversation Route",
+				"operationId": "continue_conversation",
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "content_id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"title": "Content Id"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ConversationRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Conversation updated successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseModel_ConversationResponse_"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request"
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Content or conversation not found"
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/template/get-templates": {
+			"get": {
+				"tags": ["Template"],
+				"summary": "Get Templates",
+				"operationId": "list_templates",
+				"responses": {
+					"200": {
+						"description": "Templates retrieved successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseModel_List_TemplateOut__"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				]
+			}
+		},
+		"/template/save-template": {
+			"post": {
+				"tags": ["Template"],
+				"summary": "Save Template",
+				"operationId": "save_template",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/TemplateCreate"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"201": {
+						"description": "Template saved successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseModel_TemplateOut_"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid template content"
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				]
+			}
+		},
+		"/template/get-template/{template_id}": {
+			"get": {
+				"tags": ["Template"],
+				"summary": "Get Template",
+				"operationId": "get_template",
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "template_id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"title": "Template Id"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Template retrieved successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseModel_TemplateOut_"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Template not found"
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/template/update-template/{template_id}": {
+			"put": {
+				"tags": ["Template"],
+				"summary": "Update Template Route",
+				"operationId": "update_template",
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "template_id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"title": "Template Id"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/TemplateUpdate"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Template updated successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseModel_TemplateOut_"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid template content"
+					},
+					"404": {
+						"description": "Template not found or unauthorized"
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/template/delete-template/{template_id}": {
+			"delete": {
+				"tags": ["Template"],
+				"summary": "Delete Template Route",
+				"operationId": "delete_template",
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "template_id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"title": "Template Id"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Template deleted successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseModel_NoneType_"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Template not found or unauthorized"
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/user/profile": {
+			"get": {
+				"tags": ["User", "User"],
+				"summary": "Get User Profile",
+				"operationId": "get_user_profile",
+				"responses": {
+					"200": {
+						"description": "Successful Response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/app__schemas__auth_schema__UserOut"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				]
+			}
+		},
+		"/user/change-display-name": {
+			"post": {
+				"tags": ["User", "User"],
+				"summary": "Change Display Name",
+				"operationId": "change_display_name",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserUpdate"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"description": "Successful Response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/app__schemas__auth_schema__UserOut"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				]
+			}
+		},
+		"/user/change-email": {
+			"post": {
+				"tags": ["User", "User"],
+				"summary": "Change Email",
+				"operationId": "change_email",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserUpdate"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"description": "Successful Response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/app__schemas__auth_schema__UserOut"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				]
+			}
+		},
+		"/user/usage": {
+			"get": {
+				"tags": ["User", "User"],
+				"summary": "Get Current User Usage",
+				"operationId": "get_user_usage",
+				"responses": {
+					"200": {
+						"description": "Successful Response",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				]
+			}
+		},
+		"/media/config": {
+			"get": {
+				"tags": ["Media Processing"],
+				"summary": "Get Media File Configuration",
+				"description": "Get media file configuration including allowed extensions.",
+				"operationId": "get_media_config",
+				"responses": {
+					"200": {
+						"description": "Media file configuration",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseModel_dict_"
+								},
+								"example": {
+									"status": "success",
+									"message": "Media file configuration",
+									"data": {
+										"video_extensions": ["mp4", "webm", "mov", "avi"],
+										"audio_extensions": ["mp3", "wav", "aac", "flac"],
+										"max_upload_size": 3221225472
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/media/models": {
+			"get": {
+				"tags": ["Media Processing"],
+				"summary": "Get Available Models",
+				"description": "Get available AI models for content generation.",
+				"operationId": "get_available_models",
+				"responses": {
+					"200": {
+						"description": "Available AI models for content generation",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseModel_list_"
+								},
+								"example": {
+									"status": "success",
+									"message": "Available models",
+									"data": [
+										{
+											"id": "gemini-3-flash-preview",
+											"label": "Gemini 3 Flash (High)"
+										},
+										{
+											"id": "gpt-5.1",
+											"label": "GPT-5.1"
+										}
+									]
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/media/process-media": {
+			"post": {
+				"tags": ["Media Processing"],
+				"summary": "Process Media Route",
+				"operationId": "process_media",
+				"requestBody": {
+					"content": {
+						"multipart/form-data": {
+							"schema": {
+								"$ref": "#/components/schemas/Body_process_media"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"description": "Media processing job enqueued successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MediaProcessingResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request"
+					},
+					"413": {
+						"description": "Payload Too Large"
+					},
+					"404": {
+						"description": "Template not found"
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				]
+			}
+		},
+		"/media/media-processing-status/{job_id}": {
+			"get": {
+				"tags": ["Media Processing"],
+				"summary": "Get Media Processing Status Route",
+				"operationId": "get_media_processing_status",
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "job_id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"title": "Job Id"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Media processing status retrieved successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MediaProcessingStatusResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found"
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/items/": {
+			"post": {
+				"tags": ["Documentation"],
+				"summary": "Create Item",
+				"description": "Create a new item.\n\n- **name**: The name of the item.\n- **price**: The price of the item.",
+				"operationId": "create_item",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Item"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"description": "Successful Response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Item"
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/items/{item_id}": {
+			"get": {
+				"tags": ["Documentation"],
+				"summary": "Read Item",
+				"description": "Retrieve an item by its ID.\n\n- **item_id**: The ID of the item. Must be 1 or greater.\n- **q**: Optional query string for searching. Max 50 characters.",
+				"operationId": "read_item",
+				"parameters": [
+					{
+						"name": "item_id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"minimum": 1,
+							"title": "The ID of the item to get"
+						}
+					},
+					{
+						"name": "q",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"type": "string",
+									"maxLength": 50
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Q"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successful Response",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/users/me": {
+			"get": {
+				"tags": ["Documentation"],
+				"summary": "Read Users Me",
+				"description": "Get info about the current authenticated user.",
+				"operationId": "read_users_me",
+				"responses": {
+					"200": {
+						"description": "Successful Response",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				]
+			}
+		},
+		"/web/process-web": {
+			"post": {
+				"tags": ["Web Scraping"],
+				"summary": "Enqueue Web Scraping Route",
+				"description": "Scrape a webpage at `input_url` and run the text through the LLM+template pipeline.\nReturns a `job_id` that can be polled for status updates.",
+				"operationId": "process_web",
+				"requestBody": {
+					"content": {
+						"application/x-www-form-urlencoded": {
+							"schema": {
+								"$ref": "#/components/schemas/Body_process_web"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"description": "Enqueued web scraping successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MediaProcessingStatusResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid URL or missing parameters"
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				]
+			}
+		},
+		"/web/web-processing-status/{job_id}": {
+			"get": {
+				"tags": ["Web Scraping"],
+				"summary": "Get Web Processing Status Route",
+				"description": "Poll the status of the web-scraping job by job_id.",
+				"operationId": "get_web_processing_status",
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "job_id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"title": "Job Id"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successful Response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MediaProcessingStatusResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Job not found"
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/admin/get-usage": {
+			"get": {
+				"tags": ["Admin", "Admin"],
+				"summary": "Get Usage",
+				"description": "Return a list of usage stats (per user + usage_type).\nIncludes the user's email & display name for better tracking.",
+				"operationId": "get_admin_usage",
+				"responses": {
+					"200": {
+						"description": "Successful Response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseModel_list_dict__"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Not authorized"
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				]
+			}
+		},
+		"/admin/get-subscriptions": {
+			"get": {
+				"tags": ["Admin", "Admin"],
+				"summary": "Get Subscriptions",
+				"operationId": "get_subscriptions",
+				"responses": {
+					"200": {
+						"description": "Successful Response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseModel_list_SubscriptionOut__"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Not authorized"
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				]
+			}
+		},
+		"/health/": {
+			"get": {
+				"tags": ["Health", "Health"],
+				"summary": "Health Check",
+				"operationId": "health_check",
+				"responses": {
+					"200": {
+						"description": "Successful Response",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/logs/process-logs": {
+			"post": {
+				"tags": ["Logs", "Logs"],
+				"summary": "Process Logs",
+				"description": "Enqueue a log file for processing and return a job ID.",
+				"operationId": "process_logs",
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "anonymize",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "boolean",
+							"description": "Anonymize sensitive data before processing",
+							"default": false,
+							"title": "Anonymize"
+						},
+						"description": "Anonymize sensitive data before processing"
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"multipart/form-data": {
+							"schema": {
+								"$ref": "#/components/schemas/Body_process_logs"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Log processing job enqueued successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseModel_LogsProcessingResponse_"
+								},
+								"example": {
+									"status": "success",
+									"message": "Log processing job enqueued",
+									"data": {
+										"job_id": "123e4567-e89b-12d3-a456-426614174000",
+										"status": "pending",
+										"message": "Log processing job enqueued."
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request"
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/logs/logs-processing-status/{job_id}": {
+			"get": {
+				"tags": ["Logs", "Logs"],
+				"summary": "Get Logs Processing Status Route",
+				"description": "Retrieve the status of a log processing job.",
+				"operationId": "get_logs_processing_status",
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "job_id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"title": "Job Id"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Log processing status retrieved successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseModel_LogsProcessingStatusResponse_"
+								},
+								"example": {
+									"status": "success",
+									"message": "Log processing status retrieved",
+									"data": {
+										"job_id": "123e4567-e89b-12d3-a456-426614174000",
+										"status": "completed",
+										"progress": 100,
+										"message": "Log summary generated and saved",
+										"result": {
+											"summary": "Summary content here",
+											"title": "Log Summary",
+											"content_id": 1,
+											"user_id": 1,
+											"template_id": "log-summary"
+										}
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Job not found"
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/logs/generate-splunk-config": {
+			"post": {
+				"tags": ["Logs", "Logs"],
+				"summary": "Generate Splunk Config",
+				"description": "Enqueue a log file sample for Splunk config generation and return a job ID.",
+				"operationId": "generate_splunk_config",
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "anonymize",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "boolean",
+							"description": "Anonymize sensitive data before processing",
+							"default": false,
+							"title": "Anonymize"
+						},
+						"description": "Anonymize sensitive data before processing"
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"multipart/form-data": {
+							"schema": {
+								"$ref": "#/components/schemas/Body_generate_splunk_config"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Splunk config generation job enqueued successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseModel_LogsProcessingResponse_"
+								},
+								"example": {
+									"status": "success",
+									"message": "Splunk config generation job enqueued",
+									"data": {
+										"job_id": "123e4567-e89b-12d3-a456-426614174000",
+										"status": "pending",
+										"message": "Splunk config generation job enqueued."
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request"
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/logs/config": {
+			"get": {
+				"tags": ["Logs", "Logs"],
+				"summary": "Get Log File Configuration",
+				"description": "Get log file configuration including allowed extensions.",
+				"operationId": "get_log_config",
+				"responses": {
+					"200": {
+						"description": "Log file configuration",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseModel_dict_"
+								},
+								"example": {
+									"status": "success",
+									"message": "Log file configuration",
+									"data": {
+										"allowed_extensions": ["csv", "json", "log", "md", "txt"]
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"AuthTokenPayload": {
+				"properties": {
+					"access_token": {
+						"type": "string",
+						"title": "Access Token"
+					},
+					"refresh_token": {
+						"type": "string",
+						"title": "Refresh Token",
+						"default": ""
+					},
+					"user": {
+						"$ref": "#/components/schemas/app__schemas__auth_schema__UserOut"
+					}
+				},
+				"type": "object",
+				"required": ["access_token", "user"],
+				"title": "AuthTokenPayload",
+				"description": "Payload for auth token responses (login, register, refresh)."
+			},
+			"AuthTokenResponse": {
+				"properties": {
+					"status": {
+						"$ref": "#/components/schemas/ResponseStatus"
+					},
+					"message": {
+						"type": "string",
+						"title": "Message"
+					},
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/AuthTokenPayload"
+							},
+							{
+								"type": "null"
+							}
+						]
+					},
+					"timestamp": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Timestamp"
+					}
+				},
+				"type": "object",
+				"required": ["status", "message"],
+				"title": "AuthTokenResponse",
+				"description": "Wrapped response for auth token endpoints."
+			},
+			"Body_generate_splunk_config": {
+				"properties": {
+					"log_file": {
+						"type": "string",
+						"format": "binary",
+						"title": "Log File"
+					}
+				},
+				"type": "object",
+				"required": ["log_file"],
+				"title": "Body_generate_splunk_config"
+			},
+			"Body_process_logs": {
+				"properties": {
+					"log_file": {
+						"type": "string",
+						"format": "binary",
+						"title": "Log File"
+					}
+				},
+				"type": "object",
+				"required": ["log_file"],
+				"title": "Body_process_logs"
+			},
+			"Body_process_media": {
+				"properties": {
+					"input_url": {
+						"type": "string",
+						"title": "Input Url"
+					},
+					"template_id": {
+						"type": "string",
+						"title": "Template Id"
+					},
+					"input_file": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "binary"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Input File"
+					},
+					"model": {
+						"type": "string",
+						"title": "Model"
+					},
+					"media_type": {
+						"type": "string",
+						"title": "Media Type"
+					},
+					"enable_diarization": {
+						"type": "boolean",
+						"title": "Enable Diarization",
+						"default": false
+					},
+					"min_speakers": {
+						"anyOf": [
+							{
+								"type": "integer"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Min Speakers"
+					},
+					"max_speakers": {
+						"anyOf": [
+							{
+								"type": "integer"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Max Speakers"
+					}
+				},
+				"type": "object",
+				"required": ["template_id", "media_type"],
+				"title": "Body_process_media"
+			},
+			"Body_process_web": {
+				"properties": {
+					"input_url": {
+						"type": "string",
+						"title": "Input Url"
+					},
+					"template_id": {
+						"type": "string",
+						"title": "Template Id"
+					},
+					"model": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Model"
+					}
+				},
+				"type": "object",
+				"required": ["input_url", "template_id"],
+				"title": "Body_process_web"
+			},
+			"ChangePasswordRequest": {
+				"properties": {
+					"current_password": {
+						"type": "string",
+						"title": "Current Password"
+					},
+					"new_password": {
+						"type": "string",
+						"title": "New Password"
+					}
+				},
+				"type": "object",
+				"required": ["current_password", "new_password"],
+				"title": "ChangePasswordRequest"
+			},
+			"CommentCreate": {
+				"properties": {
+					"text": {
+						"type": "string",
+						"maxLength": 5000,
+						"minLength": 1,
+						"title": "Text"
+					},
+					"parent_id": {
+						"anyOf": [
+							{
+								"type": "integer"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Parent Id"
+					}
+				},
+				"type": "object",
+				"required": ["text"],
+				"title": "CommentCreate"
+			},
+			"CommentOut": {
+				"properties": {
+					"text": {
+						"type": "string",
+						"maxLength": 5000,
+						"minLength": 1,
+						"title": "Text"
+					},
+					"id": {
+						"type": "integer",
+						"title": "Id"
+					},
+					"content_id": {
+						"type": "integer",
+						"title": "Content Id"
+					},
+					"user_id": {
+						"type": "integer",
+						"title": "User Id"
+					},
+					"created_at": {
+						"type": "string",
+						"title": "Created At"
+					},
+					"updated_at": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Updated At"
+					},
+					"parent_id": {
+						"anyOf": [
+							{
+								"type": "integer"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Parent Id"
+					},
+					"author_display_name": {
+						"type": "string",
+						"title": "Author Display Name"
+					}
+				},
+				"type": "object",
+				"required": [
+					"text",
+					"id",
+					"content_id",
+					"user_id",
+					"created_at",
+					"updated_at",
+					"parent_id",
+					"author_display_name"
+				],
+				"title": "CommentOut"
+			},
+			"CommentUpdate": {
+				"properties": {
+					"text": {
+						"type": "string",
+						"maxLength": 5000,
+						"minLength": 1,
+						"title": "Text"
+					}
+				},
+				"type": "object",
+				"required": ["text"],
+				"title": "CommentUpdate"
+			},
+			"ContentCreate": {
+				"properties": {
+					"title": {
+						"type": "string",
+						"title": "Title"
+					},
+					"content": {
+						"type": "string",
+						"title": "Content"
+					},
+					"user_id": {
+						"anyOf": [
+							{
+								"type": "integer"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "User Id"
+					},
+					"template_id": {
+						"anyOf": [
+							{
+								"type": "integer"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Template Id"
+					},
+					"tags": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array",
+						"title": "Tags",
+						"default": []
+					}
+				},
+				"type": "object",
+				"required": ["title", "content"],
+				"title": "ContentCreate"
+			},
+			"ContentOut": {
+				"properties": {
+					"title": {
+						"type": "string",
+						"maxLength": 200,
+						"minLength": 1,
+						"title": "Title"
+					},
+					"content": {
+						"type": "string",
+						"minLength": 1,
+						"title": "Content"
+					},
+					"is_published": {
+						"type": "boolean",
+						"title": "Is Published",
+						"default": false
+					},
+					"id": {
+						"type": "integer",
+						"title": "Id"
+					},
+					"user_id": {
+						"type": "integer",
+						"title": "User Id"
+					},
+					"template_id": {
+						"anyOf": [
+							{
+								"type": "integer"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Template Id"
+					},
+					"created_at": {
+						"type": "string",
+						"format": "date-time",
+						"title": "Created At"
+					},
+					"updated_at": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Updated At"
+					},
+					"view_count": {
+						"type": "integer",
+						"title": "View Count",
+						"default": 0
+					},
+					"tags": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array",
+						"title": "Tags"
+					},
+					"user": {
+						"$ref": "#/components/schemas/app__schemas__auth_schema__UserOut"
+					},
+					"template": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/TemplateOut"
+							},
+							{
+								"type": "null"
+							}
+						]
+					}
+				},
+				"type": "object",
+				"required": [
+					"title",
+					"content",
+					"id",
+					"user_id",
+					"created_at",
+					"tags",
+					"user"
+				],
+				"title": "ContentOut"
+			},
+			"ContentTitleUpdate": {
+				"properties": {
+					"title": {
+						"type": "string",
+						"maxLength": 200,
+						"minLength": 1,
+						"title": "Title"
+					}
+				},
+				"type": "object",
+				"required": ["title"],
+				"title": "ContentTitleUpdate"
+			},
+			"ContentUpdate": {
+				"properties": {
+					"id": {
+						"anyOf": [
+							{
+								"type": "integer"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Id"
+					},
+					"title": {
+						"anyOf": [
+							{
+								"type": "string",
+								"maxLength": 200,
+								"minLength": 1
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Title"
+					},
+					"content": {
+						"anyOf": [
+							{
+								"type": "string",
+								"minLength": 1
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Content"
+					},
+					"is_published": {
+						"anyOf": [
+							{
+								"type": "boolean"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Is Published"
+					},
+					"tags": {
+						"anyOf": [
+							{
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Tags"
+					}
+				},
+				"type": "object",
+				"title": "ContentUpdate"
+			},
+			"ConversationMessageOut": {
+				"properties": {
+					"role": {
+						"type": "string",
+						"minLength": 1,
+						"title": "Role"
+					},
+					"content": {
+						"type": "string",
+						"minLength": 1,
+						"title": "Content"
+					},
+					"id": {
+						"type": "integer",
+						"title": "Id"
+					},
+					"created_at": {
+						"type": "string",
+						"format": "date-time",
+						"title": "Created At"
+					}
+				},
+				"type": "object",
+				"required": ["role", "content", "id", "created_at"],
+				"title": "ConversationMessageOut"
+			},
+			"ConversationRequest": {
+				"properties": {
+					"message": {
+						"type": "string",
+						"maxLength": 5000,
+						"minLength": 1,
+						"title": "Message",
+						"description": "User message (max 5000 characters)"
+					},
+					"conversation_id": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Conversation Id",
+						"description": "Existing conversation to append to. If omitted, a new conversation is created."
+					},
+					"preserve_context": {
+						"type": "boolean",
+						"title": "Preserve Context",
+						"description": "When false, a new conversation branch is created even if conversation_id is provided.",
+						"default": true
+					},
+					"model": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Model",
+						"description": "Optional override for the generation model."
+					},
+					"branch_from_id": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Branch From Id",
+						"description": "Create a branched conversation that references this parent conversation ID."
+					},
+					"follow_up_type": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Follow Up Type",
+						"description": "Optional identifier for which quick action or suggestion was selected."
+					}
+				},
+				"type": "object",
+				"required": ["message"],
+				"title": "ConversationRequest"
+			},
+			"ConversationResponse": {
+				"properties": {
+					"conversation_id": {
+						"type": "string",
+						"title": "Conversation Id"
+					},
+					"content_id": {
+						"type": "integer",
+						"title": "Content Id"
+					},
+					"updated_content": {
+						"type": "string",
+						"title": "Updated Content"
+					},
+					"model_used": {
+						"type": "string",
+						"title": "Model Used"
+					},
+					"change_summary": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array",
+						"title": "Change Summary"
+					},
+					"notes": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Notes"
+					},
+					"suggestions": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array",
+						"title": "Suggestions"
+					},
+					"messages": {
+						"items": {
+							"$ref": "#/components/schemas/ConversationMessageOut"
+						},
+						"type": "array",
+						"title": "Messages"
+					},
+					"branch_parent_id": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Branch Parent Id"
+					},
+					"created_new_conversation": {
+						"type": "boolean",
+						"title": "Created New Conversation",
+						"default": false
+					}
+				},
+				"type": "object",
+				"required": [
+					"conversation_id",
+					"content_id",
+					"updated_content",
+					"model_used",
+					"change_summary",
+					"suggestions",
+					"messages"
+				],
+				"title": "ConversationResponse"
+			},
+			"ConversationSummary": {
+				"properties": {
+					"id": {
+						"type": "string",
+						"title": "Id"
+					},
+					"content_id": {
+						"type": "integer",
+						"title": "Content Id"
+					},
+					"template_id": {
+						"anyOf": [
+							{
+								"type": "integer"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Template Id"
+					},
+					"template_used": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Template Used"
+					},
+					"model": {
+						"type": "string",
+						"title": "Model"
+					},
+					"parent_id": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Parent Id"
+					},
+					"created_at": {
+						"type": "string",
+						"format": "date-time",
+						"title": "Created At"
+					},
+					"updated_at": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Updated At"
+					},
+					"message_count": {
+						"type": "integer",
+						"title": "Message Count"
+					}
+				},
+				"type": "object",
+				"required": [
+					"id",
+					"content_id",
+					"model",
+					"created_at",
+					"message_count"
+				],
+				"title": "ConversationSummary"
+			},
+			"ConversationThreadOut": {
+				"properties": {
+					"id": {
+						"type": "string",
+						"title": "Id"
+					},
+					"content_id": {
+						"type": "integer",
+						"title": "Content Id"
+					},
+					"template_id": {
+						"anyOf": [
+							{
+								"type": "integer"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Template Id"
+					},
+					"template_used": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Template Used"
+					},
+					"model": {
+						"type": "string",
+						"title": "Model"
+					},
+					"parent_id": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Parent Id"
+					},
+					"created_at": {
+						"type": "string",
+						"format": "date-time",
+						"title": "Created At"
+					},
+					"updated_at": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Updated At"
+					},
+					"message_count": {
+						"type": "integer",
+						"title": "Message Count"
+					},
+					"messages": {
+						"items": {
+							"$ref": "#/components/schemas/ConversationMessageOut"
+						},
+						"type": "array",
+						"title": "Messages"
+					}
+				},
+				"type": "object",
+				"required": [
+					"id",
+					"content_id",
+					"model",
+					"created_at",
+					"message_count",
+					"messages"
+				],
+				"title": "ConversationThreadOut"
+			},
+			"CsrfTokenPayload": {
+				"properties": {
+					"csrf_token": {
+						"type": "string",
+						"title": "Csrf Token"
+					}
+				},
+				"type": "object",
+				"required": ["csrf_token"],
+				"title": "CsrfTokenPayload",
+				"description": "Payload for CSRF token response."
+			},
+			"CsrfTokenResponse": {
+				"properties": {
+					"status": {
+						"$ref": "#/components/schemas/ResponseStatus"
+					},
+					"message": {
+						"type": "string",
+						"title": "Message"
+					},
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/CsrfTokenPayload"
+							},
+							{
+								"type": "null"
+							}
+						]
+					},
+					"timestamp": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Timestamp"
+					}
+				},
+				"type": "object",
+				"required": ["status", "message"],
+				"title": "CsrfTokenResponse",
+				"description": "Wrapped response for CSRF token endpoint."
+			},
+			"HTTPValidationError": {
+				"properties": {
+					"detail": {
+						"items": {
+							"$ref": "#/components/schemas/ValidationError"
+						},
+						"type": "array",
+						"title": "Detail"
+					}
+				},
+				"type": "object",
+				"title": "HTTPValidationError"
+			},
+			"Item": {
+				"properties": {
+					"name": {
+						"type": "string",
+						"title": "Name"
+					},
+					"price": {
+						"type": "number",
+						"title": "Price"
+					}
+				},
+				"type": "object",
+				"required": ["name", "price"],
+				"title": "Item",
+				"env": "item"
+			},
+			"JobStatus": {
+				"type": "string",
+				"enum": [
+					"pending",
+					"processing",
+					"completed",
+					"failed",
+					"cancelled",
+					"not_found"
+				],
+				"title": "JobStatus"
+			},
+			"LogsProcessingResponse": {
+				"properties": {
+					"job_id": {
+						"type": "string",
+						"title": "Job Id"
+					},
+					"status": {
+						"type": "string",
+						"title": "Status"
+					},
+					"message": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Message"
+					}
+				},
+				"type": "object",
+				"required": ["job_id", "status"],
+				"title": "LogsProcessingResponse"
+			},
+			"LogsProcessingStatusResponse": {
+				"properties": {
+					"job_id": {
+						"type": "string",
+						"title": "Job Id"
+					},
+					"status": {
+						"$ref": "#/components/schemas/JobStatus"
+					},
+					"progress": {
+						"type": "integer",
+						"title": "Progress",
+						"default": 0
+					},
+					"message": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Message"
+					},
+					"result": {
+						"anyOf": [
+							{
+								"additionalProperties": true,
+								"type": "object"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Result"
+					},
+					"error": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Error"
+					}
+				},
+				"type": "object",
+				"required": ["job_id", "status"],
+				"title": "LogsProcessingStatusResponse"
+			},
+			"MediaProcessingResponse": {
+				"properties": {
+					"job_id": {
+						"type": "string",
+						"title": "Job Id"
+					},
+					"status": {
+						"$ref": "#/components/schemas/MediaProcessingStatus"
+					},
+					"message": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Message"
+					}
+				},
+				"type": "object",
+				"required": ["job_id", "status"],
+				"title": "MediaProcessingResponse"
+			},
+			"MediaProcessingStatus": {
+				"type": "string",
+				"enum": ["pending", "processing", "completed", "failed"],
+				"title": "MediaProcessingStatus"
+			},
+			"MediaProcessingStatusResponse": {
+				"properties": {
+					"job_id": {
+						"type": "string",
+						"title": "Job Id"
+					},
+					"status": {
+						"$ref": "#/components/schemas/JobStatus"
+					},
+					"progress": {
+						"type": "integer",
+						"maximum": 100.0,
+						"minimum": 0.0,
+						"title": "Progress",
+						"default": 0
+					},
+					"message": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Message"
+					},
+					"result": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"additionalProperties": true,
+								"type": "object"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Result"
+					},
+					"error": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Error"
+					}
+				},
+				"type": "object",
+				"required": ["job_id", "status"],
+				"title": "MediaProcessingStatusResponse"
+			},
+			"PaginatedResponse_ContentOut_": {
+				"properties": {
+					"items": {
+						"items": {
+							"$ref": "#/components/schemas/ContentOut"
+						},
+						"type": "array",
+						"title": "Items"
+					},
+					"total": {
+						"type": "integer",
+						"title": "Total"
+					},
+					"page": {
+						"type": "integer",
+						"title": "Page"
+					},
+					"per_page": {
+						"type": "integer",
+						"title": "Per Page"
+					}
+				},
+				"type": "object",
+				"required": ["items", "total", "page", "per_page"],
+				"title": "PaginatedResponse[ContentOut]"
+			},
+			"ResponseModel_CommentOut_": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"title": "Status"
+					},
+					"message": {
+						"type": "string",
+						"title": "Message"
+					},
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/CommentOut"
+							},
+							{
+								"type": "null"
+							}
+						]
+					}
+				},
+				"type": "object",
+				"required": ["status", "message"],
+				"title": "ResponseModel[CommentOut]"
+			},
+			"ResponseModel_ContentOut_": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"title": "Status"
+					},
+					"message": {
+						"type": "string",
+						"title": "Message"
+					},
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/ContentOut"
+							},
+							{
+								"type": "null"
+							}
+						]
+					}
+				},
+				"type": "object",
+				"required": ["status", "message"],
+				"title": "ResponseModel[ContentOut]"
+			},
+			"ResponseModel_ConversationResponse_": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"title": "Status"
+					},
+					"message": {
+						"type": "string",
+						"title": "Message"
+					},
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/ConversationResponse"
+							},
+							{
+								"type": "null"
+							}
+						]
+					}
+				},
+				"type": "object",
+				"required": ["status", "message"],
+				"title": "ResponseModel[ConversationResponse]"
+			},
+			"ResponseModel_ConversationThreadOut_": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"title": "Status"
+					},
+					"message": {
+						"type": "string",
+						"title": "Message"
+					},
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/ConversationThreadOut"
+							},
+							{
+								"type": "null"
+							}
+						]
+					}
+				},
+				"type": "object",
+				"required": ["status", "message"],
+				"title": "ResponseModel[ConversationThreadOut]"
+			},
+			"ResponseModel_List_CommentOut__": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"title": "Status"
+					},
+					"message": {
+						"type": "string",
+						"title": "Message"
+					},
+					"data": {
+						"anyOf": [
+							{
+								"items": {
+									"$ref": "#/components/schemas/CommentOut"
+								},
+								"type": "array"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Data"
+					}
+				},
+				"type": "object",
+				"required": ["status", "message"],
+				"title": "ResponseModel[List[CommentOut]]"
+			},
+			"ResponseModel_List_ConversationSummary__": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"title": "Status"
+					},
+					"message": {
+						"type": "string",
+						"title": "Message"
+					},
+					"data": {
+						"anyOf": [
+							{
+								"items": {
+									"$ref": "#/components/schemas/ConversationSummary"
+								},
+								"type": "array"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Data"
+					}
+				},
+				"type": "object",
+				"required": ["status", "message"],
+				"title": "ResponseModel[List[ConversationSummary]]"
+			},
+			"ResponseModel_List_TemplateOut__": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"title": "Status"
+					},
+					"message": {
+						"type": "string",
+						"title": "Message"
+					},
+					"data": {
+						"anyOf": [
+							{
+								"items": {
+									"$ref": "#/components/schemas/TemplateOut"
+								},
+								"type": "array"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Data"
+					}
+				},
+				"type": "object",
+				"required": ["status", "message"],
+				"title": "ResponseModel[List[TemplateOut]]"
+			},
+			"ResponseModel_LogsProcessingResponse_": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"title": "Status"
+					},
+					"message": {
+						"type": "string",
+						"title": "Message"
+					},
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/LogsProcessingResponse"
+							},
+							{
+								"type": "null"
+							}
+						]
+					}
+				},
+				"type": "object",
+				"required": ["status", "message"],
+				"title": "ResponseModel[LogsProcessingResponse]"
+			},
+			"ResponseModel_LogsProcessingStatusResponse_": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"title": "Status"
+					},
+					"message": {
+						"type": "string",
+						"title": "Message"
+					},
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/LogsProcessingStatusResponse"
+							},
+							{
+								"type": "null"
+							}
+						]
+					}
+				},
+				"type": "object",
+				"required": ["status", "message"],
+				"title": "ResponseModel[LogsProcessingStatusResponse]"
+			},
+			"ResponseModel_NoneType_": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"title": "Status"
+					},
+					"message": {
+						"type": "string",
+						"title": "Message"
+					},
+					"data": {
+						"type": "null",
+						"title": "Data"
+					}
+				},
+				"type": "object",
+				"required": ["status", "message"],
+				"title": "ResponseModel[NoneType]"
+			},
+			"ResponseModel_PaginatedResponse_ContentOut__": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"title": "Status"
+					},
+					"message": {
+						"type": "string",
+						"title": "Message"
+					},
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/PaginatedResponse_ContentOut_"
+							},
+							{
+								"type": "null"
+							}
+						]
+					}
+				},
+				"type": "object",
+				"required": ["status", "message"],
+				"title": "ResponseModel[PaginatedResponse[ContentOut]]"
+			},
+			"ResponseModel_TemplateOut_": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"title": "Status"
+					},
+					"message": {
+						"type": "string",
+						"title": "Message"
+					},
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/TemplateOut"
+							},
+							{
+								"type": "null"
+							}
+						]
+					}
+				},
+				"type": "object",
+				"required": ["status", "message"],
+				"title": "ResponseModel[TemplateOut]"
+			},
+			"ResponseModel_dict_": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"title": "Status"
+					},
+					"message": {
+						"type": "string",
+						"title": "Message"
+					},
+					"data": {
+						"anyOf": [
+							{
+								"additionalProperties": true,
+								"type": "object"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Data"
+					}
+				},
+				"type": "object",
+				"required": ["status", "message"],
+				"title": "ResponseModel[dict]"
+			},
+			"ResponseModel_list_": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"title": "Status"
+					},
+					"message": {
+						"type": "string",
+						"title": "Message"
+					},
+					"data": {
+						"anyOf": [
+							{
+								"items": {},
+								"type": "array"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Data"
+					}
+				},
+				"type": "object",
+				"required": ["status", "message"],
+				"title": "ResponseModel[list]"
+			},
+			"ResponseModel_list_SubscriptionOut__": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"title": "Status"
+					},
+					"message": {
+						"type": "string",
+						"title": "Message"
+					},
+					"data": {
+						"anyOf": [
+							{
+								"items": {
+									"$ref": "#/components/schemas/SubscriptionOut"
+								},
+								"type": "array"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Data"
+					}
+				},
+				"type": "object",
+				"required": ["status", "message"],
+				"title": "ResponseModel[list[SubscriptionOut]]"
+			},
+			"ResponseModel_list_dict__": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"title": "Status"
+					},
+					"message": {
+						"type": "string",
+						"title": "Message"
+					},
+					"data": {
+						"anyOf": [
+							{
+								"items": {
+									"additionalProperties": true,
+									"type": "object"
+								},
+								"type": "array"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Data"
+					}
+				},
+				"type": "object",
+				"required": ["status", "message"],
+				"title": "ResponseModel[list[dict]]"
+			},
+			"ResponseStatus": {
+				"type": "string",
+				"enum": ["success", "error", "warning", "info"],
+				"title": "ResponseStatus"
+			},
+			"SubscriptionOut": {
+				"properties": {
+					"id": {
+						"type": "integer",
+						"title": "Id"
+					},
+					"user_id": {
+						"type": "integer",
+						"title": "User Id"
+					},
+					"plan": {
+						"type": "string",
+						"title": "Plan"
+					},
+					"status": {
+						"type": "string",
+						"title": "Status"
+					},
+					"stripe_customer_id": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Stripe Customer Id"
+					},
+					"stripe_subscription_id": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Stripe Subscription Id"
+					},
+					"created_at": {
+						"type": "string",
+						"title": "Created At"
+					},
+					"updated_at": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Updated At"
+					},
+					"user": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/UserBasicOut"
+							},
+							{
+								"type": "null"
+							}
+						]
+					}
+				},
+				"type": "object",
+				"required": ["id", "user_id", "plan", "status", "created_at"],
+				"title": "SubscriptionOut"
+			},
+			"TemplateCreate": {
+				"properties": {
+					"name": {
+						"type": "string",
+						"maxLength": 100,
+						"minLength": 1,
+						"title": "Name"
+					},
+					"template_content": {
+						"type": "string",
+						"minLength": 1,
+						"title": "Template Content"
+					},
+					"is_default": {
+						"type": "boolean",
+						"title": "Is Default",
+						"default": false
+					},
+					"user_id": {
+						"anyOf": [
+							{
+								"type": "integer"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "User Id"
+					}
+				},
+				"type": "object",
+				"required": ["name", "template_content"],
+				"title": "TemplateCreate"
+			},
+			"TemplateOut": {
+				"properties": {
+					"id": {
+						"type": "integer",
+						"title": "Id"
+					},
+					"name": {
+						"type": "string",
+						"title": "Name"
+					},
+					"template_content": {
+						"type": "string",
+						"title": "Template Content"
+					},
+					"user_id": {
+						"anyOf": [
+							{
+								"type": "integer"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "User Id"
+					},
+					"is_default": {
+						"type": "boolean",
+						"title": "Is Default"
+					},
+					"created_at": {
+						"type": "string",
+						"format": "date-time",
+						"title": "Created At"
+					},
+					"updated_at": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Updated At"
+					},
+					"usage_count": {
+						"type": "integer",
+						"title": "Usage Count",
+						"default": 0
+					},
+					"user": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/app__schemas__auth_schema__UserOut"
+							},
+							{
+								"type": "null"
+							}
+						]
+					}
+				},
+				"type": "object",
+				"required": [
+					"id",
+					"name",
+					"template_content",
+					"is_default",
+					"created_at"
+				],
+				"title": "TemplateOut"
+			},
+			"TemplateUpdate": {
+				"properties": {
+					"name": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Name"
+					},
+					"template_content": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Template Content"
+					}
+				},
+				"type": "object",
+				"title": "TemplateUpdate"
+			},
+			"UserBasicOut": {
+				"properties": {
+					"id": {
+						"type": "integer",
+						"title": "Id"
+					},
+					"email": {
+						"type": "string",
+						"title": "Email"
+					},
+					"display_name": {
+						"type": "string",
+						"title": "Display Name"
+					}
+				},
+				"type": "object",
+				"required": ["id", "email", "display_name"],
+				"title": "UserBasicOut"
+			},
+			"UserCreate": {
+				"properties": {
+					"email": {
+						"type": "string",
+						"format": "email",
+						"title": "Email"
+					},
+					"display_name": {
+						"type": "string",
+						"maxLength": 50,
+						"minLength": 1,
+						"title": "Display Name"
+					},
+					"role": {
+						"$ref": "#/components/schemas/UserRole",
+						"default": "USER"
+					},
+					"password": {
+						"type": "string",
+						"title": "Password",
+						"description": "Password must be at least 8 characters long"
+					}
+				},
+				"type": "object",
+				"required": ["email", "display_name", "password"],
+				"title": "UserCreate"
+			},
+			"UserLogin": {
+				"properties": {
+					"email": {
+						"type": "string",
+						"format": "email",
+						"title": "Email"
+					},
+					"password": {
+						"type": "string",
+						"title": "Password"
+					}
+				},
+				"type": "object",
+				"required": ["email", "password"],
+				"title": "UserLogin"
+			},
+			"UserRole": {
+				"type": "string",
+				"enum": ["USER", "ADMIN", "POWER", "MODERATOR", "GUEST"],
+				"title": "UserRole"
+			},
+			"UserUpdate": {
+				"properties": {
+					"email": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "email"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Email"
+					},
+					"display_name": {
+						"anyOf": [
+							{
+								"type": "string",
+								"maxLength": 50,
+								"minLength": 1
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Display Name"
+					},
+					"role": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/UserRole"
+							},
+							{
+								"type": "null"
+							}
+						]
+					}
+				},
+				"type": "object",
+				"title": "UserUpdate"
+			},
+			"ValidationError": {
+				"properties": {
+					"loc": {
+						"items": {
+							"anyOf": [
+								{
+									"type": "string"
+								},
+								{
+									"type": "integer"
+								}
+							]
+						},
+						"type": "array",
+						"title": "Location"
+					},
+					"msg": {
+						"type": "string",
+						"title": "Message"
+					},
+					"type": {
+						"type": "string",
+						"title": "Error Type"
+					}
+				},
+				"type": "object",
+				"required": ["loc", "msg", "type"],
+				"title": "ValidationError"
+			},
+			"app__schemas__auth_schema__UserOut": {
+				"properties": {
+					"email": {
+						"type": "string",
+						"format": "email",
+						"title": "Email"
+					},
+					"display_name": {
+						"type": "string",
+						"maxLength": 50,
+						"minLength": 1,
+						"title": "Display Name"
+					},
+					"role": {
+						"$ref": "#/components/schemas/UserRole",
+						"default": "USER"
+					},
+					"id": {
+						"type": "integer",
+						"title": "Id"
+					},
+					"created_at": {
+						"type": "string",
+						"format": "date-time",
+						"title": "Created At"
+					},
+					"last_login": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Last Login"
+					},
+					"is_active": {
+						"type": "boolean",
+						"title": "Is Active"
+					},
+					"content_count": {
+						"type": "integer",
+						"title": "Content Count",
+						"default": 0
+					}
+				},
+				"type": "object",
+				"required": ["email", "display_name", "id", "created_at", "is_active"],
+				"title": "UserOut"
+			}
+		},
+		"securitySchemes": {
+			"OAuth2PasswordBearer": {
+				"type": "oauth2",
+				"flows": {
+					"password": {
+						"scopes": {},
+						"tokenUrl": "/auth/login"
+					}
+				}
+			}
+		}
+	}
+}

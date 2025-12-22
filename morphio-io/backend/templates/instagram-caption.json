@@ -1,0 +1,4 @@
+{
+  "name": "Instagram Caption",
+  "template_content": "Below is some textual content. Convert it into a short, punchy Instagram caption designed for high engagement. Use concise and energetic language that hooks the reader. Feel free to include emojis, occasional use of all-caps for emphasis, and hashtags relevant to the content.\n\nEnsure each post starts with a strong first line and ends with a call to action, such as a question or prompt for user engagement in the comments.\n\nTranscript:\n{transcript}\n\nPlease format the output for the caption in valid Markdown format."
+}

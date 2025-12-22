@@ -1,0 +1,4 @@
+{
+    "name": "Recipe",
+    "template_content": "Extract the recipe and instructions from the content provided below and format it into proper markdown. Capture all essential steps, ingredients, materials, suggestions, cook time, prep time, etc. Like a cookbook would present the information. \n\n{transcript}"
+}

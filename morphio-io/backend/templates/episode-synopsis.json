@@ -1,0 +1,4 @@
+{
+  "name": "Episode Synopsis",
+  "template_content": "I missed the most recent episode of a show I am watching and the new episode airs tonight, so I don't have time to rewatch the episode I missed. I have provided the transcript from the missed episode and am asking you to capture all key points so I can watch the next episodes without being lost or missing any context. Thank you in advance.\nInclude the following information in your output:\nShow name: (if available)\nSeason-Episode: (if available)\n\nHere is the episode transcript:\n{transcript}\n"
+}

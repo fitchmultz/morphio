@@ -1,0 +1,4 @@
+{
+  "name": "Just the Gist",
+  "template_content": "Your task is to take the text content provided and boil it down to provide me just the gist. I don't have the time nor patience to ingest every bit of information out there and often just desire to know what I need to know. If the content provided is huge as hell then I understand the gist may be a little longer. Thanks brotha.\n\n{transcript}\n\nBottom line(s) up front"
+}

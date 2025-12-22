@@ -1,0 +1,20 @@
+{
+	"$schema": "https://typedoc.org/schema.json",
+	"entryPoints": ["src/**/*.ts", "src/**/*.tsx"],
+	"out": "docs",
+	"includeVersion": true,
+	"excludePrivate": true,
+	"excludeProtected": true,
+	"excludeExternals": true,
+	"theme": "default",
+	"categorizeByGroup": true,
+	"categoryOrder": ["Components", "Hooks", "Utils", "*"],
+	"readme": "README.md",
+	"name": "Project Documentation",
+	"gitRevision": "main",
+	"compilerOptions": {
+		"strictNullChecks": true
+	},
+	"plugin": ["typedoc-plugin-merge-modules"],
+	"mergeModulesMergeMode": "module"
+}

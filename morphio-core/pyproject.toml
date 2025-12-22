@@ -1,0 +1,72 @@
+[project]
+name = "morphio-core"
+version = "0.1.0"
+description = "Reusable Python library for audio processing, LLM orchestration, and security utilities"
+readme = "README.md"
+requires-python = ">=3.13"
+license = "MIT"
+authors = [{ name = "Mitch Fultz" }]
+keywords = ["audio", "llm", "transcription", "ai", "security"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Multimedia :: Sound/Audio",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Typing :: Typed",
+]
+dependencies = [
+    "pydantic>=2.10.0",
+]
+
+[project.optional-dependencies]
+# LLM providers - split for minimal installs
+llm-openai = ["openai>=1.75.0"]
+llm-anthropic = ["anthropic>=0.45.0"]
+llm-gemini = ["google-genai>=1.0.0"]
+llm = ["openai>=1.75.0", "anthropic>=0.45.0", "google-genai>=1.0.0"]
+
+# Video downloading
+video = ["yt-dlp>=2024.12.1"]
+
+# Whisper backends (install one based on your hardware)
+whisper-mlx = ["mlx-whisper>=0.4.0"]
+whisper-cuda = ["faster-whisper>=1.0.0"]
+whisper-cpu = ["faster-whisper>=1.0.0"]
+
+# Explicit union - avoid self-referential extras
+all = [
+    "openai>=1.75.0",
+    "anthropic>=0.45.0",
+    "google-genai>=1.0.0",
+    "yt-dlp>=2024.12.1",
+    "faster-whisper>=1.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.24.0",
+    "ruff>=0.8.0",
+    "ty>=0.0.1a1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/morphio_core"]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
