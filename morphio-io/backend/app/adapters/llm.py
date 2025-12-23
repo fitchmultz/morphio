@@ -213,7 +213,7 @@ async def generate_completion(
 
         # Get token limit for model
         token_limit = get_model_token_limit(chosen_model)
-        effective_max_tokens = min(max_tokens or token_limit, token_limit)
+        effective_max_tokens = min(max_tokens, token_limit) if max_tokens is not None else token_limit
 
         # Convert dict messages to Message objects
         typed_messages = convert_to_messages(messages)

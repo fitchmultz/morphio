@@ -81,7 +81,7 @@ class OpenAIProvider:
             if effort not in VALID_REASONING_EFFORTS:
                 raise LLMProviderError(
                     f"Invalid reasoning_effort '{reasoning_effort}'. "
-                    f"Valid values: {VALID_REASONING_EFFORTS}"
+                    f"Valid values: {', '.join(sorted(VALID_REASONING_EFFORTS))}"
                 )
             api_params["reasoning_effort"] = effort
 
