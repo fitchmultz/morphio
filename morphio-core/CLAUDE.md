@@ -133,9 +133,11 @@ router = create_router(config, openai_client=mock_client)
 ```python
 from morphio_core.security import URLValidator, Anonymizer
 
+# SSRF protection
 validator = URLValidator()
 validator.validate("https://api.example.com")  # Raises SSRFBlockedError if blocked
 
+# Content anonymization
 anonymizer = Anonymizer()
 safe = anonymizer.anonymize("Email: john@test.com")  # "Email: [EMAIL_1]"
 original = anonymizer.deanonymize(safe)
@@ -143,20 +145,33 @@ original = anonymizer.deanonymize(safe)
 
 ### Audio
 ```python
-from morphio_core.audio import chunk_audio, ChunkingConfig, Transcriber
+from morphio_core.audio import chunk_audio, ChunkingConfig, transcribe_audio, TranscriptionConfig
 
-chunks = list(chunk_audio(audio_path, ChunkingConfig(chunk_duration=300)))
+# Chunking
+result = await chunk_audio("audio.mp3", "/tmp/chunks", config=ChunkingConfig(segment_duration=300))
 
-transcriber = Transcriber(...)
-result = await transcriber.transcribe(audio_path)
+# Transcription (auto-selects best backend)
+result = transcribe_audio("audio.mp3")
+print(f"{result.text} (via {result.backend_used} on {result.device_used})")
 ```
 
 ### LLM
 ```python
-from morphio_core.llm import create_router, LLMConfig
+from morphio_core.llm import create_router, Message, LLMConfig, ProviderConfig
+from pydantic import SecretStr
 
-router = create_router(LLMConfig(providers=[...]))
-response = await router.complete("Hello")
+# Simple creation
+router = create_router(openai_api_key="sk-...", default_provider="openai")
+result = await router.generate([Message(role="user", content="Hello")])
+
+# Custom providers
+def my_factory(config: ProviderConfig) -> "LLMProvider":
+    return MyProvider(api_key=config.api_key, model=config.default_model)
+
+config = LLMConfig(
+    custom_providers={"my-llm": my_factory},
+    custom_configs={"my-llm": ProviderConfig(api_key=SecretStr("..."), default_model="m1")},
+)
 ```
 
 ### Video
@@ -170,10 +185,21 @@ path = await download_video_audio(url, output_dir)
 
 ### Media (FFmpeg)
 ```python
-from morphio_core.media import probe_duration, convert_to_audio
+from morphio_core.media import FFmpegConfig, probe_duration, convert_to_audio
 
+# Auto-detect (default)
 duration = await probe_duration(video_path)
-await convert_to_audio(input_path, output_path)
+
+# Custom paths (containers, etc.)
+config = FFmpegConfig(ffmpeg_path="/opt/ffmpeg/bin/ffmpeg")
+await convert_to_audio(input_path, output_path, config=config)
+```
+
+### CLI
+```bash
+morphio info                                    # Show system info
+morphio validate-url https://example.com       # SSRF validation
+morphio transcribe audio.mp3 --model base      # Transcription
 ```
 
 ## Testing Guidelines
