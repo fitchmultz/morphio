@@ -63,6 +63,28 @@ class OpenAIProvider:
     def provider_name(self) -> str:
         return "openai"
 
+    @staticmethod
+    def _apply_reasoning_effort(
+        api_params: dict[str, Any], reasoning_effort: str | None
+    ) -> None:
+        """Validate and apply reasoning_effort to API params.
+
+        Args:
+            api_params: Dictionary to modify in place
+            reasoning_effort: Optional reasoning effort level
+
+        Raises:
+            LLMProviderError: If reasoning_effort is invalid
+        """
+        if reasoning_effort:
+            effort = reasoning_effort.lower()
+            if effort not in VALID_REASONING_EFFORTS:
+                raise LLMProviderError(
+                    f"Invalid reasoning_effort '{reasoning_effort}'. "
+                    f"Valid values: {VALID_REASONING_EFFORTS}"
+                )
+            api_params["reasoning_effort"] = effort
+
     async def generate(
         self,
         messages: list[Message],
@@ -103,15 +125,7 @@ class OpenAIProvider:
             "temperature": temperature,
         }
 
-        # Add reasoning_effort if provided
-        if reasoning_effort:
-            effort = reasoning_effort.lower()
-            if effort not in VALID_REASONING_EFFORTS:
-                raise LLMProviderError(
-                    f"Invalid reasoning_effort '{reasoning_effort}'. "
-                    f"Valid values: {VALID_REASONING_EFFORTS}"
-                )
-            api_params["reasoning_effort"] = effort
+        self._apply_reasoning_effort(api_params, reasoning_effort)
 
         try:
             response = await client.chat.completions.create(**api_params)
@@ -175,15 +189,7 @@ class OpenAIProvider:
             "stream_options": {"include_usage": True},
         }
 
-        # Add reasoning_effort if provided
-        if reasoning_effort:
-            effort = reasoning_effort.lower()
-            if effort not in VALID_REASONING_EFFORTS:
-                raise LLMProviderError(
-                    f"Invalid reasoning_effort '{reasoning_effort}'. "
-                    f"Valid values: {VALID_REASONING_EFFORTS}"
-                )
-            api_params["reasoning_effort"] = effort
+        self._apply_reasoning_effort(api_params, reasoning_effort)
 
         try:
             stream = await client.chat.completions.create(**api_params)

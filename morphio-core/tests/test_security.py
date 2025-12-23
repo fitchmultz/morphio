@@ -56,8 +56,6 @@ class TestAnonymizer:
 
     def test_anonymize_valid_ips(self):
         """Test that valid IP addresses are anonymized."""
-        anonymizer = Anonymizer()
-
         # Test various valid IPs
         valid_ips = [
             ("0.0.0.0", "minimum valid"),
@@ -76,8 +74,6 @@ class TestAnonymizer:
 
     def test_anonymize_invalid_ips_unchanged(self):
         """Test that invalid IPs are NOT anonymized."""
-        anonymizer = Anonymizer()
-
         invalid_ips = [
             "999.999.999.999",
             "256.256.256.256",
