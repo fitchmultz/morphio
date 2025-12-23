@@ -80,6 +80,47 @@ class AnthropicProvider:
         system_prompt = "\n\n".join(system_parts) if system_parts else None
         return anthropic_messages, system_prompt
 
+    @staticmethod
+    def _build_api_params(
+        model: str,
+        messages: list[dict[str, str]],
+        max_tokens: int,
+        temperature: float,
+        system_prompt: str | None,
+        extended_thinking: bool,
+        thinking_budget: int,
+    ) -> dict[str, Any]:
+        """Build API parameters for Anthropic requests.
+
+        Args:
+            model: Model identifier
+            messages: Converted message list
+            max_tokens: Maximum tokens for response
+            temperature: Sampling temperature
+            system_prompt: Optional system instruction
+            extended_thinking: Enable extended thinking mode
+            thinking_budget: Token budget for thinking
+
+        Returns:
+            Dictionary of API parameters
+        """
+        api_params: dict[str, Any] = {
+            "model": model,
+            "messages": messages,
+            "max_tokens": max_tokens,
+            "temperature": temperature,
+        }
+        if system_prompt:
+            api_params["system"] = system_prompt
+
+        if extended_thinking:
+            api_params["thinking"] = {
+                "type": "enabled",
+                "budget_tokens": max(1024, thinking_budget),  # Min 1024 per API docs
+            }
+
+        return api_params
+
     async def generate(
         self,
         messages: list[Message],
@@ -114,21 +155,15 @@ class AnthropicProvider:
         anthropic_messages, system_prompt = self._convert_messages(messages)
 
         try:
-            api_params: dict[str, Any] = {
-                "model": model,
-                "messages": anthropic_messages,
-                "max_tokens": max_tokens,
-                "temperature": temperature,
-            }
-            if system_prompt:
-                api_params["system"] = system_prompt
-
-            # Enable extended thinking if requested
-            if extended_thinking:
-                api_params["thinking"] = {
-                    "type": "enabled",
-                    "budget_tokens": max(1024, thinking_budget),  # Min 1024 per API docs
-                }
+            api_params = self._build_api_params(
+                model=model,
+                messages=anthropic_messages,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                system_prompt=system_prompt,
+                extended_thinking=extended_thinking,
+                thinking_budget=thinking_budget,
+            )
 
             response = await client.messages.create(**api_params)
 
@@ -187,21 +222,15 @@ class AnthropicProvider:
         anthropic_messages, system_prompt = self._convert_messages(messages)
 
         try:
-            api_params: dict[str, Any] = {
-                "model": model,
-                "messages": anthropic_messages,
-                "max_tokens": max_tokens,
-                "temperature": temperature,
-            }
-            if system_prompt:
-                api_params["system"] = system_prompt
-
-            # Enable extended thinking if requested
-            if extended_thinking:
-                api_params["thinking"] = {
-                    "type": "enabled",
-                    "budget_tokens": max(1024, thinking_budget),  # Min 1024 per API docs
-                }
+            api_params = self._build_api_params(
+                model=model,
+                messages=anthropic_messages,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                system_prompt=system_prompt,
+                extended_thinking=extended_thinking,
+                thinking_budget=thinking_budget,
+            )
 
             async with client.messages.stream(**api_params) as stream:
                 async for text in stream.text_stream:

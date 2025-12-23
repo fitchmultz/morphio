@@ -92,7 +92,7 @@ Provider-specific parameters flow through the adapter → router → provider ch
 morphio-io adapter                          morphio-core router                      Provider
 ┌──────────────────────┐                   ┌──────────────────┐                    ┌──────────────┐
 │ generate_completion( │                   │ router.generate( │                    │ provider.    │
-│   model="gpt-5.1-high",  ──resolve────>  │   model="gpt-5.1", ──pass_through──> │   generate(  │
+│   model="gpt-5.2-high",  ──resolve────>  │   model="gpt-5.2", ──pass_through──> │   generate(  │
 │   ...                │     alias         │   reasoning_effort="high",           │     ...      │
 │ )                    │                   │   **kwargs                           │     reasoning_effort="high")
 └──────────────────────┘                   └──────────────────┘                    └──────────────┘
@@ -104,15 +104,15 @@ morphio-io adapter                          morphio-core router                 
 |----------|-----------|--------|--------|
 | OpenAI | `reasoning_effort` | o1, o3 series | `"low"`, `"medium"`, `"high"` |
 | Gemini | `thinking_level` | All (Pro: limited) | `"minimal"`, `"low"`, `"medium"`, `"high"` |
-| Anthropic | (none yet) | - | - |
+| Anthropic | `extended_thinking` | Claude 3.5+ | `True` (boolean) |
 
 **Model Alias Resolution (in morphio-io):**
 
 ```python
 # User-facing model aliases encode parameters
-"gpt-5.1-high"                → base="gpt-5.1", reasoning_effort="high"
-"gemini-3-flash-preview-low"  → base="gemini-3-flash-preview", thinking_level="low"
-"claude-4-sonnet"             → base="claude-4-sonnet" (no special params)
+"gpt-5.2-high"                  → base="gpt-5.2", reasoning_effort="high"
+"gemini-3-flash-preview-low"    → base="gemini-3-flash-preview", thinking_level="low"
+"claude-4.5-sonnet-thinking"    → base="claude-4.5-sonnet", extended_thinking=True
 ```
 
 The LLM adapter resolves these aliases before calling morphio-core's router.
