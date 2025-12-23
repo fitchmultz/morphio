@@ -45,14 +45,8 @@ def transcribe(
     ] = WhisperBackend.auto,
 ) -> None:
     """Transcribe an audio file using local Whisper."""
-    try:
-        from morphio_core.audio import TranscriptionConfig, transcribe_audio
-        from morphio_core.exceptions import TranscriptionError
-    except ImportError as e:
-        console.print("[red]Error:[/red] Whisper backend not installed.")
-        console.print("Install with: [cyan]uv add mlx-whisper[/cyan] (Apple Silicon)")
-        console.print("         or: [cyan]uv add faster-whisper[/cyan] (NVIDIA GPU or CPU)")
-        raise typer.Exit(1) from e
+    from morphio_core.audio import TranscriptionConfig, transcribe_audio
+    from morphio_core.exceptions import TranscriptionError
 
     if not audio_file.exists():
         console.print(f"[red]Error:[/red] File not found: {audio_file}")
