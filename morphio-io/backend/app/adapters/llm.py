@@ -4,7 +4,7 @@ LLM adapter - provides configured LLM router and utilities.
 This adapter wraps morphio-core's LLMRouter and provides:
 - Configuration from application settings
 - Exception translation to ApplicationException
-- Model alias resolution (e.g., "gpt-5.1-high" -> base model + reasoning_effort)
+- Model alias resolution (e.g., "gpt-5.2-high" -> base model + reasoning_effort)
 - Provider-specific parameter handling (thinking_level, reasoning_effort)
 """
 
@@ -35,20 +35,25 @@ class GenerationWithUsage(TokenUsage):
 
 # Model token limits for output
 MODEL_TOKEN_LIMITS = {
-    # OpenAI models
-    "gpt-5.1": 128000,
-    "gpt-5.1-nano": 128000,
-    "gpt-5.1-low": 128000,
-    "gpt-5.1-medium": 128000,
-    "gpt-5.1-high": 128000,
-    # Anthropic models
-    "claude-4-sonnet": 16384,
-    # Gemini 3 Flash variants
+    # OpenAI models (accept reasoning_effort: low/medium/high)
+    "gpt-5.2": 128000,
+    "gpt-5.2-low": 128000,
+    "gpt-5.2-medium": 128000,
+    "gpt-5.2-high": 128000,
+    "gpt-5.2-codex": 128000,
+    "gpt-5.2-codex-low": 128000,
+    "gpt-5.2-codex-medium": 128000,
+    "gpt-5.2-codex-high": 128000,
+    # Anthropic models (no thinking/reasoning support)
+    "claude-4.5-opus": 16384,
+    "claude-4.5-sonnet": 16384,
+    "claude-4.5-haiku": 16384,
+    # Gemini 3 Flash variants (accept thinking_level)
     "gemini-3-flash-preview": 65536,
     "gemini-3-flash-preview-medium": 65536,
     "gemini-3-flash-preview-low": 65536,
     "gemini-3-flash-preview-minimal": 65536,
-    # Gemini 3 Pro variants
+    # Gemini 3 Pro variants (accept thinking_level)
     "gemini-3-pro-preview": 65536,
     "gemini-3-pro-preview-low": 65536,
 }
@@ -58,17 +63,26 @@ VALID_GENERATION_MODELS = set(MODEL_TOKEN_LIMITS.keys())
 
 # Display labels for UI
 MODEL_DISPLAY_INFO = [
+    # Gemini models
     {"id": "gemini-3-flash-preview", "label": "Gemini 3 Flash (High)"},
     {"id": "gemini-3-flash-preview-medium", "label": "Gemini 3 Flash (Medium)"},
     {"id": "gemini-3-flash-preview-low", "label": "Gemini 3 Flash (Low)"},
     {"id": "gemini-3-flash-preview-minimal", "label": "Gemini 3 Flash (Minimal)"},
     {"id": "gemini-3-pro-preview", "label": "Gemini 3 Pro (High)"},
     {"id": "gemini-3-pro-preview-low", "label": "Gemini 3 Pro (Low)"},
-    {"id": "gpt-5.1", "label": "GPT-5.1"},
-    {"id": "gpt-5.1-high", "label": "GPT-5.1 (High Reasoning)"},
-    {"id": "gpt-5.1-medium", "label": "GPT-5.1 (Medium Reasoning)"},
-    {"id": "gpt-5.1-low", "label": "GPT-5.1 (Low Reasoning)"},
-    {"id": "claude-4-sonnet", "label": "Claude 4 Sonnet"},
+    # OpenAI models
+    {"id": "gpt-5.2", "label": "GPT-5.2"},
+    {"id": "gpt-5.2-high", "label": "GPT-5.2 (High Reasoning)"},
+    {"id": "gpt-5.2-medium", "label": "GPT-5.2 (Medium Reasoning)"},
+    {"id": "gpt-5.2-low", "label": "GPT-5.2 (Low Reasoning)"},
+    {"id": "gpt-5.2-codex", "label": "GPT-5.2 Codex"},
+    {"id": "gpt-5.2-codex-high", "label": "GPT-5.2 Codex (High Reasoning)"},
+    {"id": "gpt-5.2-codex-medium", "label": "GPT-5.2 Codex (Medium Reasoning)"},
+    {"id": "gpt-5.2-codex-low", "label": "GPT-5.2 Codex (Low Reasoning)"},
+    # Anthropic models
+    {"id": "claude-4.5-opus", "label": "Claude 4.5 Opus"},
+    {"id": "claude-4.5-sonnet", "label": "Claude 4.5 Sonnet"},
+    {"id": "claude-4.5-haiku", "label": "Claude 4.5 Haiku"},
 ]
 
 
@@ -77,8 +91,10 @@ def resolve_model_alias(chosen_model: str) -> tuple[str, ProviderName, dict[str,
     Resolve a model alias to base model, provider, and provider-specific kwargs.
 
     Model aliases encode provider-specific features:
-    - "gpt-5.1-high" -> base="gpt-5.1", provider="openai", kwargs={"reasoning_effort": "high"}
+    - "gpt-5.2-high" -> base="gpt-5.2", provider="openai", kwargs={"reasoning_effort": "high"}
+    - "gpt-5.2-codex-medium" -> base="gpt-5.2-codex", kwargs={"reasoning_effort": "medium"}
     - "gemini-3-flash-preview-medium" -> base="gemini-3-flash-preview", kwargs={"thinking_level": "medium"}
+    - "claude-4.5-sonnet" -> base="claude-4.5-sonnet", provider="anthropic", kwargs={}
 
     Args:
         chosen_model: Model ID (possibly with embedded parameters)
@@ -202,7 +218,7 @@ async def _generate_core(
 
     Args:
         messages: List of message dicts with 'role' and 'content' keys
-        model: Model to use (supports aliases like "gpt-5.1-high")
+        model: Model to use (supports aliases like "gpt-5.2-high")
         max_tokens: Maximum tokens in response (uses model default if None)
         temperature: Temperature override
 
@@ -268,7 +284,7 @@ async def generate_completion(
 
     Args:
         messages: List of message dicts with 'role' and 'content' keys
-        model: Model to use (supports aliases like "gpt-5.1-high", "gemini-3-flash-preview-medium")
+        model: Model to use (supports aliases like "gpt-5.2-high", "gemini-3-flash-preview-medium")
         max_tokens: Maximum tokens in response (uses model default if None)
         temperature: Temperature override
 
@@ -317,7 +333,7 @@ async def generate_completion_with_usage(
 
     Args:
         messages: List of message dicts with 'role' and 'content' keys
-        model: Model to use (supports aliases like "gpt-5.1-high")
+        model: Model to use (supports aliases like "gpt-5.2-high")
         max_tokens: Maximum tokens in response (uses model default if None)
         temperature: Temperature override
 
