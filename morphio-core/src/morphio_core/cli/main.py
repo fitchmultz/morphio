@@ -49,7 +49,10 @@ def transcribe(
     from morphio_core.exceptions import TranscriptionError
 
     if not audio_file.is_file():
-        console.print(f"[red]Error:[/red] Audio file not found or is not a regular file: {audio_file}")
+        if not audio_file.exists():
+            console.print(f"[red]Error:[/red] File not found: {audio_file}")
+        else:
+            console.print(f"[red]Error:[/red] Path is not a file: {audio_file}")
         raise typer.Exit(1)
 
     config = TranscriptionConfig(
@@ -83,6 +86,15 @@ def transcribe(
             "duration": result.duration,
             "backend": result.backend_used,
             "device": result.device_used,
+            "segments": [
+                {
+                    "id": s.id,
+                    "text": s.text,
+                    "start": s.start_time,
+                    "end": s.end_time,
+                }
+                for s in result.segments
+            ],
         }
         if word_timestamps and result.words:
             output_data["words"] = [
@@ -161,11 +173,13 @@ def info() -> None:
     table.add_section()
 
     def check_import(module: str) -> str:
-        try:
-            __import__(module)
-            return "[green]Installed[/green]"
-        except ImportError:
-            return "[dim]Not installed[/dim]"
+        import importlib.util
+
+        return (
+            "[green]Installed[/green]"
+            if importlib.util.find_spec(module)
+            else "[dim]Not installed[/dim]"
+        )
 
     table.add_row("OpenAI SDK", check_import("openai"))
     table.add_row("Anthropic SDK", check_import("anthropic"))
