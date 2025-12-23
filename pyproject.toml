@@ -1,0 +1,27 @@
+[project]
+name = "morphio-all"
+version = "0.0.0"
+description = "Morphio monorepo workspace"
+requires-python = ">=3.11"
+dependencies = [
+    "morphio-core",
+    "morphio-backend",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.24.0",
+    "pytest-cov>=7.0.0",
+    "coverage>=7.0.0",
+    "ruff>=0.8.0",
+    "ty>=0.0.4",
+    "pygments>=2.0.0",
+]
+
+[tool.uv.workspace]
+members = ["morphio-core", "morphio-io/backend"]
+
+[tool.uv.sources]
+morphio-core = { workspace = true }
+morphio-backend = { workspace = true }

@@ -117,7 +117,7 @@ ignore = ["E203", "E402", "E501"]
 package = false
 
 [tool.uv.sources]
-morphio-core = { path = "../../morphio-core", editable = true }
+morphio-core = { workspace = true }
 
 [tool.ty]
 # Note: worker_ml excluded via --exclude flag in Makefile

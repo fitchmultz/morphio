@@ -4,7 +4,7 @@
 #   - morphio-io: Full-stack web application (FastAPI + Next.js)
 #   - morphio-core: Standalone Python library for audio/LLM/security
 
-.PHONY: help dev test lint format check clean
+.PHONY: help install install-backend install-frontend update update-backend update-frontend dev test lint format check clean
 
 # Default target
 help: ## Show this help message
@@ -12,11 +12,39 @@ help: ## Show this help message
 	@echo "===================================="
 	@echo ""
 	@echo "Quick Start:"
+	@echo "  make install  - Install all dependencies (dev + optional)"
+	@echo "  make update   - Update all dependencies to latest"
 	@echo "  make dev      - Start morphio-io dev servers"
 	@echo "  make test     - Run all tests (core + io)"
 	@echo "  make check    - Full CI check (required before commits)"
 	@echo ""
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}'
+
+# ============================================================================
+# Installation (uses uv workspaces - single .venv at root)
+# ============================================================================
+
+install: install-backend install-frontend ## Install all dependencies (dev + optional)
+	@echo "✅ All dependencies installed!"
+
+install-backend: ## Install Python dependencies (morphio-core + morphio-io/backend)
+	@echo "📦 Installing Python dependencies (workspace)..."
+	@uv sync --package morphio-core --package morphio-backend --all-groups --all-extras
+
+install-frontend: ## Install frontend dependencies
+	@echo "📦 Installing frontend dependencies..."
+	@cd morphio-io/frontend && corepack enable && pnpm install
+
+update: update-backend update-frontend ## Update all dependencies to latest versions
+	@echo "✅ All dependencies updated!"
+
+update-backend: ## Update Python dependencies to latest
+	@echo "⬆️  Updating Python dependencies..."
+	@uv sync --package morphio-core --package morphio-backend --all-groups --all-extras --upgrade
+
+update-frontend: ## Update frontend dependencies to latest
+	@echo "⬆️  Updating frontend dependencies..."
+	@cd morphio-io/frontend && pnpm update
 
 # ============================================================================
 # Development
