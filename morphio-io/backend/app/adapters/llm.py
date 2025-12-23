@@ -81,29 +81,23 @@ def resolve_model_alias(chosen_model: str) -> tuple[str, ProviderName, dict[str,
     if chosen_model.startswith("gpt-5.1"):
         base_model = "gpt-5.1"
         provider: ProviderName = "openai"
-        if chosen_model == "gpt-5.1-low":
-            provider_kwargs["reasoning_effort"] = "low"
-        elif chosen_model == "gpt-5.1-medium":
-            provider_kwargs["reasoning_effort"] = "medium"
-        elif chosen_model == "gpt-5.1-high":
-            provider_kwargs["reasoning_effort"] = "high"
+        parts = chosen_model.split("-")
+        if len(parts) == 3 and parts[2] in {"low", "medium", "high"}:
+            provider_kwargs["reasoning_effort"] = parts[2]
         return base_model, provider, provider_kwargs
 
     # Gemini models with thinking level
     if chosen_model.startswith("gemini"):
         provider = "gemini"
-        if chosen_model.endswith("-minimal"):
-            base_model = chosen_model.removesuffix("-minimal")
-            provider_kwargs["thinking_level"] = "minimal"
-        elif chosen_model.endswith("-medium"):
-            base_model = chosen_model.removesuffix("-medium")
-            provider_kwargs["thinking_level"] = "medium"
-        elif chosen_model.endswith("-low"):
-            base_model = chosen_model.removesuffix("-low")
-            provider_kwargs["thinking_level"] = "low"
-        else:
-            base_model = chosen_model
-            provider_kwargs["thinking_level"] = "high"
+        # Default to high, then check for level suffixes
+        base_model = chosen_model
+        provider_kwargs["thinking_level"] = "high"
+        for level in ("minimal", "medium", "low"):
+            suffix = f"-{level}"
+            if chosen_model.endswith(suffix):
+                base_model = chosen_model.removesuffix(suffix)
+                provider_kwargs["thinking_level"] = level
+                break
         return base_model, provider, provider_kwargs
 
     # Claude models
