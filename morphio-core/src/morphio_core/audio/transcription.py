@@ -133,11 +133,13 @@ class MLXWhisperBackend:
         beam_size: int,
         word_timestamps: bool,
     ) -> TranscriptionResult:
+        # MLX Whisper doesn't support beam search yet, force greedy decoding
+        # beam_size=None triggers greedy decoder (not beam_size=1)
         result = self._mlx_whisper.transcribe(
             str(audio_path),
             path_or_hf_repo=f"mlx-community/whisper-{model}-mlx",
             language=language,
-            beam_size=beam_size,
+            beam_size=None,  # Force greedy decoding (beam search not implemented)
             word_timestamps=word_timestamps,
         )
 

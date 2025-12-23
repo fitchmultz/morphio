@@ -54,6 +54,41 @@ class TestAnonymizer:
         assert "192.168.1.1" not in result
         assert "[IP_ADDRESS_1]" in result
 
+    def test_anonymize_valid_ips(self):
+        """Test that valid IP addresses are anonymized."""
+        # Test various valid IPs
+        valid_ips = [
+            ("0.0.0.0", "minimum valid"),
+            ("255.255.255.255", "maximum valid"),
+            ("127.0.0.1", "loopback"),
+            ("10.0.0.255", "private class A"),
+            ("172.16.0.1", "private class B"),
+        ]
+
+        for ip, description in valid_ips:
+            anonymizer = Anonymizer()
+            content = f"Server: {ip}"
+            result = anonymizer.anonymize(content)
+            assert ip not in result, f"Failed to anonymize {description}: {ip}"
+            assert "[IP_ADDRESS_1]" in result
+
+    def test_anonymize_invalid_ips_unchanged(self):
+        """Test that invalid IPs are NOT anonymized."""
+        invalid_ips = [
+            "999.999.999.999",
+            "256.256.256.256",
+            "192.168.1.256",
+            "300.168.1.1",
+        ]
+
+        for invalid_ip in invalid_ips:
+            anonymizer = Anonymizer()
+            content = f"Invalid IP: {invalid_ip}"
+            result = anonymizer.anonymize(content)
+            # Invalid IPs should remain unchanged
+            assert invalid_ip in result, f"{invalid_ip} should not match IP pattern"
+            assert "[IP_ADDRESS" not in result
+
     def test_deanonymize(self):
         """Test deanonymization restores original content."""
         anonymizer = Anonymizer()

@@ -1,9 +1,18 @@
 """Video processing types and configuration models."""
 
+from enum import Enum
 from pathlib import Path
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
+
+
+class OutputMode(str, Enum):
+    """yt-dlp output verbosity mode."""
+
+    QUIET = "quiet"
+    NORMAL = "normal"
+    VERBOSE = "verbose"
 
 
 class DownloadResult(BaseModel):
@@ -34,8 +43,10 @@ class DownloadConfig(BaseModel):
     no_playlist: bool = Field(default=True, description="Don't download playlists")
     retries: int = Field(default=5, ge=0, description="Number of retries")
     concurrent_fragments: int = Field(default=16, ge=1, description="Concurrent fragment downloads")
-    quiet: bool = Field(default=True, description="Suppress yt-dlp output")
-    verbose: bool = Field(default=False, description="Verbose yt-dlp output")
+    output_mode: OutputMode = Field(
+        default=OutputMode.QUIET,
+        description="Output verbosity: quiet (suppress), normal, or verbose (detailed)",
+    )
     # YouTube-specific options
     youtube_player_client: str = Field(
         default="android",

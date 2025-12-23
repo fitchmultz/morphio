@@ -19,7 +19,7 @@ from ...services.generation import (
 from ...services.job import get_job_status, update_job_status
 from ...services.template import load_template
 from ...services.usage import increment_usage
-from ...utils.anonymizer import anonymize_content, deanonymize_content
+from ...adapters.anonymizer import anonymize_content, deanonymize_content
 from ...utils.cache_utils import (
     cache_generated_content,
     compute_template_hash,

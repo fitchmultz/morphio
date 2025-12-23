@@ -83,8 +83,20 @@ class AnthropicProvider:
         model: str | None = None,
         max_tokens: int | None = None,
         temperature: float | None = None,
+        **kwargs: Any,  # Accept and ignore unknown kwargs for provider compatibility
     ) -> GenerationResult:
-        """Generate a completion from messages."""
+        """Generate a completion from messages.
+
+        Args:
+            messages: Conversation messages
+            model: Model override (uses provider default if None)
+            max_tokens: Max tokens override
+            temperature: Temperature override
+            **kwargs: Ignored (for provider compatibility)
+
+        Returns:
+            GenerationResult with content and usage info
+        """
         client = self._ensure_client()
 
         model = model or self._default_model
@@ -133,8 +145,20 @@ class AnthropicProvider:
         model: str | None = None,
         max_tokens: int | None = None,
         temperature: float | None = None,
+        **kwargs: Any,  # Accept and ignore unknown kwargs for provider compatibility
     ) -> AsyncIterator[StreamEvent]:
-        """Stream a completion from messages."""
+        """Stream a completion from messages.
+
+        Args:
+            messages: Conversation messages
+            model: Model override (uses provider default if None)
+            max_tokens: Max tokens override
+            temperature: Temperature override
+            **kwargs: Ignored (for provider compatibility)
+
+        Yields:
+            StreamDelta for content chunks, StreamDone at end
+        """
         client = self._ensure_client()
 
         model = model or self._default_model

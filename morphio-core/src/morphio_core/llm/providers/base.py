@@ -1,7 +1,7 @@
 """Base protocol for LLM providers."""
 
 from collections.abc import AsyncIterator
-from typing import Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 from ..types import GenerationResult, Message, StreamEvent
 
@@ -12,6 +12,12 @@ class LLMProvider(Protocol):
 
     Each provider must implement both synchronous and streaming generation.
     Configuration (API keys, model names, etc.) is passed at construction time.
+
+    Provider-specific parameters can be passed via **kwargs:
+    - thinking_level: For Gemini models ("high", "medium", "low", "minimal")
+    - reasoning_effort: For OpenAI o1/o3 models ("low", "medium", "high")
+
+    Providers should accept and gracefully ignore unknown kwargs for compatibility.
     """
 
     @property
@@ -26,6 +32,7 @@ class LLMProvider(Protocol):
         model: str | None = None,
         max_tokens: int | None = None,
         temperature: float | None = None,
+        **kwargs: Any,
     ) -> GenerationResult:
         """Generate a completion from messages.
 
@@ -34,6 +41,7 @@ class LLMProvider(Protocol):
             model: Model override (uses provider default if None)
             max_tokens: Max tokens override
             temperature: Temperature override
+            **kwargs: Provider-specific arguments (e.g., thinking_level, reasoning_effort)
 
         Returns:
             GenerationResult with content and usage info
@@ -47,6 +55,7 @@ class LLMProvider(Protocol):
         model: str | None = None,
         max_tokens: int | None = None,
         temperature: float | None = None,
+        **kwargs: Any,
     ) -> AsyncIterator[StreamEvent]:
         """Stream a completion from messages.
 
@@ -55,6 +64,7 @@ class LLMProvider(Protocol):
             model: Model override (uses provider default if None)
             max_tokens: Max tokens override
             temperature: Temperature override
+            **kwargs: Provider-specific arguments (e.g., thinking_level, reasoning_effort)
 
         Yields:
             StreamDelta for content chunks, StreamDone at end

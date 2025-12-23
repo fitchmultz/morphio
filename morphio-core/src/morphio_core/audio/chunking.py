@@ -131,8 +131,14 @@ async def chunk_audio(
         if end >= total_duration:
             break
 
-        # Advance start position (overlap already validated < segment_duration)
-        start = end - overlap_sec
+        # Advance start position with runtime safety check
+        next_start = end - overlap_sec
+        if next_start <= start:
+            raise AudioChunkingError(
+                f"Invalid chunking configuration: overlap ({overlap_sec}s) must be less than "
+                f"segment_duration ({cfg.segment_duration}s) to ensure forward progress."
+            )
+        start = next_start
         index += 1
 
     return ChunkingResult(

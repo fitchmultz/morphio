@@ -1,12 +1,19 @@
 """OpenAI provider implementation."""
 
+import logging
 from collections.abc import AsyncIterator
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import SecretStr
 
 from ...exceptions import LLMProviderError
 from ..types import GenerationResult, Message, StreamDelta, StreamDone, StreamEvent, Usage
+
+logger = logging.getLogger(__name__)
+
+# Valid reasoning effort levels for OpenAI reasoning models (o1, o3 series)
+ReasoningEffort = Literal["low", "medium", "high"]
+VALID_REASONING_EFFORTS = {"low", "medium", "high"}
 
 
 class OpenAIProvider:
@@ -56,6 +63,28 @@ class OpenAIProvider:
     def provider_name(self) -> str:
         return "openai"
 
+    @staticmethod
+    def _apply_reasoning_effort(
+        api_params: dict[str, Any], reasoning_effort: str | None
+    ) -> None:
+        """Validate and apply reasoning_effort to API params.
+
+        Args:
+            api_params: Dictionary to modify in place
+            reasoning_effort: Optional reasoning effort level
+
+        Raises:
+            LLMProviderError: If reasoning_effort is invalid
+        """
+        if reasoning_effort:
+            effort = reasoning_effort.lower()
+            if effort not in VALID_REASONING_EFFORTS:
+                raise LLMProviderError(
+                    f"Invalid reasoning_effort '{reasoning_effort}'. "
+                    f"Valid values: {', '.join(sorted(VALID_REASONING_EFFORTS))}"
+                )
+            api_params["reasoning_effort"] = effort
+
     async def generate(
         self,
         messages: list[Message],
@@ -63,8 +92,22 @@ class OpenAIProvider:
         model: str | None = None,
         max_tokens: int | None = None,
         temperature: float | None = None,
+        reasoning_effort: str | None = None,
+        **kwargs: Any,  # Accept and ignore unknown kwargs
     ) -> GenerationResult:
-        """Generate a completion from messages."""
+        """Generate a completion from messages.
+
+        Args:
+            messages: Conversation messages
+            model: Model override (uses provider default if None)
+            max_tokens: Max tokens override
+            temperature: Temperature override
+            reasoning_effort: Reasoning effort for o1/o3 models ("low", "medium", "high")
+            **kwargs: Ignored (for provider compatibility)
+
+        Returns:
+            GenerationResult with content and usage info
+        """
         client = self._ensure_client()
 
         model = model or self._default_model
@@ -74,13 +117,18 @@ class OpenAIProvider:
         # Convert to OpenAI message format
         openai_messages = [{"role": m.role, "content": m.content} for m in messages]
 
+        # Build API params
+        api_params: dict[str, Any] = {
+            "model": model,
+            "messages": openai_messages,
+            "max_completion_tokens": max_tokens,
+            "temperature": temperature,
+        }
+
+        self._apply_reasoning_effort(api_params, reasoning_effort)
+
         try:
-            response = await client.chat.completions.create(
-                model=model,
-                messages=openai_messages,
-                max_completion_tokens=max_tokens,
-                temperature=temperature,
-            )
+            response = await client.chat.completions.create(**api_params)
 
             content = response.choices[0].message.content or ""
             usage = None
@@ -107,8 +155,22 @@ class OpenAIProvider:
         model: str | None = None,
         max_tokens: int | None = None,
         temperature: float | None = None,
+        reasoning_effort: str | None = None,
+        **kwargs: Any,  # Accept and ignore unknown kwargs
     ) -> AsyncIterator[StreamEvent]:
-        """Stream a completion from messages."""
+        """Stream a completion from messages.
+
+        Args:
+            messages: Conversation messages
+            model: Model override (uses provider default if None)
+            max_tokens: Max tokens override
+            temperature: Temperature override
+            reasoning_effort: Reasoning effort for o1/o3 models ("low", "medium", "high")
+            **kwargs: Ignored (for provider compatibility)
+
+        Yields:
+            StreamDelta for content chunks, StreamDone at end
+        """
         client = self._ensure_client()
 
         model = model or self._default_model
@@ -117,15 +179,20 @@ class OpenAIProvider:
 
         openai_messages = [{"role": m.role, "content": m.content} for m in messages]
 
+        # Build API params
+        api_params: dict[str, Any] = {
+            "model": model,
+            "messages": openai_messages,
+            "max_completion_tokens": max_tokens,
+            "temperature": temperature,
+            "stream": True,
+            "stream_options": {"include_usage": True},
+        }
+
+        self._apply_reasoning_effort(api_params, reasoning_effort)
+
         try:
-            stream = await client.chat.completions.create(
-                model=model,
-                messages=openai_messages,
-                max_completion_tokens=max_tokens,
-                temperature=temperature,
-                stream=True,
-                stream_options={"include_usage": True},
-            )
+            stream = await client.chat.completions.create(**api_params)
 
             async for chunk in stream:
                 if chunk.choices and chunk.choices[0].delta.content:

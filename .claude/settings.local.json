@@ -5,7 +5,9 @@
       "Bash(make help:*)",
       "Bash(make:*)",
       "mcp__RepoPrompt__file_search",
-      "mcp__RepoPrompt__read_file"
+      "mcp__RepoPrompt__read_file",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs"
     ]
   }
 }

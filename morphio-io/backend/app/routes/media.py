@@ -31,7 +31,7 @@ from ..utils.error_handlers import ApplicationException
 from ..utils.file_utils import get_unique_filename, is_allowed_file, sanitize_filename
 from ..utils.response_utils import create_response
 from ..utils.route_helpers import common_responses, handle_route_errors
-from ..utils.youtube_utils import is_supported_video_url
+from ..adapters.video import is_supported_video_url
 
 logger = logging.getLogger(__name__)
 router = APIRouter()

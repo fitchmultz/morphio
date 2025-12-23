@@ -18,7 +18,7 @@ from ..utils.cache_utils import (
 )
 from ..utils.error_handlers import ApplicationException
 from ..utils.file_utils import compute_file_hash, compute_hash
-from ..utils.youtube_utils import get_yt_video_id
+from ..adapters.video import get_yt_video_id
 from .generation.core import generate_content_from_transcript
 from .generation.storage import save_generated_content
 from .job.status import update_job_status

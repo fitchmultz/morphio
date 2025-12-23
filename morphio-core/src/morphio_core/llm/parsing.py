@@ -1,5 +1,6 @@
 """LLM output parsing and sanitization utilities."""
 
+import json
 import re
 
 
@@ -101,10 +102,21 @@ def extract_json_from_response(content: str) -> str:
     if fenced_match:
         return fenced_match.group(1).strip()
 
-    # Try to find JSON object or array
-    json_match = re.search(r"(\{[\s\S]*\}|\[[\s\S]*\])", content)
-    if json_match:
-        return json_match.group(1).strip()
+    # Try to find and decode the first complete JSON object or array
+    # Using raw_decode correctly handles nested structures
+    try:
+        # Find the start of the first JSON object or array
+        idx = min(
+            (i for i in [content.find("{"), content.find("[")] if i != -1),
+            default=-1,
+        )
+        if idx != -1:
+            # raw_decode finds the first complete JSON document from idx
+            _, end = json.JSONDecoder().raw_decode(content, idx)
+            return content[idx:end].strip()
+    except json.JSONDecodeError:
+        # If parsing fails, fall through to returning the original content
+        pass
 
     # Return original content if no JSON found
     return content.strip()

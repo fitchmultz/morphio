@@ -325,6 +325,27 @@ Let me know if you need changes."""
         result = extract_json_from_response(content)
         assert result == content
 
+    def test_multiple_json_objects_extracts_first(self):
+        """Test that multiple JSON objects extracts only the first."""
+        content = 'First: {"a": 1} then {"b": 2}'
+        result = extract_json_from_response(content)
+        assert result == '{"a": 1}'
+
+    def test_multiple_json_arrays_extracts_first(self):
+        """Test that multiple JSON arrays extracts only the first."""
+        content = "Data: [1, 2] and [3, 4]"
+        result = extract_json_from_response(content)
+        assert result == "[1, 2]"
+
+    def test_nested_json_extracted_correctly(self):
+        """Test that nested JSON is extracted correctly.
+
+        Uses json.raw_decode to properly handle nested structures.
+        """
+        content = 'Here: {"outer": {"inner": "value"}} more text'
+        result = extract_json_from_response(content)
+        assert result == '{"outer": {"inner": "value"}}'
+
 
 class TestTruncateForContext:
     """Tests for truncate_for_context function."""
@@ -368,3 +389,136 @@ class TestExceptions:
         from morphio_core.exceptions import LLMError
 
         assert issubclass(LLMProviderError, LLMError)
+
+
+class TestGeminiProviderKwargs:
+    """Tests for Gemini provider thinking_level support."""
+
+    def test_valid_thinking_levels(self):
+        """Test that all valid thinking levels are recognized."""
+        from morphio_core.llm.providers.gemini import VALID_THINKING_LEVELS
+
+        assert {"high", "medium", "low", "minimal"} == VALID_THINKING_LEVELS
+
+    def test_pro_model_thinking_levels(self):
+        """Test that Pro models have restricted thinking levels."""
+        from morphio_core.llm.providers.gemini import PRO_THINKING_LEVELS
+
+        assert {"high", "low"} == PRO_THINKING_LEVELS
+
+
+class TestOpenAIProviderKwargs:
+    """Tests for OpenAI provider reasoning_effort support."""
+
+    def test_valid_reasoning_efforts(self):
+        """Test that all valid reasoning efforts are recognized."""
+        from morphio_core.llm.providers.openai import VALID_REASONING_EFFORTS
+
+        assert {"low", "medium", "high"} == VALID_REASONING_EFFORTS
+
+
+class TestProviderKwargsPassthrough:
+    """Tests for provider-specific kwargs being passed through router."""
+
+    def test_router_generate_accepts_provider_kwargs(self):
+        """Test that router.generate accepts provider-specific kwargs."""
+        # This tests the method signature, not actual API calls
+        import inspect
+
+        from morphio_core.llm import LLMRouter
+
+        sig = inspect.signature(LLMRouter.generate)
+        params = sig.parameters
+
+        # Should have **provider_kwargs in signature
+        has_var_keyword = any(
+            p.kind == inspect.Parameter.VAR_KEYWORD for p in params.values()
+        )
+        assert has_var_keyword, "Router.generate should accept **kwargs"
+
+    def test_router_stream_accepts_provider_kwargs(self):
+        """Test that router.stream accepts provider-specific kwargs."""
+        import inspect
+
+        from morphio_core.llm import LLMRouter
+
+        sig = inspect.signature(LLMRouter.stream)
+        params = sig.parameters
+
+        # Should have **provider_kwargs in signature
+        has_var_keyword = any(
+            p.kind == inspect.Parameter.VAR_KEYWORD for p in params.values()
+        )
+        assert has_var_keyword, "Router.stream should accept **kwargs"
+
+    def test_gemini_provider_accepts_thinking_level(self):
+        """Test that GeminiProvider.generate accepts thinking_level."""
+        import inspect
+
+        from morphio_core.llm.providers.gemini import GeminiProvider
+
+        sig = inspect.signature(GeminiProvider.generate)
+        params = sig.parameters
+
+        assert "thinking_level" in params, "GeminiProvider.generate should accept thinking_level"
+
+    def test_gemini_provider_stream_accepts_thinking_level(self):
+        """Test that GeminiProvider.stream accepts thinking_level."""
+        import inspect
+
+        from morphio_core.llm.providers.gemini import GeminiProvider
+
+        sig = inspect.signature(GeminiProvider.stream)
+        params = sig.parameters
+
+        assert "thinking_level" in params, "GeminiProvider.stream should accept thinking_level"
+
+    def test_openai_provider_accepts_reasoning_effort(self):
+        """Test that OpenAIProvider.generate accepts reasoning_effort."""
+        import inspect
+
+        from morphio_core.llm.providers.openai import OpenAIProvider
+
+        sig = inspect.signature(OpenAIProvider.generate)
+        params = sig.parameters
+
+        assert "reasoning_effort" in params, "OpenAIProvider.generate should accept reasoning_effort"
+
+    def test_openai_provider_stream_accepts_reasoning_effort(self):
+        """Test that OpenAIProvider.stream accepts reasoning_effort."""
+        import inspect
+
+        from morphio_core.llm.providers.openai import OpenAIProvider
+
+        sig = inspect.signature(OpenAIProvider.stream)
+        params = sig.parameters
+
+        assert "reasoning_effort" in params, "OpenAIProvider.stream should accept reasoning_effort"
+
+    def test_anthropic_provider_accepts_kwargs(self):
+        """Test that AnthropicProvider accepts **kwargs for compatibility."""
+        import inspect
+
+        from morphio_core.llm.providers.anthropic import AnthropicProvider
+
+        sig = inspect.signature(AnthropicProvider.generate)
+        params = sig.parameters
+
+        has_var_keyword = any(
+            p.kind == inspect.Parameter.VAR_KEYWORD for p in params.values()
+        )
+        assert has_var_keyword, "AnthropicProvider.generate should accept **kwargs"
+
+    def test_base_protocol_accepts_kwargs(self):
+        """Test that LLMProvider protocol accepts **kwargs."""
+        import inspect
+
+        from morphio_core.llm.providers.base import LLMProvider
+
+        sig = inspect.signature(LLMProvider.generate)
+        params = sig.parameters
+
+        has_var_keyword = any(
+            p.kind == inspect.Parameter.VAR_KEYWORD for p in params.values()
+        )
+        assert has_var_keyword, "LLMProvider.generate should accept **kwargs"

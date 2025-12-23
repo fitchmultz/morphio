@@ -4,15 +4,12 @@ LLM adapter - provides configured LLM router and utilities.
 This adapter wraps morphio-core's LLMRouter and provides:
 - Configuration from application settings
 - Exception translation to ApplicationException
-- Simple completion helpers
-
-Note: Advanced features like Gemini thinking levels and OpenAI reasoning
-effort are handled directly in generation/core.py since morphio-core
-doesn't support these provider-specific features.
+- Model alias resolution (e.g., "gpt-5.1-high" -> base model + reasoning_effort)
+- Provider-specific parameter handling (thinking_level, reasoning_effort)
 """
 
 import logging
-from typing import List, Literal, Tuple
+from typing import Any, Literal
 
 from morphio_core.exceptions import LLMProviderError
 from morphio_core.llm import LLMRouter
@@ -24,6 +21,96 @@ from ..utils.error_handlers import ApplicationException
 logger = logging.getLogger(__name__)
 
 ProviderName = Literal["openai", "anthropic", "gemini"]
+
+# Model token limits for output
+MODEL_TOKEN_LIMITS = {
+    # OpenAI models
+    "gpt-5.1": 128000,
+    "gpt-5.1-nano": 128000,
+    "gpt-5.1-low": 128000,
+    "gpt-5.1-medium": 128000,
+    "gpt-5.1-high": 128000,
+    # Anthropic models
+    "claude-4-sonnet": 16384,
+    # Gemini 3 Flash variants
+    "gemini-3-flash-preview": 65536,
+    "gemini-3-flash-preview-medium": 65536,
+    "gemini-3-flash-preview-low": 65536,
+    "gemini-3-flash-preview-minimal": 65536,
+    # Gemini 3 Pro variants
+    "gemini-3-pro-preview": 65536,
+    "gemini-3-pro-preview-low": 65536,
+}
+
+# Valid models for content generation
+VALID_GENERATION_MODELS = list(MODEL_TOKEN_LIMITS.keys())
+
+# Display labels for UI
+MODEL_DISPLAY_INFO = [
+    {"id": "gemini-3-flash-preview", "label": "Gemini 3 Flash (High)"},
+    {"id": "gemini-3-flash-preview-medium", "label": "Gemini 3 Flash (Medium)"},
+    {"id": "gemini-3-flash-preview-low", "label": "Gemini 3 Flash (Low)"},
+    {"id": "gemini-3-flash-preview-minimal", "label": "Gemini 3 Flash (Minimal)"},
+    {"id": "gemini-3-pro-preview", "label": "Gemini 3 Pro (High)"},
+    {"id": "gemini-3-pro-preview-low", "label": "Gemini 3 Pro (Low)"},
+    {"id": "gpt-5.1", "label": "GPT-5.1"},
+    {"id": "gpt-5.1-high", "label": "GPT-5.1 (High Reasoning)"},
+    {"id": "gpt-5.1-medium", "label": "GPT-5.1 (Medium Reasoning)"},
+    {"id": "gpt-5.1-low", "label": "GPT-5.1 (Low Reasoning)"},
+    {"id": "claude-4-sonnet", "label": "Claude 4 Sonnet"},
+]
+
+
+def resolve_model_alias(chosen_model: str) -> tuple[str, ProviderName, dict[str, Any]]:
+    """
+    Resolve a model alias to base model, provider, and provider-specific kwargs.
+
+    Model aliases encode provider-specific features:
+    - "gpt-5.1-high" -> base="gpt-5.1", provider="openai", kwargs={"reasoning_effort": "high"}
+    - "gemini-3-flash-preview-medium" -> base="gemini-3-flash-preview", kwargs={"thinking_level": "medium"}
+
+    Args:
+        chosen_model: Model ID (possibly with embedded parameters)
+
+    Returns:
+        Tuple of (base_model, provider, provider_kwargs)
+    """
+    provider_kwargs: dict[str, Any] = {}
+
+    # OpenAI models with reasoning effort
+    if chosen_model.startswith("gpt-5.1"):
+        base_model = "gpt-5.1"
+        provider: ProviderName = "openai"
+        parts = chosen_model.split("-")
+        if len(parts) == 3 and parts[2] in {"low", "medium", "high"}:
+            provider_kwargs["reasoning_effort"] = parts[2]
+        return base_model, provider, provider_kwargs
+
+    # Gemini models with thinking level
+    if chosen_model.startswith("gemini"):
+        provider = "gemini"
+        # Default to high, then check for level suffixes
+        base_model = chosen_model
+        provider_kwargs["thinking_level"] = "high"
+        for level in ("minimal", "medium", "low"):
+            suffix = f"-{level}"
+            if chosen_model.endswith(suffix):
+                base_model = chosen_model.removesuffix(suffix)
+                provider_kwargs["thinking_level"] = level
+                break
+        return base_model, provider, provider_kwargs
+
+    # Claude models
+    if chosen_model.startswith("claude"):
+        return chosen_model, "anthropic", provider_kwargs
+
+    # Default to OpenAI
+    return chosen_model, "openai", provider_kwargs
+
+
+def get_model_token_limit(model: str) -> int:
+    """Get the output token limit for a model."""
+    return MODEL_TOKEN_LIMITS.get(model, 8192)
 
 
 def get_llm_router() -> LLMRouter:
@@ -89,23 +176,23 @@ def get_llm_router() -> LLMRouter:
     return LLMRouter(config)
 
 
-async def simple_completion(
-    messages: List[dict],
+async def generate_completion(
+    messages: list[dict],
     model: str | None = None,
-    max_tokens: int = 4096,
+    max_tokens: int | None = None,
     temperature: float | None = None,
-) -> Tuple[str, str]:
+) -> tuple[str, str]:
     """
-    Simple completion without provider-specific features.
+    Generate a completion with full provider-specific feature support.
 
-    For basic completions that don't need thinking levels or reasoning effort.
-    Uses morphio-core's LLMRouter for clean provider abstraction.
+    Resolves model aliases to base models and provider kwargs, then uses
+    morphio-core's LLMRouter with the appropriate parameters.
 
     Args:
         messages: List of message dicts with 'role' and 'content' keys
-        model: Optional model override (uses default from settings if None)
-        max_tokens: Maximum tokens in response
-        temperature: Optional temperature override
+        model: Model to use (supports aliases like "gpt-5.1-high", "gemini-3-flash-preview-medium")
+        max_tokens: Maximum tokens in response (uses model default if None)
+        temperature: Temperature override
 
     Returns:
         Tuple of (content, model_used)
@@ -116,31 +203,31 @@ async def simple_completion(
     try:
         router = get_llm_router()
 
-        # Convert dict messages to Message objects
-        typed_messages = [
-            Message(role=msg.get("role", "user"), content=msg.get("content", ""))
-            for msg in messages
-        ]
+        # Use default model if not specified
+        chosen_model = model or settings.CONTENT_MODEL
+        if chosen_model not in VALID_GENERATION_MODELS:
+            chosen_model = settings.CONTENT_MODEL
 
-        # Determine provider from model if specified
-        provider: ProviderName | None = None
-        if model:
-            if model.startswith("claude"):
-                provider = "anthropic"
-            elif model.startswith("gemini"):
-                provider = "gemini"
-            elif model.startswith("gpt"):
-                provider = "openai"
+        # Resolve alias to base model and provider kwargs
+        base_model, provider, provider_kwargs = resolve_model_alias(chosen_model)
+
+        # Get token limit for model
+        token_limit = get_model_token_limit(chosen_model)
+        effective_max_tokens = min(max_tokens, token_limit) if max_tokens is not None else token_limit
+
+        # Convert dict messages to Message objects
+        typed_messages = convert_to_messages(messages)
 
         result = await router.generate(
             typed_messages,
             provider=provider,
-            model=model,
-            max_tokens=max_tokens,
+            model=base_model,
+            max_tokens=effective_max_tokens,
             temperature=temperature or settings.CONTENT_TEMPERATURE,
+            **provider_kwargs,
         )
 
-        return result.content, result.model
+        return result.content, chosen_model
 
     except LLMProviderError as e:
         logger.error(f"LLM provider error: {e}")
@@ -150,18 +237,46 @@ async def simple_completion(
         ) from e
 
 
-def convert_to_messages(messages: List[dict]) -> List[Message]:
+async def simple_completion(
+    messages: list[dict],
+    model: str | None = None,
+    max_tokens: int = 4096,
+    temperature: float | None = None,
+) -> tuple[str, str]:
+    """
+    Simple completion (alias for generate_completion for backward compatibility).
+
+    See generate_completion for full documentation.
+    """
+    return await generate_completion(
+        messages=messages,
+        model=model,
+        max_tokens=max_tokens,
+        temperature=temperature,
+    )
+
+
+def convert_to_messages(messages: list[dict]) -> list[Message]:
     """Convert dict messages to typed Message objects."""
     return [
-        Message(role=msg.get("role", "user"), content=msg.get("content", ""))
-        for msg in messages
+        Message(role=msg.get("role", "user"), content=msg.get("content", "")) for msg in messages
     ]
 
 
 __all__ = [
+    # Core functions
     "get_llm_router",
+    "generate_completion",
     "simple_completion",
     "convert_to_messages",
+    # Model resolution
+    "resolve_model_alias",
+    "get_model_token_limit",
+    # Model metadata
+    "MODEL_TOKEN_LIMITS",
+    "VALID_GENERATION_MODELS",
+    "MODEL_DISPLAY_INFO",
+    # Re-exports from morphio-core
     "LLMRouter",
     "Message",
     "GenerationResult",
