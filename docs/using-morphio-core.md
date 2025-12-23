@@ -68,6 +68,7 @@ from morphio_core.llm.types import LLMConfig, ProviderConfig, Message
 config = LLMConfig(
     openai=ProviderConfig(api_key="sk-...", default_model="gpt-4o"),
     anthropic=ProviderConfig(api_key="sk-ant-...", default_model="claude-sonnet-4-20250514"),
+    gemini=ProviderConfig(api_key="...", default_model="gemini-2.0-flash"),
     default_provider="openai",
 )
 
@@ -76,6 +77,64 @@ router = LLMRouter(config)
 messages = [Message(role="user", content="Hello!")]
 result = await router.generate(messages)
 print(result.content)
+```
+
+### Advanced Reasoning Parameters
+
+The router supports provider-specific parameters via kwargs:
+
+```python
+# OpenAI reasoning models (o1, o3 series)
+result = await router.generate(
+    messages,
+    provider="openai",
+    model="o1-preview",
+    reasoning_effort="high",  # "low", "medium", "high"
+)
+
+# Gemini thinking models
+result = await router.generate(
+    messages,
+    provider="gemini",
+    model="gemini-2.0-flash-thinking",
+    thinking_level="medium",  # "minimal", "low", "medium", "high"
+)
+
+# Stream with advanced reasoning
+async for event in router.stream(
+    messages,
+    provider="gemini",
+    thinking_level="high",
+):
+    if event.type == "delta":
+        print(event.text, end="")
+```
+
+Unknown kwargs are safely ignored, so you can pass parameters without checking provider support:
+
+```python
+# Works for any provider - unsupported params are ignored
+result = await router.generate(
+    messages,
+    reasoning_effort="high",  # Ignored if not OpenAI reasoning model
+    thinking_level="medium",  # Ignored if not Gemini
+)
+```
+
+### Token Usage Tracking
+
+Access token usage from generation results:
+
+```python
+result = await router.generate(messages)
+print(f"Prompt tokens: {result.usage.prompt_tokens}")
+print(f"Completion tokens: {result.usage.completion_tokens}")
+print(f"Total: {result.usage.total_tokens}")
+
+# Extended usage with provider/model metadata
+token_usage = result.get_token_usage()
+print(f"Provider: {token_usage.provider}, Model: {token_usage.model}")
+print(f"Input: {token_usage.input_tokens}, Output: {token_usage.output_tokens}")
 ```
 
 ### URL Validation (SSRF Protection)

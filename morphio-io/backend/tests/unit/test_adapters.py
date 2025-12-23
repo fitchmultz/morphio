@@ -19,29 +19,29 @@ class TestModelAliasResolution:
 
     def test_resolve_openai_base_model(self):
         """Test resolving base OpenAI model."""
-        base, provider, kwargs = resolve_model_alias("gpt-5.1")
-        assert base == "gpt-5.1"
+        base, provider, kwargs = resolve_model_alias("gpt-5.2")
+        assert base == "gpt-5.2"
         assert provider == "openai"
         assert kwargs == {}
 
     def test_resolve_openai_low_reasoning(self):
         """Test resolving OpenAI model with low reasoning."""
-        base, provider, kwargs = resolve_model_alias("gpt-5.1-low")
-        assert base == "gpt-5.1"
+        base, provider, kwargs = resolve_model_alias("gpt-5.2-low")
+        assert base == "gpt-5.2"
         assert provider == "openai"
         assert kwargs == {"reasoning_effort": "low"}
 
     def test_resolve_openai_medium_reasoning(self):
         """Test resolving OpenAI model with medium reasoning."""
-        base, provider, kwargs = resolve_model_alias("gpt-5.1-medium")
-        assert base == "gpt-5.1"
+        base, provider, kwargs = resolve_model_alias("gpt-5.2-medium")
+        assert base == "gpt-5.2"
         assert provider == "openai"
         assert kwargs == {"reasoning_effort": "medium"}
 
     def test_resolve_openai_high_reasoning(self):
         """Test resolving OpenAI model with high reasoning."""
-        base, provider, kwargs = resolve_model_alias("gpt-5.1-high")
-        assert base == "gpt-5.1"
+        base, provider, kwargs = resolve_model_alias("gpt-5.2-high")
+        assert base == "gpt-5.2"
         assert provider == "openai"
         assert kwargs == {"reasoning_effort": "high"}
 
@@ -89,8 +89,8 @@ class TestModelAliasResolution:
 
     def test_resolve_claude_model(self):
         """Test resolving Claude model."""
-        base, provider, kwargs = resolve_model_alias("claude-4-sonnet")
-        assert base == "claude-4-sonnet"
+        base, provider, kwargs = resolve_model_alias("claude-4.5-sonnet")
+        assert base == "claude-4.5-sonnet"
         assert provider == "anthropic"
         assert kwargs == {}
 
@@ -107,7 +107,7 @@ class TestModelTokenLimits:
 
     def test_get_openai_token_limit(self):
         """Test getting OpenAI model token limit."""
-        assert get_model_token_limit("gpt-5.1") == 128000
+        assert get_model_token_limit("gpt-5.2") == 128000
 
     def test_get_gemini_token_limit(self):
         """Test getting Gemini model token limit."""
@@ -115,7 +115,7 @@ class TestModelTokenLimits:
 
     def test_get_claude_token_limit(self):
         """Test getting Claude model token limit."""
-        assert get_model_token_limit("claude-4-sonnet") == 16384
+        assert get_model_token_limit("claude-4.5-sonnet") == 16384
 
     def test_unknown_model_returns_default(self):
         """Test that unknown models return default limit."""

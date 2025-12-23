@@ -2,19 +2,25 @@
 
 import logging
 from collections.abc import AsyncIterator
-from typing import Any, Literal
+from typing import Any
 
 from pydantic import SecretStr
 
-from ...exceptions import LLMProviderError
-from ..types import GenerationResult, Message, StreamDelta, StreamDone, StreamEvent, Usage
+from ...exceptions import LLMProviderError, OptionalDependencyError
+from ..types import (
+    GenerationResult,
+    Message,
+    StreamDelta,
+    StreamDone,
+    StreamEvent,
+    Usage,
+    validate_thinking_level,
+)
 
 logger = logging.getLogger(__name__)
 
-# Valid thinking levels for Gemini models
-ThinkingLevel = Literal["high", "medium", "low", "minimal"]
-VALID_THINKING_LEVELS = {"high", "medium", "low", "minimal"}
-PRO_THINKING_LEVELS = {"high", "low"}  # Pro models only support these
+# Pro models only support these thinking levels
+PRO_THINKING_LEVELS = {"high", "low"}
 
 
 class GeminiProvider:
@@ -54,7 +60,11 @@ class GeminiProvider:
 
                 self._client = genai.Client(api_key=self._api_key.get_secret_value())
             except ImportError as e:
-                raise LLMProviderError("google-genai package not installed") from e
+                raise OptionalDependencyError(
+                    package="Google GenAI SDK",
+                    extra="llm-gemini",
+                    pip_package="google-genai",
+                ) from e
         return self._client
 
     @property
@@ -121,19 +131,20 @@ class GeminiProvider:
             config_params["system_instruction"] = system_instruction
 
         if thinking_level:
-            level = thinking_level.lower()
-            if level not in VALID_THINKING_LEVELS:
-                raise LLMProviderError(
-                    f"Invalid thinking_level '{thinking_level}'. "
-                    f"Valid values: {', '.join(sorted(VALID_THINKING_LEVELS))}"
-                )
-            # Check Pro model restrictions
-            if "pro" in model.lower() and level not in PRO_THINKING_LEVELS:
-                raise LLMProviderError(
-                    f"Gemini Pro models only support {', '.join(sorted(PRO_THINKING_LEVELS))}, got '{level}'. "
-                    f"Use 'high' or 'low' for Pro models."
-                )
-            config_params["thinking_config"] = types.ThinkingConfig(thinking_level=level.upper())
+            try:
+                validated = validate_thinking_level(thinking_level)
+            except ValueError as e:
+                raise LLMProviderError(str(e)) from e
+
+            if validated is not None:
+                level = validated.value
+                # Check Pro model restrictions
+                if "pro" in model.lower() and level not in PRO_THINKING_LEVELS:
+                    raise LLMProviderError(
+                        f"Gemini Pro models only support {', '.join(sorted(PRO_THINKING_LEVELS))}, got '{level}'. "
+                        f"Use 'high' or 'low' for Pro models."
+                    )
+                config_params["thinking_config"] = types.ThinkingConfig(thinking_level=level.upper())
 
         return types.GenerateContentConfig(**config_params)
 

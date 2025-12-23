@@ -2,7 +2,7 @@
 name = "morphio-all"
 version = "0.0.0"
 description = "Morphio monorepo workspace"
-requires-python = ">=3.11"
+requires-python = ">=3.13"
 dependencies = [
     "morphio-core",
     "morphio-backend",
