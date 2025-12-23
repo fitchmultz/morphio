@@ -39,29 +39,29 @@ class FFmpegConfig:
     ffmpeg_path: str | None = None
     ffprobe_path: str | None = None
 
+    def _get_binary(self, custom_path: str | None, default_name: str) -> str:
+        """Find a binary, validating custom path if provided."""
+        binary_to_find = custom_path or default_name
+        found_path = shutil.which(binary_to_find)
+        if not found_path:
+            if custom_path:
+                message = (
+                    f"Custom {default_name} binary not found or not executable: '{custom_path}'"
+                )
+            else:
+                message = (
+                    f"{default_name} not found. Install FFmpeg or configure {default_name}_path."
+                )
+            raise FFmpegError(message=message, command=[binary_to_find])
+        return found_path
+
     def get_ffmpeg(self) -> str:
         """Get FFmpeg path, using auto-detection if not configured."""
-        if self.ffmpeg_path:
-            return self.ffmpeg_path
-        found = shutil.which("ffmpeg")
-        if not found:
-            raise FFmpegError(
-                message="FFmpeg not found. Install FFmpeg or configure ffmpeg_path.",
-                command=["ffmpeg"],
-            )
-        return found
+        return self._get_binary(self.ffmpeg_path, "ffmpeg")
 
     def get_ffprobe(self) -> str:
         """Get ffprobe path, using auto-detection if not configured."""
-        if self.ffprobe_path:
-            return self.ffprobe_path
-        found = shutil.which("ffprobe")
-        if not found:
-            raise FFmpegError(
-                message="ffprobe not found. Install FFmpeg or configure ffprobe_path.",
-                command=["ffprobe"],
-            )
-        return found
+        return self._get_binary(self.ffprobe_path, "ffprobe")
 
 
 # Default config for module-level convenience

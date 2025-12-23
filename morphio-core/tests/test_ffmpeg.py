@@ -149,15 +149,35 @@ class TestFFmpegConfig:
         assert config.ffmpeg_path == "/opt/ffmpeg/bin/ffmpeg"
         assert config.ffprobe_path == "/opt/ffmpeg/bin/ffprobe"
 
-    def test_get_ffmpeg_with_custom_path(self):
-        """Test get_ffmpeg returns custom path when set."""
-        config = FFmpegConfig(ffmpeg_path="/custom/ffmpeg")
-        assert config.get_ffmpeg() == "/custom/ffmpeg"
+    def test_get_ffmpeg_with_valid_custom_path(self):
+        """Test get_ffmpeg works with valid custom path."""
+        real_ffmpeg = shutil.which("ffmpeg")
+        if not real_ffmpeg:
+            pytest.skip("FFmpeg not installed")
+        config = FFmpegConfig(ffmpeg_path=real_ffmpeg)
+        assert config.get_ffmpeg() == real_ffmpeg
 
-    def test_get_ffprobe_with_custom_path(self):
-        """Test get_ffprobe returns custom path when set."""
-        config = FFmpegConfig(ffprobe_path="/custom/ffprobe")
-        assert config.get_ffprobe() == "/custom/ffprobe"
+    def test_get_ffprobe_with_valid_custom_path(self):
+        """Test get_ffprobe works with valid custom path."""
+        real_ffprobe = shutil.which("ffprobe")
+        if not real_ffprobe:
+            pytest.skip("ffprobe not installed")
+        config = FFmpegConfig(ffprobe_path=real_ffprobe)
+        assert config.get_ffprobe() == real_ffprobe
+
+    def test_get_ffmpeg_with_invalid_custom_path(self):
+        """Test get_ffmpeg raises error for invalid custom path."""
+        config = FFmpegConfig(ffmpeg_path="/nonexistent/ffmpeg")
+        with pytest.raises(FFmpegError) as exc_info:
+            config.get_ffmpeg()
+        assert "not found or not executable" in str(exc_info.value)
+
+    def test_get_ffprobe_with_invalid_custom_path(self):
+        """Test get_ffprobe raises error for invalid custom path."""
+        config = FFmpegConfig(ffprobe_path="/nonexistent/ffprobe")
+        with pytest.raises(FFmpegError) as exc_info:
+            config.get_ffprobe()
+        assert "not found or not executable" in str(exc_info.value)
 
     def test_get_ffmpeg_auto_detect(self):
         """Test get_ffmpeg auto-detects when path not set."""
