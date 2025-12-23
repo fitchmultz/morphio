@@ -323,11 +323,12 @@ async def generate_completion_with_usage(
     result, chosen_model, provider = await _generate_core(messages, model, max_tokens, temperature)
     usage = result.get_token_usage()
 
-    # Build from TokenUsage fields, but override model with user-facing alias
-    usage_data = usage.model_dump()
-    usage_data["model"] = chosen_model
-
-    return GenerationWithUsage(content=result.content, **usage_data)
+    # Construct directly, overriding model with user-facing alias
+    return GenerationWithUsage(
+        content=result.content,
+        model=chosen_model,
+        **usage.model_dump(exclude={"model"}),
+    )
 
 
 def convert_to_messages(messages: list[dict]) -> list[Message]:
