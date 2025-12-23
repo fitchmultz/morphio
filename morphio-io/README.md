@@ -10,7 +10,6 @@ Morphio is a modern, full-stack web application designed for creating, managing,
 - [AI and Machine Learning Integration](#ai-and-machine-learning-integration)
 - [Current Functionality](#current-functionality)
 - [Setup and Installation](#setup-and-installation)
- - [Setup and Installation](#setup-and-installation)
 - [Secrets & Production](#secrets--production)
  - [Releases](#releases)
  - [Database](#database)
@@ -21,7 +20,7 @@ Morphio is a modern, full-stack web application designed for creating, managing,
 
 ### Frontend
 
-- **NextJS 15.1.7**: React framework for server-side rendering and static site generation
+- **Next.js 16.1.1**: React framework for server-side rendering and static site generation
 - **React 19.0.0**: Component-based UI library
 - **TailwindCSS 4+**: Utility-first CSS framework for rapid styling
 - **TypeScript**: Static typing for enhanced code quality

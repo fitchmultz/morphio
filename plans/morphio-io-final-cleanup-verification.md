@@ -1,3 +1,5 @@
+> **📁 ARCHIVED** on 2025-12-23 — This plan has been completed. See [docs/status.md](../docs/status.md) for current project status and [docs/plans/phase-11-completion.md](../docs/plans/phase-11-completion.md) for completion details.
+
 # Morphio-IO Final Cleanup & LLM Provider Enhancement
 
 ## Status: PHASE 11 - CONSOLIDATION

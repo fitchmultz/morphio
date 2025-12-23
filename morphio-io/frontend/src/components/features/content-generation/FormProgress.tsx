@@ -3,16 +3,32 @@ import type React from "react";
 interface FormProgressProps {
 	isLoading: boolean;
 	progress?: number;
+	stage?: string | null;
 	statusMessage?: string;
 	error?: string | null;
 }
 
+// Human-readable stage labels
+const STAGE_LABELS: Record<string, string> = {
+	queued: "Queued",
+	downloading: "Downloading",
+	chunking: "Chunking Audio",
+	transcribing: "Transcribing",
+	diarizing: "Identifying Speakers",
+	generating: "Generating Content",
+	saving: "Saving",
+	completed: "Completed",
+	failed: "Failed",
+};
+
 const FormProgress: React.FC<FormProgressProps> = ({
 	isLoading,
 	progress,
+	stage,
 	statusMessage,
 	error,
 }) => {
+	const stageLabel = stage ? STAGE_LABELS[stage] || stage : null;
 	if (!isLoading) {
 		return null;
 	}
@@ -26,6 +42,11 @@ const FormProgress: React.FC<FormProgressProps> = ({
 				></div>
 			</div>
 			<div className="morphio-body-sm text-center text-gray-600 dark:text-gray-400">
+				{stageLabel && (
+					<div className="font-semibold text-blue-600 dark:text-blue-400 mb-1">
+						{stageLabel}
+					</div>
+				)}
 				{statusMessage ? (
 					<>
 						{statusMessage}

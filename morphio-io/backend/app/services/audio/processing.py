@@ -326,6 +326,7 @@ async def get_audio_processing_status(job_id: str, user_id: int):
         job_id=job_id,
         status=status.status,
         progress=status.progress,
+        stage=status.stage,
         message=status.message,
         result=status.result if isinstance(status.result, (str, dict)) else None,
         error=status.error,

@@ -278,6 +278,7 @@ const TranscriptPage: React.FC = () => {
 					<FormProgress
 						isLoading={isLoading}
 						progress={progress}
+						stage={currentStatus?.stage}
 						statusMessage={statusMessage}
 						error={error}
 					/>

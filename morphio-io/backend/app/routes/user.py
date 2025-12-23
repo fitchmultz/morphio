@@ -8,7 +8,10 @@ from ..config import settings
 from ..database import get_db
 from ..models.usage import Usage
 from ..models.user import User
-from ..schemas.user_schema import UserOut, UserUpdate
+from ..models.subscription import Subscription
+from ..schemas.user_schema import UserCredits, UserOut, UserUpdate
+from ..utils.enums import UserRole
+from ..utils.response_utils import utc_now
 from ..services.security import get_current_user
 from ..services.security.protection import rate_limit_by_ip
 from ..utils.response_utils import ResponseStatus, create_response
@@ -96,6 +99,74 @@ async def change_email(
         status=ResponseStatus.SUCCESS,
         message="Email updated successfully",
         data=UserOut.model_validate(current_user).model_dump(),
+    )
+
+
+@router.get(
+    "/credits",
+    operation_id="get_user_credits",
+    response_model=UserCredits,
+    responses={**common_responses},
+)
+@handle_route_errors
+async def get_user_credits(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Get summary of user's credit usage for the current billing period."""
+    # Determine subscription plan
+    subscription_plan = "free"
+    subscription_result = await db.execute(
+        select(Subscription).where(
+            Subscription.user_id == current_user.id,
+            Subscription.deleted_at.is_(None),
+        )
+    )
+    user_subscriptions = subscription_result.scalars().all()
+    active_sub = next((sub for sub in user_subscriptions if sub.status == "active"), None)
+    if active_sub:
+        subscription_plan = active_sub.plan.lower()
+
+    plan_limit = settings.SUBSCRIPTION_PLAN_LIMITS.get(subscription_plan, 50)
+    is_admin = current_user.role == UserRole.ADMIN
+
+    # Sum up current period usage credits
+    results = await db.execute(
+        select(Usage).where(Usage.user_id == current_user.id, Usage.deleted_at.is_(None))
+    )
+    usage_list = results.scalars().all()
+
+    now = utc_now()
+    total_used = 0
+    for usage_item in usage_list:
+        # Check if this usage is from the current month
+        if usage_item.updated_at:
+            if usage_item.updated_at.month == now.month and usage_item.updated_at.year == now.year:
+                total_used += usage_item.usage_credits
+        elif usage_item.created_at:
+            if usage_item.created_at.month == now.month and usage_item.created_at.year == now.year:
+                total_used += usage_item.usage_credits
+
+    # Admins have unlimited credits
+    if is_admin:
+        remaining = 999999999
+        plan_limit = 999999999
+    else:
+        remaining = max(0, plan_limit - total_used)
+
+    credits_data = UserCredits(
+        plan=subscription_plan,
+        limit=plan_limit,
+        used=total_used,
+        remaining=remaining,
+        resets_monthly=True,
+        is_admin=is_admin,
+    )
+
+    return create_response(
+        status=ResponseStatus.SUCCESS,
+        message="User credits retrieved successfully",
+        data=credits_data.model_dump(),
     )
 
 

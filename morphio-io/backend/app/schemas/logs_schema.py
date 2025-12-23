@@ -2,7 +2,7 @@ from typing import Any, Dict, Optional
 
 from pydantic import BaseModel, ConfigDict
 
-from ..utils.enums import JobStatus
+from ..utils.enums import JobStatus, ProcessingStage
 
 
 class LogsProcessingResponse(BaseModel):
@@ -17,6 +17,7 @@ class LogsProcessingStatusResponse(BaseModel):
     job_id: str
     status: JobStatus
     progress: int = 0
+    stage: Optional[ProcessingStage] = None
     message: Optional[str] = None
     result: Optional[Dict[str, Any]] = None
     error: Optional[str] = None

@@ -2,7 +2,7 @@ from typing import Any, Dict, Optional, Union
 
 from pydantic import AnyHttpUrl, BaseModel, ConfigDict, Field, HttpUrl
 
-from ..utils.enums import JobStatus, MediaProcessingStatus, MediaSource, MediaType
+from ..utils.enums import JobStatus, MediaProcessingStatus, MediaSource, MediaType, ProcessingStage
 
 
 class MediaProcessingRequest(BaseModel):
@@ -49,6 +49,7 @@ class MediaProcessingStatusResponse(BaseModel):
     job_id: str
     status: JobStatus
     progress: int = Field(default=0, ge=0, le=100)
+    stage: Optional[ProcessingStage] = None
     message: Optional[str] = None
     result: Optional[Union[str, Dict[str, Any]]] = None
     error: Optional[str] = None

@@ -3,10 +3,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from anthropic import AsyncAnthropic
 from dotenv import load_dotenv
-from google import genai
-from openai import AsyncOpenAI
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings
 
@@ -270,17 +267,30 @@ class Settings(BaseSettings):
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
         return f"sqlite+aiosqlite:///{db_path}"
 
-    @property
-    def anthropic_client(self) -> AsyncAnthropic:
-        return AsyncAnthropic(api_key=self.ANTHROPIC_API_KEY.get_secret_value())
+    # DEPRECATED: Direct SDK client access is forbidden.
+    # Use morphio-core via app/adapters/llm.py instead.
+    # See docs/architecture.md for the adapter boundary documentation.
 
     @property
-    def openai_client(self) -> AsyncOpenAI:
-        return AsyncOpenAI(api_key=self.OPENAI_API_KEY.get_secret_value())
+    def anthropic_client(self):
+        raise RuntimeError(
+            "DEPRECATED: Direct SDK client access is forbidden. "
+            "Use morphio-core via app/adapters/llm.py instead."
+        )
 
     @property
-    def gemini_client(self) -> genai.Client:
-        return genai.Client(api_key=self.GEMINI_API_KEY.get_secret_value())
+    def openai_client(self):
+        raise RuntimeError(
+            "DEPRECATED: Direct SDK client access is forbidden. "
+            "Use morphio-core via app/adapters/llm.py instead."
+        )
+
+    @property
+    def gemini_client(self):
+        raise RuntimeError(
+            "DEPRECATED: Direct SDK client access is forbidden. "
+            "Use morphio-core via app/adapters/llm.py instead."
+        )
 
     def dict(self, *args, **kwargs) -> Dict[str, Any]:
         d = super().model_dump(*args, **kwargs)

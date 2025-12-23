@@ -195,6 +195,7 @@ function Dashboard() {
 							isLoading={jobId !== null}
 							error={jobError || errorContents || errorTemplates}
 							progress={status?.progress}
+							stage={status?.stage}
 							statusMessage={status?.message ?? undefined}
 							resetFormTrigger={formResetTrigger}
 						/>
