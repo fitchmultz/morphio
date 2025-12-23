@@ -64,9 +64,7 @@ class OpenAIProvider:
         return "openai"
 
     @staticmethod
-    def _apply_reasoning_effort(
-        api_params: dict[str, Any], reasoning_effort: str | None
-    ) -> None:
+    def _apply_reasoning_effort(api_params: dict[str, Any], reasoning_effort: str | None) -> None:
         """Validate and apply reasoning_effort to API params.
 
         Args:

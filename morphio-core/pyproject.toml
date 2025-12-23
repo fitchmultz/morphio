@@ -3,7 +3,7 @@ name = "morphio-core"
 version = "0.1.0"
 description = "Reusable Python library for audio processing, LLM orchestration, and security utilities"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.11"
 license = "MIT"
 authors = [{ name = "Mitch Fultz" }]
 keywords = ["audio", "llm", "transcription", "ai", "security"]
@@ -11,13 +11,14 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Topic :: Multimedia :: Sound/Audio",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Typing :: Typed",
 ]
 dependencies = [
-    "mlx-whisper>=0.4.3",
     "pydantic>=2.10.0",
 ]
 
@@ -43,7 +44,11 @@ all = [
     "google-genai>=1.0.0",
     "yt-dlp>=2024.12.1",
     "faster-whisper>=1.0.0",
+    "mlx-whisper>=0.4.0",
 ]
+
+[project.urls]
+Repository = "https://github.com/fitchmultz/morphio-all"
 
 [dependency-groups]
 dev = [
@@ -61,7 +66,7 @@ build-backend = "hatchling.build"
 packages = ["src/morphio_core"]
 
 [tool.ruff]
-target-version = "py313"
+target-version = "py311"
 line-length = 100
 
 [tool.ruff.lint]
