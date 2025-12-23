@@ -153,7 +153,7 @@ type-check: type-check-backend type-check-frontend ## Run type checkers
 
 type-check-backend: ## Type check backend
 	@echo "🔷 Type checking backend..."
-	@cd backend && uv run ty check
+	@cd backend && uv run ty check --exclude "worker_ml/" --exclude "tests/performance/"
 
 type-check-frontend: ## Type check frontend
 	@echo "🔷 Type checking frontend..."

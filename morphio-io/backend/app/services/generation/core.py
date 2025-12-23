@@ -115,7 +115,9 @@ async def generate_conversation_completion(
 
     # Calculate token budget
     model_token_limit = get_model_token_limit(used_model)
-    budget = min(max_completion_tokens if max_completion_tokens is not None else 2048, model_token_limit)
+    budget = min(
+        max_completion_tokens if max_completion_tokens is not None else 2048, model_token_limit
+    )
 
     generated, model_used = await generate_completion(
         messages=messages,

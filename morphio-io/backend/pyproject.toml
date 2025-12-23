@@ -120,6 +120,9 @@ package = false
 morphio-core = { path = "../../morphio-core", editable = true }
 
 [tool.ty]
+# Note: worker_ml excluded via --exclude flag in Makefile
+# (requires Linux/CUDA-specific ML deps not available on macOS)
+
 [tool.ty.environment]
 python-version = "3.13"
 
