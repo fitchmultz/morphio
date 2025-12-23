@@ -53,8 +53,8 @@ MODEL_TOKEN_LIMITS = {
     "gemini-3-pro-preview-low": 65536,
 }
 
-# Valid models for content generation
-VALID_GENERATION_MODELS = list(MODEL_TOKEN_LIMITS.keys())
+# Valid models for content generation (set for O(1) membership testing)
+VALID_GENERATION_MODELS = set(MODEL_TOKEN_LIMITS.keys())
 
 # Display labels for UI
 MODEL_DISPLAY_INFO = [
@@ -192,7 +192,7 @@ async def _generate_core(
     model: str | None = None,
     max_tokens: int | None = None,
     temperature: float | None = None,
-) -> tuple[GenerationResult, str, ProviderName]:
+) -> tuple[GenerationResult, str]:
     """
     Core generation logic shared by all completion functions.
 
@@ -205,7 +205,7 @@ async def _generate_core(
         temperature: Temperature override
 
     Returns:
-        Tuple of (GenerationResult, chosen_model, provider)
+        Tuple of (GenerationResult, chosen_model)
 
     Raises:
         ApplicationException: If generation fails
@@ -242,7 +242,7 @@ async def _generate_core(
             **provider_kwargs,
         )
 
-        return result, chosen_model, provider
+        return result, chosen_model
 
     except LLMProviderError as e:
         logger.error(f"LLM provider error: {e}")
@@ -276,7 +276,7 @@ async def generate_completion(
     Raises:
         ApplicationException: If generation fails
     """
-    result, chosen_model, _ = await _generate_core(messages, model, max_tokens, temperature)
+    result, chosen_model = await _generate_core(messages, model, max_tokens, temperature)
     return result.content, chosen_model
 
 
@@ -325,7 +325,7 @@ async def generate_completion_with_usage(
     Raises:
         ApplicationException: If generation fails
     """
-    result, chosen_model, _ = await _generate_core(messages, model, max_tokens, temperature)
+    result, chosen_model = await _generate_core(messages, model, max_tokens, temperature)
     usage = result.get_token_usage()
 
     # Construct directly, overriding model with user-facing alias
