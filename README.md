@@ -30,7 +30,7 @@ make check
 
 ## Project Relationship
 
-morphio-core is a standalone library extracted from morphio-io. The web app uses it via path dependency:
+morphio-core is a standalone library extracted from morphio-io. The web app uses it via **uv workspace dependency**:
 
 ```
 morphio-io/backend
@@ -132,7 +132,9 @@ morphio-io uses thin adapters (`app/adapters/`) that:
 
 ### morphio-io
 - **Backend**: Python 3.13+, FastAPI, SQLAlchemy, PostgreSQL, Redis
-- **Frontend**: Next.js 15, React 19, TypeScript, TailwindCSS 4
+- **Frontend**: Next.js 16.1.1, React 19, TypeScript, TailwindCSS 4
+- **Node.js**: ≥24.0.0
+- **Ports**: Backend 8000, Frontend dev 3005, Frontend Docker 3500→3000
 - **DevOps**: Docker, GitHub Actions
 
 ### morphio-core

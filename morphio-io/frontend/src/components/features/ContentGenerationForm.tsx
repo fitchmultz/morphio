@@ -35,6 +35,7 @@ interface ContentGenerationFormProps {
 	isLoading: boolean;
 	error?: string | null;
 	progress?: number;
+	stage?: string | null;
 	statusMessage?: string;
 	resetFormTrigger?: number;
 }
@@ -45,6 +46,7 @@ const ContentGenerationFormComponent: FC<ContentGenerationFormProps> = ({
 	isLoading,
 	error,
 	progress,
+	stage,
 	statusMessage,
 	resetFormTrigger,
 }) => {
@@ -285,6 +287,7 @@ const ContentGenerationFormComponent: FC<ContentGenerationFormProps> = ({
 				<FormProgress
 					isLoading={isLoading}
 					progress={progress}
+					stage={stage}
 					statusMessage={statusMessage}
 					error={error}
 				/>

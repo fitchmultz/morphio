@@ -11,7 +11,7 @@ services:
     environment:
       - APP_ENV=${APP_ENV}
       - APP_PORT=${APP_PORT}
-      - REDIS_URL=redis://redis:6379
+      - REDIS_URL=redis://redis:6379/0
       - WORKER_ML_URL=http://worker-ml:8001
       - CRAWLER_URL=http://crawler:8002
     depends_on:

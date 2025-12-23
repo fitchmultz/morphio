@@ -104,11 +104,15 @@ format-io: ## Format morphio-io
 # Full Check (CI/Pre-commit)
 # ============================================================================
 
-check: check-core check-io ## Full CI check for both projects (required before commits)
+check: check-core check-io audit-imports ## Full CI check for both projects (required before commits)
 	@echo ""
 	@echo "============================================"
 	@echo "✅ All checks passed for entire monorepo!"
 	@echo "============================================"
+
+audit-imports: ## Verify no direct provider SDK imports in morphio-io/backend/app
+	@echo "🔍 Auditing provider SDK imports..."
+	@./scripts/audit_imports.sh
 
 check-core: ## Full check for morphio-core
 	@echo "🔎 Checking morphio-core..."

@@ -410,6 +410,7 @@ async def get_video_processing_status(job_id: str, user_id: int) -> MediaProcess
         job_id=job_id,
         status=st.status,
         progress=st.progress,
+        stage=st.stage,
         message=st.message,
         result=st.result if isinstance(st.result, (str, dict)) else None,
         error=st.error,

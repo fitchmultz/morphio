@@ -71,6 +71,17 @@ class UserOut(UserBase):
         return None
 
 
+class UserCredits(BaseModel):
+    """Summary of user's credit usage for the current billing period."""
+
+    plan: str = Field(..., description="Current subscription plan")
+    limit: int = Field(..., description="Total credits available in this plan")
+    used: int = Field(..., description="Credits used this period")
+    remaining: int = Field(..., description="Credits remaining this period")
+    resets_monthly: bool = Field(default=True, description="Whether credits reset monthly")
+    is_admin: bool = Field(default=False, description="Admin users have unlimited credits")
+
+
 class UserPasswordChange(BaseModel):
     current_password: str
     new_password: str = Field(..., min_length=8)

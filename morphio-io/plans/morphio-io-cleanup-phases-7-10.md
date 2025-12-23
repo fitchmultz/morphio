@@ -1,3 +1,5 @@
+> **📁 ARCHIVED** on 2025-12-23 — This plan has been completed. See [docs/status.md](../../docs/status.md) for current project status and [docs/plans/phase-11-completion.md](../../docs/plans/phase-11-completion.md) for completion details.
+
 # Morphio-IO Cleanup: Phases 7-10
 
 > Continuation of [extract-morphio-core-library.md](./extract-morphio-core-library.md)
