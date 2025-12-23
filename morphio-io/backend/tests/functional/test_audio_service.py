@@ -7,6 +7,17 @@ from app.schemas.audio_schema import TranscriptionResult
 from app.services.audio import transcribe_audio
 from app.services.video import process_local_video
 
+# Check if a whisper backend is available
+_whisper_available = False
+try:
+    from morphio_core.audio import detect_optimal_backend
+
+    _whisper_available = detect_optimal_backend() is not None
+except Exception:
+    pass
+
+pytestmark = pytest.mark.skipif(not _whisper_available, reason="Whisper backend not installed")
+
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

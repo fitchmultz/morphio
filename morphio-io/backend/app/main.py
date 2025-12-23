@@ -87,7 +87,7 @@ async def lifespan(app: FastAPI):
 
         if sys.platform == "darwin" and platform.machine() in {"arm64", "aarch64"}:
             try:
-                import mlx.core as mx
+                import mlx.core as mx  # type: ignore[import-untyped]
 
                 mx.eval(mx.array([1.0]))
                 logger.info("MLX Metal backend verified")
@@ -151,6 +151,13 @@ app.include_router(web.router, prefix="/web", tags=["Web Scraping"])
 app.include_router(admin.router, prefix="/admin", tags=["Admin"])
 app.include_router(health.router, prefix="/health", tags=["Health"])
 app.include_router(logs.router, prefix="/logs", tags=["Logs"])
+
+# Optional Prometheus metrics endpoint (disabled by default)
+if settings.PROMETHEUS_ENABLED:
+    from .routes import metrics
+
+    app.include_router(metrics.router)
+    logger.info("Prometheus metrics endpoint enabled at /metrics")
 
 register_exception_handlers(app)
 security = HTTPBearer()

@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from dotenv import load_dotenv
-from pydantic import Field, SecretStr
+from pydantic import AliasChoices, Field, SecretStr
 from pydantic_settings import BaseSettings
 
 # Load .env from current directory (backend/.env) first
@@ -129,6 +129,11 @@ class Settings(BaseSettings):
     RATE_LIMITING_ENABLED: bool = Field(
         default=True, json_schema_extra={"env": "RATE_LIMITING_ENABLED"}
     )
+    PROMETHEUS_ENABLED: bool = Field(
+        default=False,
+        validation_alias="PROMETHEUS_ENABLED",
+        description="Enable /metrics endpoint for Prometheus scraping",
+    )
     USER_ROUTES_RATE_LIMIT: int = Field(
         default=60, json_schema_extra={"env": "USER_ROUTES_RATE_LIMIT"}
     )
@@ -203,7 +208,7 @@ class Settings(BaseSettings):
             "LOG_PROCESSING": 1,
             "OTHER": 1,
         },
-        json_schema_extra={"env": "USAGE_WEIGHTS_JSON"},
+        validation_alias="USAGE_WEIGHTS_JSON",
     )
     SUBSCRIPTION_PLAN_LIMITS: Dict[str, int] = Field(
         default={
@@ -211,7 +216,7 @@ class Settings(BaseSettings):
             "pro": 1000,
             "enterprise": 999999999,
         },
-        json_schema_extra={"env": "SUBSCRIPTION_PLAN_LIMITS_JSON"},
+        validation_alias="SUBSCRIPTION_PLAN_LIMITS_JSON",
     )
 
     ALLOWED_LOG_EXTENSIONS: List[str] = Field(
@@ -235,7 +240,7 @@ class Settings(BaseSettings):
     SERVICE_TIMEOUT: int = Field(default=60, json_schema_extra={"env": "SERVICE_TIMEOUT"})
     DATABASE_URL: SecretStr = Field(
         default=SecretStr(""),
-        json_schema_extra={"env": ["DATABASE_URL", "SQLALCHEMY_DATABASE_URI"]},
+        validation_alias=AliasChoices("DATABASE_URL", "SQLALCHEMY_DATABASE_URI"),
     )
 
     @property

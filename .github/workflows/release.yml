@@ -40,8 +40,8 @@ jobs:
         id: build
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: backend/Dockerfile.api
+          context: morphio-io
+          file: morphio-io/backend/Dockerfile.api
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -76,8 +76,8 @@ jobs:
         id: build
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: backend/Dockerfile.worker-ml
+          context: morphio-io
+          file: morphio-io/backend/Dockerfile.worker-ml
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -112,8 +112,8 @@ jobs:
         id: build
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: backend/Dockerfile.crawler
+          context: morphio-io
+          file: morphio-io/backend/Dockerfile.crawler
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -177,4 +177,3 @@ jobs:
             sbom-api.spdx.json
             sbom-worker-ml.spdx.json
             sbom-crawler.spdx.json
-
