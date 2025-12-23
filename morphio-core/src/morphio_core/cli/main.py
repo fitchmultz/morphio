@@ -48,8 +48,8 @@ def transcribe(
     from morphio_core.audio import TranscriptionConfig, transcribe_audio
     from morphio_core.exceptions import TranscriptionError
 
-    if not audio_file.exists():
-        console.print(f"[red]Error:[/red] File not found: {audio_file}")
+    if not audio_file.is_file():
+        console.print(f"[red]Error:[/red] Audio file not found or is not a regular file: {audio_file}")
         raise typer.Exit(1)
 
     config = TranscriptionConfig(
