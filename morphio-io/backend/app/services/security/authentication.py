@@ -116,13 +116,80 @@ def is_password_complex(password: str) -> bool:
     return True
 
 
+async def _authenticate_api_key(token: str, db: AsyncSession) -> Optional[User]:
+    """
+    Attempt to authenticate using an API key.
+
+    :param token: The API key (must start with "mio_")
+    :param db: The database session
+    :return: The authenticated user or None if not an API key
+    """
+
+    from ...models.api_key import APIKey
+    from ...utils.response_utils import utc_now
+
+    if not token.startswith("mio_"):
+        return None
+
+    # Hash the key and look it up
+    hashed_key = APIKey.verify_key(token)
+    result = await db.execute(
+        select(APIKey).where(
+            APIKey.hashed_key == hashed_key,
+            APIKey.deleted_at.is_(None),
+        )
+    )
+    api_key = result.scalar_one_or_none()
+
+    if not api_key:
+        log_security_event(
+            event_type=SecurityEventType.ACCESS_DENIED,
+            message="Invalid API key used for authentication",
+            level=SECURITY_AUDIT,
+            details={"key_prefix": token[:12] if len(token) >= 12 else token},
+        )
+        raise ApplicationException(
+            message="Invalid API key",
+            status_code=status.HTTP_401_UNAUTHORIZED,
+        )
+
+    # Update last_used_at
+    api_key.last_used_at = utc_now()
+    await db.commit()
+
+    # Get the user
+    user = await db.scalar(select(User).where(User.id == api_key.user_id))
+    if not user:
+        log_security_event(
+            event_type=SecurityEventType.ACCESS_DENIED,
+            message="User for API key not found",
+            level=SECURITY_AUDIT,
+            details={"key_prefix": api_key.key_prefix},
+        )
+        raise ApplicationException(
+            message="User not found",
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    log_security_event(
+        event_type="API_KEY_VALIDATED",
+        message="User successfully authenticated via API key",
+        level=SECURITY_AUDIT,
+        user_id=int(user.id),
+        details={"key_prefix": api_key.key_prefix},
+    )
+    return user
+
+
 async def get_current_user(
     token: Optional[str] = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
 ) -> User:
     """
-    Get the current authenticated user from the token.
+    Get the current authenticated user from the token or API key.
 
-    :param token: The access token (may be None if auto_error=False)
+    Supports both JWT tokens and API keys (format: mio_*).
+
+    :param token: The access token or API key (may be None if auto_error=False)
     :param db: The database session
     :return: The authenticated user
     """
@@ -133,6 +200,13 @@ async def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
         )
 
+    # Try API key authentication first
+    if token.startswith("mio_"):
+        user = await _authenticate_api_key(token, db)
+        if user:
+            return user
+
+    # Fall back to JWT authentication
     try:
         payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
         user_id_val = payload.get("sub")

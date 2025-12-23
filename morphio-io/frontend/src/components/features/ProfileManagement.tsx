@@ -2,7 +2,12 @@
 
 import type { FC } from "react";
 import { useCallback, useEffect, useState } from "react";
-import { getUserCredits, getUserProfile } from "@/client/sdk.gen";
+import {
+	createCheckoutSession,
+	createPortalSession,
+	getUserCredits,
+	getUserProfile,
+} from "@/client/sdk.gen";
 import type {
 	AppSchemasAuthSchemaUserOut,
 	UserCredits,
@@ -22,6 +27,7 @@ export const ProfileManagement: FC = () => {
 	const [credits, setCredits] = useState<UserCredits | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [fetchError, setFetchError] = useState<string | null>(null);
+	const [isUpgrading, setIsUpgrading] = useState(false);
 
 	const fetchUserProfile = useCallback(async () => {
 		try {
@@ -78,6 +84,48 @@ export const ProfileManagement: FC = () => {
 			logger.info(`${updateKey} updated successfully`, {
 				userId: userProfile.id,
 			});
+		}
+	};
+
+	const handleUpgrade = async (plan: "pro" | "enterprise") => {
+		try {
+			setIsUpgrading(true);
+			const response = await createCheckoutSession({
+				query: { plan },
+			});
+			const responseData = response.data as {
+				data?: { checkout_url?: string };
+			} | null;
+			if (responseData?.data?.checkout_url) {
+				window.location.href = responseData.data.checkout_url;
+			} else {
+				notifyError("Failed to create checkout session");
+			}
+		} catch (error) {
+			logger.error("Failed to create checkout session", { error });
+			notifyError("Failed to start upgrade process. Please try again.");
+		} finally {
+			setIsUpgrading(false);
+		}
+	};
+
+	const handleManageBilling = async () => {
+		try {
+			setIsUpgrading(true);
+			const response = await createPortalSession();
+			const responseData = response.data as {
+				data?: { portal_url?: string };
+			} | null;
+			if (responseData?.data?.portal_url) {
+				window.location.href = responseData.data.portal_url;
+			} else {
+				notifyError("Failed to create portal session");
+			}
+		} catch (error) {
+			logger.error("Failed to create portal session", { error });
+			notifyError("Failed to open billing portal. Please try again.");
+		} finally {
+			setIsUpgrading(false);
 		}
 	};
 
@@ -161,6 +209,33 @@ export const ProfileManagement: FC = () => {
 				renderProfileSection(
 					"Usage Credits",
 					<div className="space-y-4">
+						{/* Warning banners for low credits */}
+						{!credits.is_admin &&
+							credits.remaining_pct !== undefined &&
+							credits.remaining_pct < 5 && (
+								<div className="p-3 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg">
+									<p className="morphio-body-sm text-red-700 dark:text-red-300 font-medium">
+										Critical: Less than 5% of credits remaining!
+									</p>
+									<p className="morphio-caption text-red-600 dark:text-red-400">
+										Upgrade your plan to continue using AI features.
+									</p>
+								</div>
+							)}
+						{!credits.is_admin &&
+							credits.remaining_pct !== undefined &&
+							credits.remaining_pct >= 5 &&
+							credits.remaining_pct < 20 && (
+								<div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700 rounded-lg">
+									<p className="morphio-body-sm text-yellow-700 dark:text-yellow-300 font-medium">
+										Warning: Less than 20% of credits remaining
+									</p>
+									<p className="morphio-caption text-yellow-600 dark:text-yellow-400">
+										Consider upgrading to avoid running out of credits.
+									</p>
+								</div>
+							)}
+
 						<div className="flex justify-between items-center">
 							<span className="morphio-body font-medium">Plan:</span>
 							<span className="morphio-body capitalize">{credits.plan}</span>
@@ -179,7 +254,15 @@ export const ProfileManagement: FC = () => {
 								</div>
 								<div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2.5">
 									<div
-										className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+										className={`h-2.5 rounded-full transition-all duration-300 ${
+											credits.remaining_pct !== undefined &&
+											credits.remaining_pct < 5
+												? "bg-red-600"
+												: credits.remaining_pct !== undefined &&
+														credits.remaining_pct < 20
+													? "bg-yellow-500"
+													: "bg-blue-600"
+										}`}
 										style={{
 											width: `${Math.min(100, (credits.used / credits.limit) * 100)}%`,
 										}}
@@ -187,12 +270,51 @@ export const ProfileManagement: FC = () => {
 								</div>
 								<div className="flex justify-between items-center text-sm">
 									<span className="text-gray-500 dark:text-gray-400">
-										{credits.remaining} credits remaining
+										{credits.remaining} credits remaining (
+										{credits.remaining_pct?.toFixed(0) ?? 0}%)
 									</span>
-									{credits.resets_monthly && (
+									{credits.reset_date && (
 										<span className="text-gray-500 dark:text-gray-400">
-											Resets monthly
+											Resets {new Date(credits.reset_date).toLocaleDateString()}
 										</span>
+									)}
+								</div>
+
+								{/* Upgrade CTA */}
+								<div className="pt-4 border-t border-gray-200 dark:border-gray-600">
+									{credits.plan === "free" ? (
+										<div className="space-y-2">
+											<p className="morphio-body-sm text-gray-600 dark:text-gray-300">
+												Upgrade for more credits and features
+											</p>
+											<div className="flex gap-3">
+												<button
+													type="button"
+													onClick={() => handleUpgrade("pro")}
+													disabled={isUpgrading}
+													className="morphio-button px-4 py-2 text-sm"
+												>
+													{isUpgrading ? "Loading..." : "Upgrade to Pro"}
+												</button>
+												<button
+													type="button"
+													onClick={() => handleUpgrade("enterprise")}
+													disabled={isUpgrading}
+													className="morphio-button-secondary px-4 py-2 text-sm"
+												>
+													{isUpgrading ? "Loading..." : "Enterprise"}
+												</button>
+											</div>
+										</div>
+									) : (
+										<button
+											type="button"
+											onClick={handleManageBilling}
+											disabled={isUpgrading}
+											className="morphio-button-secondary px-4 py-2 text-sm"
+										>
+											{isUpgrading ? "Loading..." : "Manage Billing"}
+										</button>
 									)}
 								</div>
 							</>

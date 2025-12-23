@@ -11,12 +11,13 @@ from ..utils.enums import UserRole
 from .base import Base, SoftDeleteMixin, logger
 
 if TYPE_CHECKING:
-    from .content import Content
-    from .template import Template
+    from .api_key import APIKey
     from .comment import Comment
+    from .content import Content
     from .conversation import ContentConversation
-    from .usage import Usage
     from .subscription import Subscription
+    from .template import Template
+    from .usage import Usage
 
 
 class User(Base, SoftDeleteMixin):
@@ -31,6 +32,12 @@ class User(Base, SoftDeleteMixin):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     # CHANGED HERE: Now default=UserRole.USER means "USER" (uppercase)
     role: Mapped[UserRole] = mapped_column(Enum(UserRole), default=UserRole.USER)
+
+    # Stripe billing fields
+    stripe_customer_id: Mapped[str | None] = mapped_column(String(255), nullable=True, index=True)
+    subscription_status: Mapped[str | None] = mapped_column(
+        String(50), nullable=True, default=None
+    )  # active, canceled, past_due, etc.
 
     contents: Mapped[list["Content"]] = relationship(
         "Content", back_populates="user", lazy="selectin"
@@ -50,6 +57,9 @@ class User(Base, SoftDeleteMixin):
     )
     subscriptions: Mapped[list["Subscription"]] = relationship(
         "Subscription", back_populates="user", lazy="selectin"
+    )
+    api_keys: Mapped[list["APIKey"]] = relationship(
+        "APIKey", back_populates="user", lazy="selectin"
     )
 
     def set_password(self, password: str) -> None:
