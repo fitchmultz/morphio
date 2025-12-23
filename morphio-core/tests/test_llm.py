@@ -561,7 +561,7 @@ class TestGeminiProviderKwargs:
 
     def test_valid_thinking_levels(self):
         """Test that all valid thinking levels are recognized."""
-        from morphio_core.llm.providers.gemini import VALID_THINKING_LEVELS
+        from morphio_core.llm.types import VALID_THINKING_LEVELS
 
         assert {"high", "medium", "low", "minimal"} == VALID_THINKING_LEVELS
 
@@ -577,7 +577,7 @@ class TestOpenAIProviderKwargs:
 
     def test_valid_reasoning_efforts(self):
         """Test that all valid reasoning efforts are recognized."""
-        from morphio_core.llm.providers.openai import VALID_REASONING_EFFORTS
+        from morphio_core.llm.types import VALID_REASONING_EFFORTS
 
         assert {"low", "medium", "high"} == VALID_REASONING_EFFORTS
 

@@ -213,8 +213,13 @@ async def _generate_core(
     try:
         router = get_llm_router()
 
-        # Use default model if not specified, or if the provided model is invalid
-        chosen_model = model if model and model in VALID_GENERATION_MODELS else settings.CONTENT_MODEL
+        # Validate model - raise error if invalid, use default if not specified
+        if model and model not in VALID_GENERATION_MODELS:
+            raise ApplicationException(
+                message=f"Invalid model '{model}'. Valid models: {', '.join(sorted(VALID_GENERATION_MODELS))}",
+                status_code=400,
+            )
+        chosen_model = model or settings.CONTENT_MODEL
 
         # Resolve alias to base model and provider kwargs
         base_model, provider, provider_kwargs = resolve_model_alias(chosen_model)

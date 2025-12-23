@@ -2,18 +2,22 @@
 
 import logging
 from collections.abc import AsyncIterator
-from typing import Any, Literal
+from typing import Any
 
 from pydantic import SecretStr
 
 from ...exceptions import LLMProviderError, OptionalDependencyError
-from ..types import GenerationResult, Message, StreamDelta, StreamDone, StreamEvent, Usage
+from ..types import (
+    GenerationResult,
+    Message,
+    StreamDelta,
+    StreamDone,
+    StreamEvent,
+    Usage,
+    validate_reasoning_effort,
+)
 
 logger = logging.getLogger(__name__)
-
-# Valid reasoning effort levels for OpenAI reasoning models (o1, o3 series)
-ReasoningEffort = Literal["low", "medium", "high"]
-VALID_REASONING_EFFORTS = {"low", "medium", "high"}
 
 
 class OpenAIProvider:
@@ -78,14 +82,12 @@ class OpenAIProvider:
         Raises:
             LLMProviderError: If reasoning_effort is invalid
         """
-        if reasoning_effort:
-            effort = reasoning_effort.lower()
-            if effort not in VALID_REASONING_EFFORTS:
-                raise LLMProviderError(
-                    f"Invalid reasoning_effort '{reasoning_effort}'. "
-                    f"Valid values: {', '.join(sorted(VALID_REASONING_EFFORTS))}"
-                )
-            api_params["reasoning_effort"] = effort
+        try:
+            validated = validate_reasoning_effort(reasoning_effort)
+            if validated is not None:
+                api_params["reasoning_effort"] = validated.value
+        except ValueError as e:
+            raise LLMProviderError(str(e)) from e
 
     async def generate(
         self,
