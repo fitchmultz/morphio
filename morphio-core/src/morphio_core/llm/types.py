@@ -4,10 +4,16 @@ LLM types and configuration models.
 All config uses Pydantic with explicit fields - no global settings.
 """
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, SecretStr
+
+# Type alias for provider factory functions
+# A factory takes a ProviderConfig and returns an LLMProvider-compatible instance
+# Uses Any for return type to avoid circular import with providers.base
+ProviderFactory = Callable[["ProviderConfig"], Any]
 
 
 class Message(BaseModel):
@@ -76,9 +82,32 @@ class ProviderConfig(BaseModel):
 
 
 class LLMConfig(BaseModel):
-    """Configuration for the LLM router - NO GLOBAL SETTINGS."""
+    """Configuration for the LLM router - NO GLOBAL SETTINGS.
 
+    Built-in providers (openai, anthropic, gemini) are configured via their
+    respective fields. Custom providers can be added via custom_providers.
+
+    Example with custom provider:
+        def my_provider_factory(config: ProviderConfig) -> "LLMProvider":
+            return MyCustomProvider(api_key=config.api_key, ...)
+
+        config = LLMConfig(
+            custom_providers={"my-provider": my_provider_factory},
+            custom_configs={"my-provider": ProviderConfig(api_key=..., default_model="...")},
+            default_provider="my-provider",
+        )
+    """
+
+    # Built-in provider configs
     openai: ProviderConfig | None = None
     anthropic: ProviderConfig | None = None
     gemini: ProviderConfig | None = None
-    default_provider: Literal["openai", "anthropic", "gemini"] = "openai"
+
+    # Custom provider support
+    custom_providers: dict[str, "ProviderFactory"] = Field(default_factory=dict)
+    custom_configs: dict[str, ProviderConfig] = Field(default_factory=dict)
+
+    # Default can be any string (built-in or custom)
+    default_provider: str = "openai"
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)

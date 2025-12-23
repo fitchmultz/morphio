@@ -26,6 +26,7 @@ from .types import (
     LLMConfig,
     Message,
     ProviderConfig,
+    ProviderFactory,
     StreamDelta,
     StreamDone,
     StreamEvent,
@@ -41,6 +42,7 @@ __all__ = [
     "StreamDone",
     "StreamEvent",
     "ProviderConfig",
+    "ProviderFactory",
     "LLMConfig",
     # Providers
     "LLMProvider",
