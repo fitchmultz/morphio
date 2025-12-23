@@ -11,8 +11,6 @@ This adapter wraps morphio-core's LLMRouter and provides:
 import logging
 from typing import Any, Literal
 
-from pydantic import BaseModel
-
 from morphio_core.exceptions import LLMProviderError
 from morphio_core.llm import LLMRouter
 from morphio_core.llm.types import GenerationResult, LLMConfig, Message, ProviderConfig, TokenUsage
@@ -25,18 +23,14 @@ logger = logging.getLogger(__name__)
 ProviderName = Literal["openai", "anthropic", "gemini"]
 
 
-class GenerationWithUsage(BaseModel):
+class GenerationWithUsage(TokenUsage):
     """Generation result with token usage for tracking/billing.
 
+    Inherits token tracking fields from TokenUsage and adds content.
     Use this when you need to track token consumption for monetization.
     """
 
     content: str
-    model: str
-    provider: str
-    input_tokens: int | None = None
-    output_tokens: int | None = None
-    total_tokens: int | None = None
 
 
 # Model token limits for output
@@ -329,14 +323,11 @@ async def generate_completion_with_usage(
     result, chosen_model, provider = await _generate_core(messages, model, max_tokens, temperature)
     usage = result.get_token_usage()
 
-    return GenerationWithUsage(
-        content=result.content,
-        model=chosen_model,
-        provider=provider,
-        input_tokens=usage.input_tokens,
-        output_tokens=usage.output_tokens,
-        total_tokens=usage.total_tokens,
-    )
+    # Build from TokenUsage fields, but override model with user-facing alias
+    usage_data = usage.model_dump()
+    usage_data["model"] = chosen_model
+
+    return GenerationWithUsage(content=result.content, **usage_data)
 
 
 def convert_to_messages(messages: list[dict]) -> list[Message]:

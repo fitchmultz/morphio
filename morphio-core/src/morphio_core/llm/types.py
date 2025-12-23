@@ -8,9 +8,12 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from decimal import Decimal
 from enum import StrEnum
-from typing import Any, Literal
+from typing import Any, Literal, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field, SecretStr
+
+# TypeVar for generic StrEnum validation
+_E = TypeVar("_E", bound=StrEnum)
 
 # Type alias for provider factory functions
 # A factory takes a ProviderConfig and returns an LLMProvider-compatible instance
@@ -44,46 +47,37 @@ VALID_THINKING_LEVELS: frozenset[str] = frozenset(e.value for e in ThinkingLevel
 VALID_REASONING_EFFORTS: frozenset[str] = frozenset(e.value for e in ReasoningEffort)
 
 
-def validate_thinking_level(value: str | None) -> ThinkingLevel | None:
-    """Validate and normalize thinking_level value.
+def _validate_str_enum(value: str | None, enum_cls: type[_E], param_name: str) -> _E | None:
+    """Validate and normalize a string value against a StrEnum.
 
     Args:
-        value: Thinking level to validate (case-insensitive)
+        value: Value to validate (case-insensitive)
+        enum_cls: The StrEnum class to validate against
+        param_name: Parameter name for error messages
 
     Returns:
-        ThinkingLevel enum value or None if input is None
+        Enum value or None if input is None
 
     Raises:
-        ValueError: If value is not a valid thinking level
+        ValueError: If value is not valid for the enum
     """
     if value is None:
         return None
     try:
-        return ThinkingLevel(value.lower())
+        return enum_cls(value.lower())
     except ValueError:
-        valid_options = ", ".join(sorted(e.value for e in ThinkingLevel))
-        raise ValueError(f"Invalid thinking_level '{value}'. Valid values: {valid_options}") from None
+        valid_options = ", ".join(sorted(e.value for e in enum_cls))
+        raise ValueError(f"Invalid {param_name} '{value}'. Valid values: {valid_options}") from None
+
+
+def validate_thinking_level(value: str | None) -> ThinkingLevel | None:
+    """Validate and normalize thinking_level value."""
+    return _validate_str_enum(value, ThinkingLevel, "thinking_level")
 
 
 def validate_reasoning_effort(value: str | None) -> ReasoningEffort | None:
-    """Validate and normalize reasoning_effort value.
-
-    Args:
-        value: Reasoning effort to validate (case-insensitive)
-
-    Returns:
-        ReasoningEffort enum value or None if input is None
-
-    Raises:
-        ValueError: If value is not a valid reasoning effort
-    """
-    if value is None:
-        return None
-    try:
-        return ReasoningEffort(value.lower())
-    except ValueError:
-        valid_options = ", ".join(sorted(e.value for e in ReasoningEffort))
-        raise ValueError(f"Invalid reasoning_effort '{value}'. Valid values: {valid_options}") from None
+    """Validate and normalize reasoning_effort value."""
+    return _validate_str_enum(value, ReasoningEffort, "reasoning_effort")
 
 
 class Message(BaseModel):
