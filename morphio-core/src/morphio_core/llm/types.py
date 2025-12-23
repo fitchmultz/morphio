@@ -7,6 +7,7 @@ All config uses Pydantic with explicit fields - no global settings.
 from collections.abc import Callable
 from dataclasses import dataclass
 from decimal import Decimal
+from enum import StrEnum
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, SecretStr
@@ -16,60 +17,73 @@ from pydantic import BaseModel, ConfigDict, Field, SecretStr
 # Uses Any for return type to avoid circular import with providers.base
 ProviderFactory = Callable[["ProviderConfig"], Any]
 
-# Advanced reasoning parameter types
-# These are passed through router kwargs to providers
 
-ThinkingLevel = Literal["minimal", "low", "medium", "high"]
-"""Gemini thinking level for advanced reasoning models."""
-
-ReasoningEffort = Literal["low", "medium", "high"]
-"""OpenAI reasoning effort for o1/o3 models."""
-
-# Valid value sets for validation
-VALID_THINKING_LEVELS: frozenset[str] = frozenset({"minimal", "low", "medium", "high"})
-VALID_REASONING_EFFORTS: frozenset[str] = frozenset({"low", "medium", "high"})
+# Advanced reasoning parameter types as StrEnum
+# Enables CLI tab-completion and inherent validation
 
 
-def validate_thinking_level(value: str | None) -> str | None:
+class ThinkingLevel(StrEnum):
+    """Gemini thinking level for advanced reasoning models."""
+
+    MINIMAL = "minimal"
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+
+
+class ReasoningEffort(StrEnum):
+    """OpenAI reasoning effort for o1/o3 models."""
+
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+
+
+# Valid value sets for validation (derived from enums)
+VALID_THINKING_LEVELS: frozenset[str] = frozenset(e.value for e in ThinkingLevel)
+VALID_REASONING_EFFORTS: frozenset[str] = frozenset(e.value for e in ReasoningEffort)
+
+
+def validate_thinking_level(value: str | None) -> ThinkingLevel | None:
     """Validate and normalize thinking_level value.
 
     Args:
         value: Thinking level to validate (case-insensitive)
 
     Returns:
-        Normalized lowercase value or None if input is None
+        ThinkingLevel enum value or None if input is None
 
     Raises:
         ValueError: If value is not a valid thinking level
     """
     if value is None:
         return None
-    normalized = value.lower()
-    if normalized not in VALID_THINKING_LEVELS:
-        valid_options = ", ".join(sorted(VALID_THINKING_LEVELS))
-        raise ValueError(f"Invalid thinking_level '{value}'. Valid values: {valid_options}")
-    return normalized
+    try:
+        return ThinkingLevel(value.lower())
+    except ValueError:
+        valid_options = ", ".join(sorted(e.value for e in ThinkingLevel))
+        raise ValueError(f"Invalid thinking_level '{value}'. Valid values: {valid_options}") from None
 
 
-def validate_reasoning_effort(value: str | None) -> str | None:
+def validate_reasoning_effort(value: str | None) -> ReasoningEffort | None:
     """Validate and normalize reasoning_effort value.
 
     Args:
         value: Reasoning effort to validate (case-insensitive)
 
     Returns:
-        Normalized lowercase value or None if input is None
+        ReasoningEffort enum value or None if input is None
 
     Raises:
         ValueError: If value is not a valid reasoning effort
     """
     if value is None:
         return None
-    normalized = value.lower()
-    if normalized not in VALID_REASONING_EFFORTS:
-        valid_options = ", ".join(sorted(VALID_REASONING_EFFORTS))
-        raise ValueError(f"Invalid reasoning_effort '{value}'. Valid values: {valid_options}")
-    return normalized
+    try:
+        return ReasoningEffort(value.lower())
+    except ValueError:
+        valid_options = ", ".join(sorted(e.value for e in ReasoningEffort))
+        raise ValueError(f"Invalid reasoning_effort '{value}'. Valid values: {valid_options}") from None
 
 
 class Message(BaseModel):

@@ -193,6 +193,66 @@ def get_llm_router() -> LLMRouter:
     return LLMRouter(config)
 
 
+async def _generate_core(
+    messages: list[dict],
+    model: str | None = None,
+    max_tokens: int | None = None,
+    temperature: float | None = None,
+) -> tuple[GenerationResult, str, ProviderName]:
+    """
+    Core generation logic shared by all completion functions.
+
+    Handles model resolution, alias expansion, token limits, and router invocation.
+
+    Args:
+        messages: List of message dicts with 'role' and 'content' keys
+        model: Model to use (supports aliases like "gpt-5.1-high")
+        max_tokens: Maximum tokens in response (uses model default if None)
+        temperature: Temperature override
+
+    Returns:
+        Tuple of (GenerationResult, chosen_model, provider)
+
+    Raises:
+        ApplicationException: If generation fails
+    """
+    try:
+        router = get_llm_router()
+
+        # Use default model if not specified, or if the provided model is invalid
+        chosen_model = model if model and model in VALID_GENERATION_MODELS else settings.CONTENT_MODEL
+
+        # Resolve alias to base model and provider kwargs
+        base_model, provider, provider_kwargs = resolve_model_alias(chosen_model)
+
+        # Get token limit for model
+        token_limit = get_model_token_limit(chosen_model)
+        effective_max_tokens = (
+            min(max_tokens, token_limit) if max_tokens is not None else token_limit
+        )
+
+        # Convert dict messages to Message objects
+        typed_messages = convert_to_messages(messages)
+
+        result = await router.generate(
+            typed_messages,
+            provider=provider,
+            model=base_model,
+            max_tokens=effective_max_tokens,
+            temperature=temperature or settings.CONTENT_TEMPERATURE,
+            **provider_kwargs,
+        )
+
+        return result, chosen_model, provider
+
+    except LLMProviderError as e:
+        logger.error(f"LLM provider error: {e}")
+        raise ApplicationException(
+            message=f"LLM generation failed: {str(e)}",
+            status_code=500,
+        ) from e
+
+
 async def generate_completion(
     messages: list[dict],
     model: str | None = None,
@@ -217,43 +277,8 @@ async def generate_completion(
     Raises:
         ApplicationException: If generation fails
     """
-    try:
-        router = get_llm_router()
-
-        # Use default model if not specified
-        chosen_model = model or settings.CONTENT_MODEL
-        if chosen_model not in VALID_GENERATION_MODELS:
-            chosen_model = settings.CONTENT_MODEL
-
-        # Resolve alias to base model and provider kwargs
-        base_model, provider, provider_kwargs = resolve_model_alias(chosen_model)
-
-        # Get token limit for model
-        token_limit = get_model_token_limit(chosen_model)
-        effective_max_tokens = (
-            min(max_tokens, token_limit) if max_tokens is not None else token_limit
-        )
-
-        # Convert dict messages to Message objects
-        typed_messages = convert_to_messages(messages)
-
-        result = await router.generate(
-            typed_messages,
-            provider=provider,
-            model=base_model,
-            max_tokens=effective_max_tokens,
-            temperature=temperature or settings.CONTENT_TEMPERATURE,
-            **provider_kwargs,
-        )
-
-        return result.content, chosen_model
-
-    except LLMProviderError as e:
-        logger.error(f"LLM provider error: {e}")
-        raise ApplicationException(
-            message=f"LLM generation failed: {str(e)}",
-            status_code=500,
-        ) from e
+    result, chosen_model, _ = await _generate_core(messages, model, max_tokens, temperature)
+    return result.content, chosen_model
 
 
 async def simple_completion(
@@ -301,53 +326,17 @@ async def generate_completion_with_usage(
     Raises:
         ApplicationException: If generation fails
     """
-    try:
-        router = get_llm_router()
+    result, chosen_model, provider = await _generate_core(messages, model, max_tokens, temperature)
+    usage = result.get_token_usage()
 
-        # Use default model if not specified
-        chosen_model = model or settings.CONTENT_MODEL
-        if chosen_model not in VALID_GENERATION_MODELS:
-            chosen_model = settings.CONTENT_MODEL
-
-        # Resolve alias to base model and provider kwargs
-        base_model, provider, provider_kwargs = resolve_model_alias(chosen_model)
-
-        # Get token limit for model
-        token_limit = get_model_token_limit(chosen_model)
-        effective_max_tokens = (
-            min(max_tokens, token_limit) if max_tokens is not None else token_limit
-        )
-
-        # Convert dict messages to Message objects
-        typed_messages = convert_to_messages(messages)
-
-        result = await router.generate(
-            typed_messages,
-            provider=provider,
-            model=base_model,
-            max_tokens=effective_max_tokens,
-            temperature=temperature or settings.CONTENT_TEMPERATURE,
-            **provider_kwargs,
-        )
-
-        # Extract usage from result
-        usage = result.get_token_usage()
-
-        return GenerationWithUsage(
-            content=result.content,
-            model=chosen_model,
-            provider=provider,
-            input_tokens=usage.input_tokens,
-            output_tokens=usage.output_tokens,
-            total_tokens=usage.total_tokens,
-        )
-
-    except LLMProviderError as e:
-        logger.error(f"LLM provider error: {e}")
-        raise ApplicationException(
-            message=f"LLM generation failed: {str(e)}",
-            status_code=500,
-        ) from e
+    return GenerationWithUsage(
+        content=result.content,
+        model=chosen_model,
+        provider=provider,
+        input_tokens=usage.input_tokens,
+        output_tokens=usage.output_tokens,
+        total_tokens=usage.total_tokens,
+    )
 
 
 def convert_to_messages(messages: list[dict]) -> list[Message]:
