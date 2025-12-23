@@ -57,7 +57,7 @@ from morphio_core.llm import LLMConfig, LLMRouter, ProviderConfig
 from pydantic import SecretStr
 
 # Define your custom provider factory
-def my_provider_factory(config: ProviderConfig):
+def my_provider_factory(config: ProviderConfig) -> "LLMProvider":
     return MyCustomProvider(api_key=config.api_key, model=config.default_model)
 
 # Register it
@@ -175,6 +175,8 @@ result = await download_video_audio(
 print(f"Downloaded: {result.output_path}")
 
 # With custom configuration
+url = "https://youtube.com/watch?v=..."
+output_dir = "/tmp/downloads"
 config = DownloadConfig(format_spec="bestaudio[ext=m4a]")
 result = await download_video_audio(url, output_dir, config=config)
 ```

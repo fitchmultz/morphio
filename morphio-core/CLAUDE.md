@@ -131,7 +131,7 @@ router = create_router(config, openai_client=mock_client)
 
 ### Security
 ```python
-from morphio_core.security import URLValidator, Anonymizer, URLValidatorConfig
+from morphio_core.security import URLValidator, Anonymizer
 
 # SSRF protection
 validator = URLValidator()
@@ -165,7 +165,7 @@ router = create_router(openai_api_key="sk-...", default_provider="openai")
 result = await router.generate([Message(role="user", content="Hello")])
 
 # Custom providers
-def my_factory(config: ProviderConfig): return MyProvider(config.api_key)
+def my_factory(config: ProviderConfig) -> "LLMProvider": return MyProvider(config.api_key)
 config = LLMConfig(
     custom_providers={"my-llm": my_factory},
     custom_configs={"my-llm": ProviderConfig(api_key=SecretStr("..."), default_model="m1")},
