@@ -7,6 +7,7 @@ Commands:
 - info: Show system information and available backends
 """
 
+from enum import Enum
 from pathlib import Path
 from typing import Annotated
 
@@ -22,6 +23,14 @@ app = typer.Typer(
 console = Console()
 
 
+class WhisperBackend(str, Enum):
+    """Available Whisper transcription backends."""
+
+    auto = "auto"
+    mlx = "mlx"
+    faster_whisper = "faster-whisper"
+
+
 @app.command()
 def transcribe(
     audio_file: Annotated[Path, typer.Argument(help="Path to audio file")],
@@ -32,8 +41,8 @@ def transcribe(
         Path | None, typer.Option("-o", "--output", help="Output file (JSON)")
     ] = None,
     backend: Annotated[
-        str, typer.Option(help="Whisper backend (auto, mlx, faster-whisper)")
-    ] = "auto",
+        WhisperBackend, typer.Option(help="Whisper backend", case_sensitive=False)
+    ] = WhisperBackend.auto,
 ) -> None:
     """Transcribe an audio file using local Whisper."""
     try:
@@ -53,11 +62,11 @@ def transcribe(
         model=model,
         language=language,
         word_timestamps=word_timestamps,
-        backend=backend,  # type: ignore[arg-type]
+        backend=backend.value,
     )
 
     console.print(f"Transcribing [cyan]{audio_file}[/cyan]...")
-    console.print(f"Model: {model}, Backend: {backend}")
+    console.print(f"Model: {model}, Backend: {backend.value}")
 
     try:
         result = transcribe_audio(audio_file, config=config)
