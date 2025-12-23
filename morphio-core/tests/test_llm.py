@@ -431,9 +431,7 @@ class TestProviderKwargsPassthrough:
         params = sig.parameters
 
         # Should have **provider_kwargs in signature
-        has_var_keyword = any(
-            p.kind == inspect.Parameter.VAR_KEYWORD for p in params.values()
-        )
+        has_var_keyword = any(p.kind == inspect.Parameter.VAR_KEYWORD for p in params.values())
         assert has_var_keyword, "Router.generate should accept **kwargs"
 
     def test_router_stream_accepts_provider_kwargs(self):
@@ -446,9 +444,7 @@ class TestProviderKwargsPassthrough:
         params = sig.parameters
 
         # Should have **provider_kwargs in signature
-        has_var_keyword = any(
-            p.kind == inspect.Parameter.VAR_KEYWORD for p in params.values()
-        )
+        has_var_keyword = any(p.kind == inspect.Parameter.VAR_KEYWORD for p in params.values())
         assert has_var_keyword, "Router.stream should accept **kwargs"
 
     def test_gemini_provider_accepts_thinking_level(self):
@@ -482,7 +478,9 @@ class TestProviderKwargsPassthrough:
         sig = inspect.signature(OpenAIProvider.generate)
         params = sig.parameters
 
-        assert "reasoning_effort" in params, "OpenAIProvider.generate should accept reasoning_effort"
+        assert "reasoning_effort" in params, (
+            "OpenAIProvider.generate should accept reasoning_effort"
+        )
 
     def test_openai_provider_stream_accepts_reasoning_effort(self):
         """Test that OpenAIProvider.stream accepts reasoning_effort."""
@@ -504,9 +502,7 @@ class TestProviderKwargsPassthrough:
         sig = inspect.signature(AnthropicProvider.generate)
         params = sig.parameters
 
-        has_var_keyword = any(
-            p.kind == inspect.Parameter.VAR_KEYWORD for p in params.values()
-        )
+        has_var_keyword = any(p.kind == inspect.Parameter.VAR_KEYWORD for p in params.values())
         assert has_var_keyword, "AnthropicProvider.generate should accept **kwargs"
 
     def test_base_protocol_accepts_kwargs(self):
@@ -518,7 +514,5 @@ class TestProviderKwargsPassthrough:
         sig = inspect.signature(LLMProvider.generate)
         params = sig.parameters
 
-        has_var_keyword = any(
-            p.kind == inspect.Parameter.VAR_KEYWORD for p in params.values()
-        )
+        has_var_keyword = any(p.kind == inspect.Parameter.VAR_KEYWORD for p in params.values())
         assert has_var_keyword, "LLMProvider.generate should accept **kwargs"

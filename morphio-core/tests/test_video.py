@@ -161,7 +161,10 @@ class TestNormalizeUrl:
 
     def test_strip_whitespace(self):
         """Test that whitespace is stripped."""
-        assert normalize_url("  https://youtube.com/watch?v=abc  ") == "https://youtube.com/watch?v=abc"
+        assert (
+            normalize_url("  https://youtube.com/watch?v=abc  ")
+            == "https://youtube.com/watch?v=abc"
+        )
 
 
 class TestDownloadConfig:

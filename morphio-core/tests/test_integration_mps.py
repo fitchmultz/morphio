@@ -156,14 +156,13 @@ class TestBackendAvailabilityDiagnostics:
         not (sys.platform == "darwin" and platform.machine() == "arm64"),
         reason="Only runs on Apple Silicon Macs",
     )
-    def test_apple_silicon_should_have_mlx_whisper(self):
-        """On Apple Silicon, mlx-whisper SHOULD be installed for GPU acceleration.
+    @pytest.mark.skipif(not has_mlx_whisper(), reason="mlx-whisper not installed (optional)")
+    def test_apple_silicon_with_mlx_whisper_uses_metal(self):
+        """When mlx-whisper IS installed on Apple Silicon, it should use Metal GPU.
 
-        This test will fail if mlx-whisper is not installed on Apple Silicon,
-        serving as a reminder to install it for optimal performance.
+        This test verifies that the backend detection correctly identifies Metal
+        as the device when mlx-whisper is available on Apple Silicon.
         """
-        assert has_mlx_whisper(), (
-            "mlx-whisper is not installed on Apple Silicon. "
-            "Install it with: uv add mlx-whisper\n"
-            "This enables Metal GPU acceleration for significantly faster transcription."
-        )
+        backend, device = detect_optimal_backend()
+        assert backend == "mlx", f"Expected mlx backend on Apple Silicon, got {backend}"
+        assert device == "metal", f"Expected metal device on Apple Silicon, got {device}"
