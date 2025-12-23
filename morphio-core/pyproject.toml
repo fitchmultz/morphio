@@ -37,6 +37,12 @@ whisper-mlx = ["mlx-whisper>=0.4.0"]
 whisper-cuda = ["faster-whisper>=1.0.0"]
 whisper-cpu = ["faster-whisper>=1.0.0"]
 
+# CLI support
+cli = [
+    "typer>=0.15.0",
+    "rich>=13.0.0",
+]
+
 # Explicit union - avoid self-referential extras
 all = [
     "openai>=1.75.0",
@@ -45,7 +51,12 @@ all = [
     "yt-dlp>=2024.12.1",
     "faster-whisper>=1.0.0",
     "mlx-whisper>=0.4.0",
+    "typer>=0.15.0",
+    "rich>=13.0.0",
 ]
+
+[project.scripts]
+morphio = "morphio_core.cli:app"
 
 [project.urls]
 Repository = "https://github.com/fitchmultz/morphio-all"
