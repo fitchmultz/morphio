@@ -2,6 +2,16 @@
 
 Standalone Python library for audio processing, LLM orchestration, video utilities, and security.
 
+## IMPORTANT: This project uses UV exclusively
+
+**NEVER use pip, poetry, or other package managers.** All commands use `uv`:
+
+```bash
+uv add <package>           # Add dependency
+uv sync                    # Install dependencies
+uv run <command>           # Run command in venv
+```
+
 ## Pre-Commit Requirements
 
 ```bash
@@ -69,7 +79,7 @@ uv run ty check
 
 ## Code Style Guidelines
 
-- Python 3.13+ with type hints
+- Python 3.11+ with type hints
 - snake_case for functions/variables, PascalCase for classes
 - Use Ruff for linting and formatting
 - Asyncio patterns for async code

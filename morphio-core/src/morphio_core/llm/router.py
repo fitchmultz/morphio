@@ -1,7 +1,7 @@
 """LLM router for multi-provider support."""
 
 from collections.abc import AsyncIterator
-from typing import Any, Literal
+from typing import Any
 
 from pydantic import SecretStr
 
@@ -12,7 +12,8 @@ from .providers.gemini import GeminiProvider
 from .providers.openai import OpenAIProvider
 from .types import GenerationResult, LLMConfig, Message, ProviderConfig, StreamEvent
 
-ProviderName = Literal["openai", "anthropic", "gemini"]
+# Built-in provider names (custom providers can use any string)
+BUILTIN_PROVIDERS = {"openai", "anthropic", "gemini"}
 
 
 class LLMRouter:
@@ -49,11 +50,28 @@ class LLMRouter:
         self._config = config
         self._providers: dict[str, LLMProvider] = {}
 
-    def _get_provider(self, name: ProviderName) -> LLMProvider:
-        """Get or create a provider instance."""
+    def _get_provider(self, name: str) -> LLMProvider:
+        """Get or create a provider instance.
+
+        Supports both built-in providers (openai, anthropic, gemini) and
+        custom providers registered via LLMConfig.custom_providers.
+        """
         if name in self._providers:
             return self._providers[name]
 
+        # Check for custom provider first
+        if name in self._config.custom_providers:
+            factory = self._config.custom_providers[name]
+            custom_config = self._config.custom_configs.get(name)
+            if custom_config is None:
+                raise LLMProviderError(
+                    f"Custom provider '{name}' registered but no config in custom_configs"
+                )
+            provider = factory(custom_config)
+            self._providers[name] = provider
+            return provider
+
+        # Built-in providers
         provider_config: ProviderConfig | None = getattr(self._config, name, None)
         if provider_config is None:
             raise LLMProviderError(f"Provider '{name}' is not configured")
@@ -89,14 +107,14 @@ class LLMRouter:
         self._providers[name] = provider
         return provider
 
-    def _resolve_provider(self, provider: ProviderName | None) -> LLMProvider:
+    def _resolve_provider(self, provider: str | None) -> LLMProvider:
         """Resolve which provider to use."""
         name = provider or self._config.default_provider
         return self._get_provider(name)
 
     @property
     def available_providers(self) -> list[str]:
-        """List configured provider names."""
+        """List configured provider names (built-in and custom)."""
         providers = []
         if self._config.openai:
             providers.append("openai")
@@ -104,13 +122,15 @@ class LLMRouter:
             providers.append("anthropic")
         if self._config.gemini:
             providers.append("gemini")
+        # Add custom providers
+        providers.extend(self._config.custom_providers.keys())
         return providers
 
     async def generate(
         self,
         messages: list[Message],
         *,
-        provider: ProviderName | None = None,
+        provider: str | None = None,
         model: str | None = None,
         max_tokens: int | None = None,
         temperature: float | None = None,
@@ -145,7 +165,7 @@ class LLMRouter:
         self,
         messages: list[Message],
         *,
-        provider: ProviderName | None = None,
+        provider: str | None = None,
         model: str | None = None,
         max_tokens: int | None = None,
         temperature: float | None = None,
@@ -186,7 +206,7 @@ def create_router(
     anthropic_model: str = "claude-sonnet-4-20250514",
     gemini_api_key: str | SecretStr | None = None,
     gemini_model: str = "gemini-2.0-flash",
-    default_provider: ProviderName = "openai",
+    default_provider: str = "openai",
 ) -> LLMRouter:
     """Create an LLM router with simple configuration.
 

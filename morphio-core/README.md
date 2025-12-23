@@ -61,7 +61,7 @@ await convert_to_audio(Path("video.mp4"), Path("audio.mp3"))
 
 ## Requirements
 
-- Python 3.13+
+- Python 3.11+
 - FFmpeg (for audio/video processing)
 
 ## License

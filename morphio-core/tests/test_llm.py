@@ -10,6 +10,7 @@ from morphio_core.llm import (
     LLMRouter,
     Message,
     ProviderConfig,
+    ProviderFactory,
     StreamDelta,
     StreamDone,
     Usage,
@@ -224,6 +225,170 @@ class TestLLMRouter:
         )
         assert "openai" in router.available_providers
         assert "anthropic" in router.available_providers
+
+
+class TestCustomProviders:
+    """Tests for custom LLM provider registration."""
+
+    def test_provider_factory_type_alias_exists(self):
+        """Test that ProviderFactory type alias is exported."""
+        # ProviderFactory should be a Callable type (the actual check is the import working)
+        assert ProviderFactory is not None
+
+    def test_custom_provider_in_available_providers(self):
+        """Test that custom providers appear in available_providers."""
+
+        # Create a mock provider factory
+        class MockProvider:
+            pass
+
+        def mock_factory(config: ProviderConfig) -> MockProvider:
+            return MockProvider()
+
+        config = LLMConfig(
+            custom_providers={"my-llm": mock_factory},
+            custom_configs={
+                "my-llm": ProviderConfig(
+                    api_key=SecretStr("test-key"),
+                    default_model="custom-model",
+                )
+            },
+        )
+        router = LLMRouter(config)
+
+        assert "my-llm" in router.available_providers
+
+    def test_custom_provider_as_default(self):
+        """Test using a custom provider as the default."""
+
+        class MockProvider:
+            pass
+
+        def mock_factory(config: ProviderConfig) -> MockProvider:
+            return MockProvider()
+
+        config = LLMConfig(
+            custom_providers={"my-llm": mock_factory},
+            custom_configs={
+                "my-llm": ProviderConfig(
+                    api_key=SecretStr("test-key"),
+                    default_model="custom-model",
+                )
+            },
+            default_provider="my-llm",
+        )
+        router = LLMRouter(config)
+
+        assert config.default_provider == "my-llm"
+        assert "my-llm" in router.available_providers
+
+    def test_custom_provider_without_config_raises(self):
+        """Test that using custom provider without config raises error."""
+
+        class MockProvider:
+            pass
+
+        def mock_factory(config: ProviderConfig) -> MockProvider:
+            return MockProvider()
+
+        config = LLMConfig(
+            custom_providers={"my-llm": mock_factory},
+            # Missing custom_configs for "my-llm"
+        )
+        router = LLMRouter(config)
+
+        with pytest.raises(LLMProviderError, match="no config in custom_configs"):
+            router._get_provider("my-llm")
+
+    def test_custom_provider_factory_called_with_config(self):
+        """Test that custom provider factory receives the correct config."""
+        received_config = None
+
+        class MockProvider:
+            pass
+
+        def mock_factory(config: ProviderConfig) -> MockProvider:
+            nonlocal received_config
+            received_config = config
+            return MockProvider()
+
+        expected_config = ProviderConfig(
+            api_key=SecretStr("test-key"),
+            default_model="custom-model",
+            default_max_tokens=8192,
+        )
+
+        config = LLMConfig(
+            custom_providers={"my-llm": mock_factory},
+            custom_configs={"my-llm": expected_config},
+        )
+        router = LLMRouter(config)
+
+        # Trigger provider creation
+        router._get_provider("my-llm")
+
+        assert received_config is not None
+        assert received_config.default_model == "custom-model"
+        assert received_config.default_max_tokens == 8192
+
+    def test_custom_provider_cached(self):
+        """Test that custom provider instances are cached."""
+        call_count = 0
+
+        class MockProvider:
+            pass
+
+        def mock_factory(config: ProviderConfig) -> MockProvider:
+            nonlocal call_count
+            call_count += 1
+            return MockProvider()
+
+        config = LLMConfig(
+            custom_providers={"my-llm": mock_factory},
+            custom_configs={
+                "my-llm": ProviderConfig(
+                    api_key=SecretStr("test-key"),
+                    default_model="custom-model",
+                )
+            },
+        )
+        router = LLMRouter(config)
+
+        # Get provider multiple times
+        router._get_provider("my-llm")
+        router._get_provider("my-llm")
+        router._get_provider("my-llm")
+
+        # Factory should only be called once
+        assert call_count == 1
+
+    def test_mixed_builtin_and_custom_providers(self):
+        """Test router with both built-in and custom providers."""
+
+        class MockProvider:
+            pass
+
+        def mock_factory(config: ProviderConfig) -> MockProvider:
+            return MockProvider()
+
+        config = LLMConfig(
+            openai=ProviderConfig(
+                api_key=SecretStr("sk-openai"),
+                default_model="gpt-4o",
+            ),
+            custom_providers={"my-llm": mock_factory},
+            custom_configs={
+                "my-llm": ProviderConfig(
+                    api_key=SecretStr("test-key"),
+                    default_model="custom-model",
+                )
+            },
+        )
+        router = LLMRouter(config)
+
+        available = router.available_providers
+        assert "openai" in available
+        assert "my-llm" in available
 
 
 class TestSanitizeMarkdown:

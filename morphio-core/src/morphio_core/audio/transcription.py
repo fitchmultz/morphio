@@ -89,9 +89,9 @@ def detect_optimal_backend() -> tuple[str, str]:
 
     raise BackendNotAvailableError(
         "No Whisper backend available. Install one of:\n"
-        "  - Apple Silicon: pip install morphio-core[whisper-mlx]\n"
-        "  - NVIDIA GPU:    pip install morphio-core[whisper-cuda]\n"
-        "  - CPU fallback:  pip install morphio-core[whisper-cpu]"
+        "  - Apple Silicon: uv add mlx-whisper\n"
+        "  - NVIDIA GPU:    uv add faster-whisper\n"
+        "  - CPU fallback:  uv add faster-whisper"
     )
 
 
@@ -125,7 +125,7 @@ class MLXWhisperBackend:
             self._mlx_whisper = mlx_whisper
         except ImportError as e:
             raise BackendNotAvailableError(
-                "mlx-whisper not installed. Install with: pip install morphio-core[whisper-mlx]"
+                "mlx-whisper not installed. Install with: uv add mlx-whisper"
             ) from e
 
     def transcribe(
@@ -197,8 +197,7 @@ class FasterWhisperBackend:
             self._WhisperModel = WhisperModel
         except ImportError as e:
             raise BackendNotAvailableError(
-                "faster-whisper not installed. Install with: pip install morphio-core[whisper-cuda] "
-                "or pip install morphio-core[whisper-cpu]"
+                "faster-whisper not installed. Install with: uv add faster-whisper"
             ) from e
 
         if device == "auto":
