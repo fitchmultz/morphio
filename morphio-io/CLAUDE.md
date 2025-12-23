@@ -1,8 +1,21 @@
 # Morphio.io Development Guidelines
 
+## Workspace Setup
+
+This project is part of the `morphio-all` monorepo using **uv workspaces**. The Python `.venv` lives at the monorepo root (not in `backend/`).
+
+```bash
+# From monorepo root
+make install    # Install all deps (Python + frontend)
+make dev        # Start backend + frontend
+
+# Or from this directory
+make dev        # Also works
+```
+
 ## Pre-Commit Requirements
 
-**IMPORTANT**: Always run `make check` from the project root before committing. This runs OpenAPI type generation, type checking, linting, build, and tests for both frontend and backend. All checks must pass (green) before commits.
+**IMPORTANT**: Always run `make check` before committing (from here or monorepo root). This runs OpenAPI type generation, type checking, linting, build, and tests for both frontend and backend. All checks must pass (green) before commits.
 
 ```bash
 make check  # Run from project root - must pass before committing

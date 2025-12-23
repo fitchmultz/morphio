@@ -2,20 +2,34 @@
 
 Standalone Python library for audio processing, LLM orchestration, video utilities, and security.
 
+## Workspace Setup
+
+This project is part of the `morphio-all` monorepo using **uv workspaces**. The `.venv` lives at the monorepo root, not in this directory.
+
+```bash
+# From monorepo root (recommended)
+make install              # Install all deps
+make test-core            # Run morphio-core tests
+
+# Or from this directory
+uv run pytest             # Uses root .venv
+uv run ruff check .
+```
+
 ## IMPORTANT: This project uses UV exclusively
 
 **NEVER use pip, poetry, or other package managers.** All commands use `uv`:
 
 ```bash
 uv add <package>           # Add dependency
-uv sync                    # Install dependencies
+uv sync                    # Install dependencies (run from root)
 uv run <command>           # Run command in venv
 ```
 
 ## Pre-Commit Requirements
 
 ```bash
-uv run pytest           # All 133 tests must pass
+uv run pytest           # All 175+ tests must pass
 uv run ruff check .     # Lint must pass
 uv run ruff format .    # Format code
 ```
@@ -52,7 +66,7 @@ src/morphio_core/
     media/              # FFmpeg utilities
         ffmpeg.py
 
-tests/                  # 133 tests covering all modules
+tests/                  # 175+ tests covering all modules
 ```
 
 ## Build and Test Commands
@@ -211,11 +225,14 @@ morphio transcribe audio.mp3 --model base      # Transcription
 
 ## Relationship to morphio-io
 
-This library is used by morphio-io via path dependency:
+This library is used by morphio-io via **uv workspace reference**:
 ```toml
 # morphio-io/backend/pyproject.toml
-morphio-core = { path = "../../morphio-core", editable = true }
+[tool.uv.sources]
+morphio-core = { workspace = true }
 ```
+
+Both projects share the same `.venv` at the monorepo root, so changes to morphio-core are immediately available to morphio-io without reinstalling.
 
 morphio-io uses thin adapters (`app/adapters/`) that:
 1. Import from morphio-core

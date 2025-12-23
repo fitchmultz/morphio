@@ -1,6 +1,6 @@
 # Morphio Monorepo Development Guidelines
 
-This monorepo contains two related Python projects:
+This monorepo uses **uv workspaces** with a single `.venv` at the root.
 
 | Project | Description | Path |
 |---------|-------------|------|
@@ -10,47 +10,48 @@ This monorepo contains two related Python projects:
 ## Quick Start
 
 ```bash
-# morphio-io (web app)
-cd morphio-io
+# From monorepo root (recommended)
+make install      # Install all deps (Python + frontend)
 make dev          # Start backend + frontend
 make check        # Run all checks (required before commits)
+make test         # Run all tests
 
-# morphio-core (library)
-cd morphio-core
-uv run pytest     # Run tests
-uv run ruff check # Lint
+# Or work in subdirectories
+cd morphio-io && make dev
+cd morphio-core && uv run pytest
 ```
 
-## Project Relationship
+## Workspace Structure
 
-morphio-core was extracted from morphio-io to create a reusable library. The relationship:
+This monorepo uses uv workspaces with a **single `.venv` at the root**:
 
 ```
-morphio-io/backend
+morphio-all/
+    pyproject.toml          # Workspace root - defines members
+    .venv/                  # Single venv for all Python deps
+    uv.lock                 # Unified lockfile
     |
-    +-- app/adapters/       # Thin wrappers that translate exceptions
-    |       video.py        # Uses morphio_core.video
-    |       url_validation.py  # Uses morphio_core.security
+    +-- morphio-core/       # Workspace member (library)
+    |       pyproject.toml
+    |       src/morphio_core/
     |
-    +-- app/utils/youtube_utils.py  # Re-exports from adapters (backward compat)
-    |
-    +-- pyproject.toml      # Has morphio-core as path dependency
-            |
-            v
-morphio-core/
-    +-- src/morphio_core/
-            security/       # URLValidator, Anonymizer, SSRF protection
-            audio/          # Chunking, transcription, speaker alignment
-            llm/            # Multi-provider router (OpenAI, Anthropic, Gemini)
-            video/          # YouTube URL parsing, yt-dlp download
-            media/          # FFmpeg utilities
+    +-- morphio-io/
+            +-- backend/    # Workspace member (app)
+            |       pyproject.toml  # Uses: morphio-core = { workspace = true }
+            +-- frontend/   # Next.js (pnpm)
+```
+
+morphio-core is referenced as a workspace dependency (not path):
+```toml
+# morphio-io/backend/pyproject.toml
+morphio-core = { workspace = true }
 ```
 
 ## Development Workflow
 
 ### Working on morphio-io (web app)
 See `morphio-io/CLAUDE.md` for detailed guidelines. Key points:
-- Run `make check` from `morphio-io/` before commits
+- Run `make check` before commits (from root or `morphio-io/`)
 - Backend: FastAPI with Python 3.13+
 - Frontend: Next.js with TypeScript, pnpm, Biome
 
@@ -58,26 +59,27 @@ See `morphio-io/CLAUDE.md` for detailed guidelines. Key points:
 See `morphio-core/CLAUDE.md` for detailed guidelines. Key points:
 - Run `uv run pytest && uv run ruff check .` before commits
 - Pure library with no HTTP/web dependencies
-- 133 tests covering all modules
+- 175+ tests covering all modules
 
 ### Cross-Project Changes
-When modifying morphio-core APIs that morphio-io uses:
+Since both projects share the same `.venv`, changes are immediately available:
 1. Update morphio-core
-2. Run morphio-core tests: `cd morphio-core && uv run pytest`
+2. Run tests: `make test` (runs both projects)
 3. Update morphio-io adapters if needed
-4. Run morphio-io tests: `cd morphio-io && make check`
 
 ## Testing
 
 ```bash
-# Test morphio-core (133 tests)
-cd morphio-core && uv run pytest -v
+# From root - run all tests
+make test
 
-# Test morphio-io backend (79+ tests)
-cd morphio-io/backend && uv run pytest
+# Or individually
+make test-core    # morphio-core tests (175+ tests)
+make test-io      # morphio-io tests (backend + frontend)
 
-# Full morphio-io check (frontend + backend)
-cd morphio-io && make check
+# Direct pytest (from any directory - uses root .venv)
+uv run pytest morphio-core/tests -v
+uv run pytest morphio-io/backend/tests -v
 ```
 
 ## Architecture Decisions
@@ -104,8 +106,13 @@ morphio-io uses thin adapters (`app/adapters/`) that:
 
 | Task | Command |
 |------|---------|
-| Start morphio-io dev server | `cd morphio-io && make dev` |
-| Run all morphio-io checks | `cd morphio-io && make check` |
-| Run morphio-core tests | `cd morphio-core && uv run pytest` |
-| Lint morphio-core | `cd morphio-core && uv run ruff check .` |
+| Install all dependencies | `make install` |
+| Update all dependencies | `make update` |
+| Start dev servers | `make dev` |
+| Run all checks (pre-commit) | `make check` |
+| Run all tests | `make test` |
+| Run morphio-core tests only | `make test-core` |
+| Run morphio-io tests only | `make test-io` |
+| Lint everything | `make lint` |
+| Format everything | `make format` |
 | Build morphio-core | `cd morphio-core && uv build` |
