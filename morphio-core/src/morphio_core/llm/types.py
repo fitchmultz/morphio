@@ -88,7 +88,7 @@ class LLMConfig(BaseModel):
     respective fields. Custom providers can be added via custom_providers.
 
     Example with custom provider:
-        def my_provider_factory(config: ProviderConfig) -> LLMProvider:
+        def my_provider_factory(config: ProviderConfig) -> "LLMProvider":
             return MyCustomProvider(api_key=config.api_key, ...)
 
         config = LLMConfig(

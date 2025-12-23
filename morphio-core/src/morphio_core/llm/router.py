@@ -115,14 +115,9 @@ class LLMRouter:
     @property
     def available_providers(self) -> list[str]:
         """List configured provider names (built-in and custom)."""
-        providers = []
-        if self._config.openai:
-            providers.append("openai")
-        if self._config.anthropic:
-            providers.append("anthropic")
-        if self._config.gemini:
-            providers.append("gemini")
-        # Add custom providers
+        providers = [
+            provider for provider in BUILTIN_PROVIDERS if getattr(self._config, provider, None)
+        ]
         providers.extend(self._config.custom_providers.keys())
         return providers
 
