@@ -47,11 +47,11 @@ def transcribe(
     """Transcribe an audio file using local Whisper."""
     try:
         from morphio_core.audio import TranscriptionConfig, transcribe_audio
+        from morphio_core.exceptions import TranscriptionError
     except ImportError as e:
         console.print("[red]Error:[/red] Whisper backend not installed.")
-        console.print("Install with: [cyan]uv add morphio-core[whisper-mlx][/cyan] (Apple Silicon)")
-        console.print("         or: [cyan]uv add morphio-core[whisper-cuda][/cyan] (NVIDIA GPU)")
-        console.print("         or: [cyan]uv add morphio-core[whisper-cpu][/cyan] (CPU)")
+        console.print("Install with: [cyan]uv add mlx-whisper[/cyan] (Apple Silicon)")
+        console.print("         or: [cyan]uv add faster-whisper[/cyan] (NVIDIA GPU or CPU)")
         raise typer.Exit(1) from e
 
     if not audio_file.exists():
@@ -70,7 +70,7 @@ def transcribe(
 
     try:
         result = transcribe_audio(audio_file, config=config)
-    except Exception as e:
+    except TranscriptionError as e:
         console.print(f"[red]Transcription failed:[/red] {e}")
         raise typer.Exit(1) from e
 
@@ -100,6 +100,7 @@ def transcribe(
                 }
                 for w in result.words
             ]
+        output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(json.dumps(output_data, indent=2))
         console.print(f"Output saved to: {output}")
     else:
@@ -113,7 +114,7 @@ def validate_url(
     allow_private: Annotated[bool, typer.Option(help="Allow private IP addresses")] = False,
 ) -> None:
     """Validate a URL for SSRF protection."""
-    from morphio_core.security import URLValidator, URLValidatorConfig
+    from morphio_core.security import SSRFBlockedError, URLValidator, URLValidatorConfig
 
     config = URLValidatorConfig(allow_private_ips=allow_private)
     validator = URLValidator(config)
@@ -121,7 +122,7 @@ def validate_url(
     try:
         validator.validate(url)
         console.print(f"[green]URL is valid:[/green] {url}")
-    except Exception as e:
+    except SSRFBlockedError as e:
         console.print(f"[red]URL blocked:[/red] {e}")
         raise typer.Exit(1) from e
 
