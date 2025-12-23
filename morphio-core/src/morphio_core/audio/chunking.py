@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from ..exceptions import AudioChunkingError
-from ..media.ffmpeg import ensure_ffmpeg_available, probe_duration, run_ffmpeg
+from ..media.ffmpeg import FFmpegConfig, ensure_ffmpeg_available, probe_duration, run_ffmpeg
 from .types import AudioChunk, ChunkingConfig, ChunkNamer, default_chunk_namer
 
 # Codec mapping for output formats
@@ -37,6 +37,7 @@ async def chunk_audio(
     *,
     config: ChunkingConfig | None = None,
     naming_strategy: ChunkNamer | None = None,
+    ffmpeg_config: FFmpegConfig | None = None,
 ) -> ChunkingResult:
     """
     Chunk audio file into segments using FFmpeg.
@@ -48,6 +49,7 @@ async def chunk_audio(
         naming_strategy: Optional callback for naming chunks
             Signature: (index: int, start: float, end: float) -> str
             If not provided, uses default_chunk_namer
+        ffmpeg_config: Optional FFmpegConfig with custom binary paths
 
     Returns:
         ChunkingResult with list of AudioChunk objects
@@ -66,8 +68,15 @@ async def chunk_audio(
             "/tmp/chunks",
             naming_strategy=lambda i, s, e: f"part_{i}.mp3"
         )
+
+        # With custom FFmpeg path
+        result = await chunk_audio(
+            "audio.mp3",
+            "/tmp/chunks",
+            ffmpeg_config=FFmpegConfig(ffmpeg_path="/opt/ffmpeg/bin/ffmpeg"),
+        )
     """
-    ensure_ffmpeg_available()
+    ensure_ffmpeg_available(config=ffmpeg_config)
 
     input_path = Path(input_path)
     output_dir = Path(output_dir)
@@ -80,7 +89,7 @@ async def chunk_audio(
         raise AudioChunkingError(f"Input file not found: {input_path}")
 
     # Get total duration
-    total_duration = await probe_duration(input_path)
+    total_duration = await probe_duration(input_path, config=ffmpeg_config)
 
     # Determine codec: copy (fast remux) or encode
     if cfg.copy_codec:
@@ -116,7 +125,8 @@ async def chunk_audio(
                 "-vn",  # No video
                 *codec_args,
                 str(chunk_path),
-            ]
+            ],
+            config=ffmpeg_config,
         )
 
         chunks.append(
@@ -153,6 +163,7 @@ async def segment_audio_fast(
     output_dir: str | Path,
     *,
     segment_duration: int = 600,
+    ffmpeg_config: FFmpegConfig | None = None,
 ) -> ChunkingResult:
     """
     Fast audio segmentation using stream copy (no re-encoding).
@@ -166,6 +177,7 @@ async def segment_audio_fast(
         input_path: Path to input audio file
         output_dir: Directory for output segments
         segment_duration: Segment length in seconds
+        ffmpeg_config: Optional FFmpegConfig with custom binary paths
 
     Returns:
         ChunkingResult with list of AudioChunk objects
@@ -173,7 +185,7 @@ async def segment_audio_fast(
     Raises:
         FFmpegError: If FFmpeg command fails
     """
-    ensure_ffmpeg_available()
+    ensure_ffmpeg_available(config=ffmpeg_config)
 
     input_path = Path(input_path)
     output_dir = Path(output_dir)
@@ -202,7 +214,8 @@ async def segment_audio_fast(
             "-reset_timestamps",
             "1",
             segment_pattern,
-        ]
+        ],
+        config=ffmpeg_config,
     )
 
     # Find generated segments and probe their durations
@@ -215,7 +228,7 @@ async def segment_audio_fast(
     total_duration = 0.0
 
     for seg_path in seg_paths:
-        dur = await probe_duration(Path(seg_path))
+        dur = await probe_duration(Path(seg_path), config=ffmpeg_config)
         end = start + dur
         chunks.append(
             AudioChunk(
@@ -242,6 +255,7 @@ async def audio_chunker(
     config: ChunkingConfig | None = None,
     naming_strategy: ChunkNamer | None = None,
     auto_cleanup: bool = True,
+    ffmpeg_config: FFmpegConfig | None = None,
 ):
     """
     Context manager for audio chunking with automatic cleanup.
@@ -257,6 +271,7 @@ async def audio_chunker(
         output_dir,
         config=config,
         naming_strategy=naming_strategy,
+        ffmpeg_config=ffmpeg_config,
     )
 
     try:

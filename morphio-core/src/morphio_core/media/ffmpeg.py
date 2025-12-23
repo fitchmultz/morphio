@@ -4,34 +4,91 @@ Unified FFmpeg utilities for audio and video processing.
 
 import asyncio
 import shutil
+from dataclasses import dataclass
 from pathlib import Path
 
 from morphio_core.exceptions import FFmpegError
 
 
-def ensure_ffmpeg_available() -> None:
+@dataclass(frozen=True)
+class FFmpegConfig:
+    """Configuration for FFmpeg binary paths.
+
+    Allows specifying custom paths to FFmpeg and ffprobe binaries,
+    useful for containerized environments, non-standard installations,
+    or when multiple FFmpeg versions are available.
+
+    Args:
+        ffmpeg_path: Path to ffmpeg binary (auto-detected if None)
+        ffprobe_path: Path to ffprobe binary (auto-detected if None)
+
+    Example:
+        # Auto-detect (default)
+        config = FFmpegConfig()
+
+        # Custom paths
+        config = FFmpegConfig(
+            ffmpeg_path="/opt/ffmpeg/bin/ffmpeg",
+            ffprobe_path="/opt/ffmpeg/bin/ffprobe",
+        )
+
+        # Use in functions
+        duration = await probe_duration(path, config=config)
+    """
+
+    ffmpeg_path: str | None = None
+    ffprobe_path: str | None = None
+
+    def _get_binary(self, custom_path: str | None, default_name: str) -> str:
+        """Find a binary, validating custom path if provided."""
+        binary_to_find = custom_path or default_name
+        found_path = shutil.which(binary_to_find)
+        if not found_path:
+            if custom_path:
+                message = (
+                    f"Custom {default_name} binary not found or not executable: '{custom_path}'"
+                )
+            else:
+                message = (
+                    f"{default_name} not found. Install FFmpeg or configure {default_name}_path."
+                )
+            raise FFmpegError(message=message, command=[binary_to_find])
+        return found_path
+
+    def get_ffmpeg(self) -> str:
+        """Get FFmpeg path, using auto-detection if not configured."""
+        return self._get_binary(self.ffmpeg_path, "ffmpeg")
+
+    def get_ffprobe(self) -> str:
+        """Get ffprobe path, using auto-detection if not configured."""
+        return self._get_binary(self.ffprobe_path, "ffprobe")
+
+
+# Default config for module-level convenience
+_default_config = FFmpegConfig()
+
+
+def ensure_ffmpeg_available(config: FFmpegConfig | None = None) -> None:
     """
     Check that FFmpeg and ffprobe are installed and available.
+
+    Args:
+        config: Optional FFmpegConfig with custom binary paths
 
     Raises:
         FFmpegError: If FFmpeg or ffprobe is not found
     """
-    if not shutil.which("ffmpeg"):
-        raise FFmpegError(
-            message="FFmpeg not found. Please install FFmpeg.",
-            command=["ffmpeg"],
-        )
-    if not shutil.which("ffprobe"):
-        raise FFmpegError(
-            message="ffprobe not found. Please install FFmpeg (includes ffprobe).",
-            command=["ffprobe"],
-        )
+    cfg = config or _default_config
+    # These will raise FFmpegError if not found
+    cfg.get_ffmpeg()
+    cfg.get_ffprobe()
 
 
 async def run_ffmpeg(
     args: list[str],
     *,
     timeout: float | None = None,
+    config: FFmpegConfig | None = None,
 ) -> tuple[bytes, bytes]:
     """
     Run FFmpeg command asynchronously.
@@ -39,6 +96,7 @@ async def run_ffmpeg(
     Args:
         args: FFmpeg arguments (without 'ffmpeg' prefix)
         timeout: Optional timeout in seconds
+        config: Optional FFmpegConfig with custom binary paths
 
     Returns:
         Tuple of (stdout, stderr)
@@ -46,7 +104,9 @@ async def run_ffmpeg(
     Raises:
         FFmpegError: If command fails
     """
-    cmd = ["ffmpeg", "-y"] + args  # -y to overwrite without asking
+    cfg = config or _default_config
+    ffmpeg_bin = cfg.get_ffmpeg()
+    cmd = [ffmpeg_bin, "-y"] + args  # -y to overwrite without asking
 
     process = await asyncio.create_subprocess_exec(
         *cmd,
@@ -76,12 +136,17 @@ async def run_ffmpeg(
     return stdout, stderr
 
 
-async def probe_duration(path: Path) -> float:
+async def probe_duration(
+    path: Path,
+    *,
+    config: FFmpegConfig | None = None,
+) -> float:
     """
     Get duration of media file in seconds using ffprobe.
 
     Args:
         path: Path to media file
+        config: Optional FFmpegConfig with custom binary paths
 
     Returns:
         Duration in seconds
@@ -89,8 +154,10 @@ async def probe_duration(path: Path) -> float:
     Raises:
         FFmpegError: If probe fails
     """
+    cfg = config or _default_config
+    ffprobe_bin = cfg.get_ffprobe()
     cmd = [
-        "ffprobe",
+        ffprobe_bin,
         "-v",
         "error",
         "-show_entries",
@@ -131,6 +198,7 @@ async def convert_to_audio(
     *,
     audio_codec: str = "libmp3lame",
     audio_bitrate: str = "192k",
+    config: FFmpegConfig | None = None,
 ) -> None:
     """
     Extract/convert audio from video file.
@@ -140,6 +208,7 @@ async def convert_to_audio(
         output_path: Destination audio file
         audio_codec: Audio codec (default: libmp3lame for MP3)
         audio_bitrate: Audio bitrate (default: 192k)
+        config: Optional FFmpegConfig with custom binary paths
 
     Raises:
         FFmpegError: If conversion fails
@@ -154,5 +223,6 @@ async def convert_to_audio(
             "-ab",
             audio_bitrate,
             str(output_path),
-        ]
+        ],
+        config=config,
     )
