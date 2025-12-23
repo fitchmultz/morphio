@@ -68,10 +68,54 @@ The adapter:
 | `url_validation.py` | `security.URLValidator` | SSRF protection |
 | `video.py` | `video.YouTubeDownloader` | Video downloading |
 | `audio.py` | `audio.chunking`, `audio.transcription` | Audio processing |
-| `llm.py` | `llm.LLMRouter` | LLM orchestration |
+| `llm.py` | `llm.LLMRouter` | LLM orchestration with model aliases |
 | `speaker_alignment.py` | `audio.speaker_alignment` | Speaker diarization |
 | `media.py` | `media.FFmpegWrapper` | Media conversion |
 | `anonymizer.py` | `security.Anonymizer` | PII removal |
+
+## Provider SDK Boundary
+
+**Critical Rule:** Only morphio-core may import provider SDKs (OpenAI, Anthropic, Google GenAI).
+
+```
+✓ Good: morphio-core imports openai SDK
+✓ Good: morphio-io imports from morphio_core.llm
+✗ Bad:  morphio-io imports openai directly
+✗ Bad:  morphio-io imports google.genai directly
+```
+
+### Advanced Reasoning Parameters
+
+Provider-specific parameters flow through the adapter → router → provider chain:
+
+```
+morphio-io adapter                          morphio-core router                      Provider
+┌──────────────────────┐                   ┌──────────────────┐                    ┌──────────────┐
+│ generate_completion( │                   │ router.generate( │                    │ provider.    │
+│   model="gpt-5.1-high",  ──resolve────>  │   model="gpt-5.1", ──pass_through──> │   generate(  │
+│   ...                │     alias         │   reasoning_effort="high",           │     ...      │
+│ )                    │                   │   **kwargs                           │     reasoning_effort="high")
+└──────────────────────┘                   └──────────────────┘                    └──────────────┘
+```
+
+**Supported Parameters:**
+
+| Provider | Parameter | Models | Values |
+|----------|-----------|--------|--------|
+| OpenAI | `reasoning_effort` | o1, o3 series | `"low"`, `"medium"`, `"high"` |
+| Gemini | `thinking_level` | All (Pro: limited) | `"minimal"`, `"low"`, `"medium"`, `"high"` |
+| Anthropic | (none yet) | - | - |
+
+**Model Alias Resolution (in morphio-io):**
+
+```python
+# User-facing model aliases encode parameters
+"gpt-5.1-high"                → base="gpt-5.1", reasoning_effort="high"
+"gemini-3-flash-preview-low"  → base="gemini-3-flash-preview", thinking_level="low"
+"claude-4-sonnet"             → base="claude-4-sonnet" (no special params)
+```
+
+The LLM adapter resolves these aliases before calling morphio-core's router.
 
 ## Exception Translation
 

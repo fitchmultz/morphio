@@ -6,7 +6,7 @@ from typing import Any, Literal
 
 from pydantic import SecretStr
 
-from ...exceptions import LLMProviderError
+from ...exceptions import LLMProviderError, OptionalDependencyError
 from ..types import GenerationResult, Message, StreamDelta, StreamDone, StreamEvent, Usage
 
 logger = logging.getLogger(__name__)
@@ -56,7 +56,11 @@ class OpenAIProvider:
                     timeout=self._timeout,
                 )
             except ImportError as e:
-                raise LLMProviderError("openai package not installed") from e
+                raise OptionalDependencyError(
+                    package="OpenAI SDK",
+                    extra="llm-openai",
+                    pip_package="openai",
+                ) from e
         return self._client
 
     @property

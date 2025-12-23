@@ -11,9 +11,11 @@ This adapter wraps morphio-core's LLMRouter and provides:
 import logging
 from typing import Any, Literal
 
+from pydantic import BaseModel
+
 from morphio_core.exceptions import LLMProviderError
 from morphio_core.llm import LLMRouter
-from morphio_core.llm.types import GenerationResult, LLMConfig, Message, ProviderConfig
+from morphio_core.llm.types import GenerationResult, LLMConfig, Message, ProviderConfig, TokenUsage
 
 from ..config import settings
 from ..utils.error_handlers import ApplicationException
@@ -21,6 +23,21 @@ from ..utils.error_handlers import ApplicationException
 logger = logging.getLogger(__name__)
 
 ProviderName = Literal["openai", "anthropic", "gemini"]
+
+
+class GenerationWithUsage(BaseModel):
+    """Generation result with token usage for tracking/billing.
+
+    Use this when you need to track token consumption for monetization.
+    """
+
+    content: str
+    model: str
+    provider: str
+    input_tokens: int | None = None
+    output_tokens: int | None = None
+    total_tokens: int | None = None
+
 
 # Model token limits for output
 MODEL_TOKEN_LIMITS = {
@@ -258,6 +275,81 @@ async def simple_completion(
     )
 
 
+async def generate_completion_with_usage(
+    messages: list[dict],
+    model: str | None = None,
+    max_tokens: int | None = None,
+    temperature: float | None = None,
+) -> GenerationWithUsage:
+    """
+    Generate a completion and return token usage for tracking/billing.
+
+    This function is preferred when you need to:
+    - Track token consumption for monetization
+    - Log usage for analytics
+    - Implement credit-based access control
+
+    Args:
+        messages: List of message dicts with 'role' and 'content' keys
+        model: Model to use (supports aliases like "gpt-5.1-high")
+        max_tokens: Maximum tokens in response (uses model default if None)
+        temperature: Temperature override
+
+    Returns:
+        GenerationWithUsage with content and token counts
+
+    Raises:
+        ApplicationException: If generation fails
+    """
+    try:
+        router = get_llm_router()
+
+        # Use default model if not specified
+        chosen_model = model or settings.CONTENT_MODEL
+        if chosen_model not in VALID_GENERATION_MODELS:
+            chosen_model = settings.CONTENT_MODEL
+
+        # Resolve alias to base model and provider kwargs
+        base_model, provider, provider_kwargs = resolve_model_alias(chosen_model)
+
+        # Get token limit for model
+        token_limit = get_model_token_limit(chosen_model)
+        effective_max_tokens = (
+            min(max_tokens, token_limit) if max_tokens is not None else token_limit
+        )
+
+        # Convert dict messages to Message objects
+        typed_messages = convert_to_messages(messages)
+
+        result = await router.generate(
+            typed_messages,
+            provider=provider,
+            model=base_model,
+            max_tokens=effective_max_tokens,
+            temperature=temperature or settings.CONTENT_TEMPERATURE,
+            **provider_kwargs,
+        )
+
+        # Extract usage from result
+        usage = result.get_token_usage()
+
+        return GenerationWithUsage(
+            content=result.content,
+            model=chosen_model,
+            provider=provider,
+            input_tokens=usage.input_tokens,
+            output_tokens=usage.output_tokens,
+            total_tokens=usage.total_tokens,
+        )
+
+    except LLMProviderError as e:
+        logger.error(f"LLM provider error: {e}")
+        raise ApplicationException(
+            message=f"LLM generation failed: {str(e)}",
+            status_code=500,
+        ) from e
+
+
 def convert_to_messages(messages: list[dict]) -> list[Message]:
     """Convert dict messages to typed Message objects."""
     return [
@@ -269,8 +361,11 @@ __all__ = [
     # Core functions
     "get_llm_router",
     "generate_completion",
+    "generate_completion_with_usage",
     "simple_completion",
     "convert_to_messages",
+    # Response types
+    "GenerationWithUsage",
     # Model resolution
     "resolve_model_alias",
     "get_model_token_limit",
@@ -282,4 +377,5 @@ __all__ = [
     "LLMRouter",
     "Message",
     "GenerationResult",
+    "TokenUsage",
 ]

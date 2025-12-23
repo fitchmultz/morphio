@@ -5,7 +5,7 @@ from typing import Any
 
 from pydantic import SecretStr
 
-from ...exceptions import LLMProviderError
+from ...exceptions import LLMProviderError, OptionalDependencyError
 from ..types import GenerationResult, Message, StreamDelta, StreamDone, StreamEvent, Usage
 
 
@@ -49,7 +49,11 @@ class AnthropicProvider:
                     timeout=self._timeout,
                 )
             except ImportError as e:
-                raise LLMProviderError("anthropic package not installed") from e
+                raise OptionalDependencyError(
+                    package="Anthropic SDK",
+                    extra="llm-anthropic",
+                    pip_package="anthropic",
+                ) from e
         return self._client
 
     @property

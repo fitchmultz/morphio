@@ -6,6 +6,7 @@ All config uses Pydantic with explicit fields - no global settings.
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from decimal import Decimal
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, SecretStr
@@ -14,6 +15,61 @@ from pydantic import BaseModel, ConfigDict, Field, SecretStr
 # A factory takes a ProviderConfig and returns an LLMProvider-compatible instance
 # Uses Any for return type to avoid circular import with providers.base
 ProviderFactory = Callable[["ProviderConfig"], Any]
+
+# Advanced reasoning parameter types
+# These are passed through router kwargs to providers
+
+ThinkingLevel = Literal["minimal", "low", "medium", "high"]
+"""Gemini thinking level for advanced reasoning models."""
+
+ReasoningEffort = Literal["low", "medium", "high"]
+"""OpenAI reasoning effort for o1/o3 models."""
+
+# Valid value sets for validation
+VALID_THINKING_LEVELS: frozenset[str] = frozenset({"minimal", "low", "medium", "high"})
+VALID_REASONING_EFFORTS: frozenset[str] = frozenset({"low", "medium", "high"})
+
+
+def validate_thinking_level(value: str | None) -> str | None:
+    """Validate and normalize thinking_level value.
+
+    Args:
+        value: Thinking level to validate (case-insensitive)
+
+    Returns:
+        Normalized lowercase value or None if input is None
+
+    Raises:
+        ValueError: If value is not a valid thinking level
+    """
+    if value is None:
+        return None
+    normalized = value.lower()
+    if normalized not in VALID_THINKING_LEVELS:
+        valid_options = ", ".join(sorted(VALID_THINKING_LEVELS))
+        raise ValueError(f"Invalid thinking_level '{value}'. Valid values: {valid_options}")
+    return normalized
+
+
+def validate_reasoning_effort(value: str | None) -> str | None:
+    """Validate and normalize reasoning_effort value.
+
+    Args:
+        value: Reasoning effort to validate (case-insensitive)
+
+    Returns:
+        Normalized lowercase value or None if input is None
+
+    Raises:
+        ValueError: If value is not a valid reasoning effort
+    """
+    if value is None:
+        return None
+    normalized = value.lower()
+    if normalized not in VALID_REASONING_EFFORTS:
+        valid_options = ", ".join(sorted(VALID_REASONING_EFFORTS))
+        raise ValueError(f"Invalid reasoning_effort '{value}'. Valid values: {valid_options}")
+    return normalized
 
 
 class Message(BaseModel):
@@ -33,6 +89,56 @@ class Usage(BaseModel):
     prompt_tokens: int = 0
     completion_tokens: int = 0
 
+    @property
+    def total_tokens(self) -> int:
+        """Total tokens used (prompt + completion)."""
+        return self.prompt_tokens + self.completion_tokens
+
+
+class TokenUsage(BaseModel):
+    """Extended token usage with cost tracking for monetization.
+
+    This is the full usage model for tracking across the application layer.
+    Includes provider/model metadata and optional cost estimation.
+    """
+
+    model_config = ConfigDict(frozen=True)
+
+    input_tokens: int | None = None
+    output_tokens: int | None = None
+    total_tokens: int | None = None
+    provider: str | None = None
+    model: str | None = None
+    cost_usd: Decimal | None = None  # Optional - populated by cost estimation layer
+
+    @classmethod
+    def from_usage(
+        cls,
+        usage: "Usage | None",
+        *,
+        provider: str | None = None,
+        model: str | None = None,
+    ) -> "TokenUsage":
+        """Create TokenUsage from a basic Usage object.
+
+        Args:
+            usage: Basic usage from provider response
+            provider: Provider name (e.g., "openai", "anthropic")
+            model: Model identifier
+
+        Returns:
+            TokenUsage with extended metadata
+        """
+        if usage is None:
+            return cls(provider=provider, model=model)
+        return cls(
+            input_tokens=usage.prompt_tokens,
+            output_tokens=usage.completion_tokens,
+            total_tokens=usage.total_tokens,
+            provider=provider,
+            model=model,
+        )
+
 
 class GenerationResult(BaseModel):
     """Response from any LLM provider."""
@@ -44,6 +150,14 @@ class GenerationResult(BaseModel):
     provider: str
     usage: Usage | None = None
     raw: Any | None = Field(default=None, repr=False, exclude=True)  # Debug only
+
+    def get_token_usage(self) -> TokenUsage:
+        """Get extended token usage with provider/model metadata.
+
+        Returns:
+            TokenUsage with full metadata for tracking/billing
+        """
+        return TokenUsage.from_usage(self.usage, provider=self.provider, model=self.model)
 
 
 # Streaming event types - use dataclasses for hot path performance

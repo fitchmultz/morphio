@@ -103,6 +103,31 @@ class LLMProviderError(LLMError):
     pass
 
 
+class OptionalDependencyError(LLMProviderError):
+    """SDK or optional dependency is not installed.
+
+    Provides actionable error messages with the exact install command.
+    """
+
+    def __init__(self, package: str, extra: str, pip_package: str | None = None):
+        """Create an optional dependency error.
+
+        Args:
+            package: Human-readable package name (e.g., "OpenAI SDK")
+            extra: The morphio-core extra to install (e.g., "llm", "llm-openai")
+            pip_package: Pip package name if different from extra (e.g., "openai")
+        """
+        self.package = package
+        self.extra = extra
+        self.pip_package = pip_package or extra
+
+        message = (
+            f"{package} not installed. "
+            f"Install with: uv add morphio-core[{extra}] or pip install {self.pip_package}"
+        )
+        super().__init__(message)
+
+
 class ProviderNotConfiguredError(LLMError):
     """Requested provider is not configured."""
 
