@@ -165,7 +165,9 @@ router = create_router(openai_api_key="sk-...", default_provider="openai")
 result = await router.generate([Message(role="user", content="Hello")])
 
 # Custom providers
-def my_factory(config: ProviderConfig) -> "LLMProvider": return MyProvider(config.api_key)
+def my_factory(config: ProviderConfig) -> "LLMProvider":
+    return MyProvider(api_key=config.api_key, model=config.default_model)
+
 config = LLMConfig(
     custom_providers={"my-llm": my_factory},
     custom_configs={"my-llm": ProviderConfig(api_key=SecretStr("..."), default_model="m1")},
