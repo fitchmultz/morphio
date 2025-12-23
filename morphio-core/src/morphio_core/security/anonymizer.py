@@ -4,6 +4,7 @@ Content anonymization utilities.
 Pure regex-based PII anonymization with reversible mappings.
 """
 
+import ipaddress
 import logging
 import re
 
@@ -60,8 +61,8 @@ class Anonymizer:
         # Social security numbers
         content = self._replace_pattern(content, r"\b\d{3}-\d{2}-\d{4}\b", "SSN")
 
-        # IP addresses
-        content = self._replace_pattern(content, r"\b(?:\d{1,3}\.){3}\d{1,3}\b", "IP_ADDRESS")
+        # IP addresses (validated with ipaddress module)
+        content = self._replace_valid_ips(content)
 
         return content
 
@@ -80,23 +81,53 @@ class Anonymizer:
             result = result.replace(placeholder, original)
         return result
 
-    def _replace_pattern(self, content: str, pattern: str, prefix: str) -> str:
-        """Replace matches of pattern with numbered placeholders."""
+    def _get_or_create_placeholder(self, original: str, prefix: str) -> str:
+        """Get existing placeholder or create a new one for the original value.
+
+        Args:
+            original: The original value to map
+            prefix: Placeholder prefix (e.g., "EMAIL", "IP_ADDRESS")
+
+        Returns:
+            The placeholder string for this value
+        """
+        if original in self.mapping:
+            return self.mapping[original]
+
         if prefix not in self.counters:
             self.counters[prefix] = 0
 
-        def replace_match(match):
-            original = match.group(0)
-            if original in self.mapping:
-                return self.mapping[original]
+        self.counters[prefix] += 1
+        placeholder = f"[{prefix}_{self.counters[prefix]}]"
+        self.mapping[original] = placeholder
+        self.reverse_mapping[placeholder] = original
+        return placeholder
 
-            self.counters[prefix] += 1
-            placeholder = f"[{prefix}_{self.counters[prefix]}]"
-            self.mapping[original] = placeholder
-            self.reverse_mapping[placeholder] = original
-            return placeholder
+    def _replace_pattern(self, content: str, pattern: str, prefix: str) -> str:
+        """Replace matches of pattern with numbered placeholders."""
+
+        def replace_match(match: re.Match) -> str:
+            return self._get_or_create_placeholder(match.group(0), prefix)
 
         return re.sub(pattern, replace_match, content)
+
+    def _replace_valid_ips(self, content: str) -> str:
+        """Replace valid IPv4 addresses with placeholders.
+
+        Uses the ipaddress module to validate IPs, ensuring only
+        valid addresses (0-255 per octet) are anonymized.
+        """
+        pattern = r"\b(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\b"
+
+        def replace_if_valid(match: re.Match) -> str:
+            ip = match.group(1)
+            try:
+                ipaddress.IPv4Address(ip)
+            except ipaddress.AddressValueError:
+                return ip  # Invalid IP - leave unchanged
+            return self._get_or_create_placeholder(ip, "IP_ADDRESS")
+
+        return re.sub(pattern, replace_if_valid, content)
 
 
 def anonymize_content(content: str, enabled: bool = False) -> str:
