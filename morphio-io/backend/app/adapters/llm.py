@@ -320,7 +320,7 @@ async def generate_completion_with_usage(
     Raises:
         ApplicationException: If generation fails
     """
-    result, chosen_model, provider = await _generate_core(messages, model, max_tokens, temperature)
+    result, chosen_model, _ = await _generate_core(messages, model, max_tokens, temperature)
     usage = result.get_token_usage()
 
     # Construct directly, overriding model with user-facing alias
