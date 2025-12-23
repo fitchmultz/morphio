@@ -2,6 +2,8 @@
 
 This monorepo uses **uv workspaces** with a single `.venv` at the root.
 
+**IMPORTANT: Always use `make install` from the project root to install dependencies. Do not use `uv sync`, `pip`, or other methods.**
+
 | Project | Description | Path |
 |---------|-------------|------|
 | **morphio-io** | Full-stack web application (FastAPI + Next.js) | `morphio-io/` |

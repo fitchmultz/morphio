@@ -589,6 +589,7 @@ export type LogsProcessingStatusResponse = {
      * Progress
      */
     progress?: number;
+    stage?: ProcessingStage | null;
     /**
      * Message
      */
@@ -638,6 +639,7 @@ export type MediaProcessingStatusResponse = {
      * Progress
      */
     progress?: number;
+    stage?: ProcessingStage | null;
     /**
      * Message
      */
@@ -675,6 +677,22 @@ export type PaginatedResponseContentOut = {
      */
     per_page: number;
 };
+
+/**
+ * ProcessingStage
+ *
+ * Detailed processing stages for progress reporting.
+ *
+ * Each stage has a typical progress range:
+ * - QUEUED: 0-5%
+ * - DOWNLOADING: 5-20%
+ * - CHUNKING: 20-30%
+ * - TRANSCRIBING: 30-60%
+ * - DIARIZING: 50-70% (overlaps with transcribing)
+ * - GENERATING: 70-90%
+ * - SAVING: 90-100%
+ */
+export type ProcessingStage = 'queued' | 'downloading' | 'chunking' | 'transcribing' | 'diarizing' | 'generating' | 'saving' | 'completed' | 'failed';
 
 /**
  * ResponseModel[CommentOut]
@@ -1100,6 +1118,50 @@ export type UserCreate = {
      * Password must be at least 8 characters long
      */
     password: string;
+};
+
+/**
+ * UserCredits
+ *
+ * Summary of user's credit usage for the current billing period.
+ */
+export type UserCredits = {
+    /**
+     * Plan
+     *
+     * Current subscription plan
+     */
+    plan: string;
+    /**
+     * Limit
+     *
+     * Total credits available in this plan
+     */
+    limit: number;
+    /**
+     * Used
+     *
+     * Credits used this period
+     */
+    used: number;
+    /**
+     * Remaining
+     *
+     * Credits remaining this period
+     */
+    remaining: number;
+    /**
+     * Resets Monthly
+     *
+     * Whether credits reset monthly
+     */
+    resets_monthly?: boolean;
+    /**
+     * Is Admin
+     *
+     * Admin users have unlimited credits
+     */
+    is_admin?: boolean;
 };
 
 /**
@@ -2390,6 +2452,37 @@ export type ChangeEmailResponses = {
 };
 
 export type ChangeEmailResponse = ChangeEmailResponses[keyof ChangeEmailResponses];
+
+export type GetUserCreditsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/user/credits';
+};
+
+export type GetUserCreditsErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Too Many Requests
+     */
+    429: unknown;
+    /**
+     * Internal Server Error
+     */
+    500: unknown;
+};
+
+export type GetUserCreditsResponses = {
+    /**
+     * Successful Response
+     */
+    200: UserCredits;
+};
+
+export type GetUserCreditsResponse = GetUserCreditsResponses[keyof GetUserCreditsResponses];
 
 export type GetUserUsageData = {
     body?: never;

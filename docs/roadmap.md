@@ -41,7 +41,7 @@ These items were completed in the documentation normalization work:
 - [ ] Export LLM usage reports (CSV/PDF)
 - [ ] Add usage alerts when approaching limit
 - [ ] Implement plan upgrade flow in UI
-- [ ] Add webhook notifications for job completion
+- [ ] Add API key authentication for programmatic access
 
 ### Performance
 - [ ] Profile and optimize transcript generation
@@ -58,13 +58,11 @@ These items were completed in the documentation normalization work:
 
 ### Platform
 - [ ] Multi-tenant workspace support
-- [ ] API key authentication for programmatic access
 - [ ] Batch processing API
 - [ ] WebSocket-based real-time updates
 
 ### Integrations
 - [ ] Slack notifications
-- [ ] Zapier/n8n webhook templates
 - [ ] Calendar integration for scheduled processing
 
 ### Scalability

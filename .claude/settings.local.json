@@ -11,7 +11,8 @@
       "mcp__RepoPrompt__context_builder",
       "mcp__RepoPrompt__list_windows",
       "mcp__RepoPrompt__select_window",
-      "mcp__RepoPrompt__chat_send"
+      "mcp__RepoPrompt__chat_send",
+      "Bash(./scripts/audit_imports.sh:*)"
     ]
   }
 }

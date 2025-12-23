@@ -1,6 +1,16 @@
 import io
 
+import pytest
 from fastapi.testclient import TestClient
+
+# Check if playwright is available (crawler dependency)
+_playwright_available = False
+try:
+    import playwright  # noqa: F401
+
+    _playwright_available = True
+except ImportError:
+    pass
 
 
 def test_worker_ml_transcribe_mocked():
@@ -22,6 +32,7 @@ def test_worker_ml_transcribe_mocked():
     assert body["text"] == "hello world"
 
 
+@pytest.mark.skipif(not _playwright_available, reason="Playwright not installed")
 def test_crawler_render_mocked():
     from unittest.mock import patch
     from crawler.main import app as crawler_app

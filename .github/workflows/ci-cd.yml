@@ -34,21 +34,21 @@ jobs:
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Sync (frozen) with dev deps
-        working-directory: backend
+        working-directory: morphio-io/backend
         run: |
           uv venv .venv
           UV_PROJECT_ENVIRONMENT=.venv uv sync --dev --frozen
 
       - name: Ruff (lint)
-        working-directory: backend
+        working-directory: morphio-io/backend
         run: uv run ruff check .
 
       - name: Ruff (format check)
-        working-directory: backend
+        working-directory: morphio-io/backend
         run: uv run ruff format --check .
 
       - name: ty (type check)
-        working-directory: backend
+        working-directory: morphio-io/backend
         run: uv run ty check
 
   frontend-checks:
@@ -58,29 +58,29 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 22
+      - name: Setup Node.js 24
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
           cache: 'pnpm'
-          cache-dependency-path: frontend/pnpm-lock.yaml
+          cache-dependency-path: morphio-io/frontend/pnpm-lock.yaml
 
       - name: Enable Corepack and pin pnpm
-        working-directory: frontend
+        working-directory: morphio-io/frontend
         run: |
           corepack enable
-          corepack prepare pnpm@9.0.0 --activate
+          corepack prepare pnpm@10.11.0 --activate
 
       - name: Install dependencies
-        working-directory: frontend
+        working-directory: morphio-io/frontend
         run: pnpm install --frozen-lockfile
 
       - name: Biome (lint + format check)
-        working-directory: frontend
+        working-directory: morphio-io/frontend
         run: pnpm biome ci .
 
       - name: TypeScript
-        working-directory: frontend
+        working-directory: morphio-io/frontend
         run: pnpm type-check
 
   docker-build-push:
@@ -92,17 +92,17 @@ jobs:
       matrix:
         include:
           - name: api
-            dockerfile: backend/Dockerfile.api
+            dockerfile: morphio-io/backend/Dockerfile.api
             image: ghcr.io/${{ github.repository_owner }}/morphio-io-backend-api
-            context: .
+            context: morphio-io
           - name: worker-ml
-            dockerfile: backend/Dockerfile.worker-ml
+            dockerfile: morphio-io/backend/Dockerfile.worker-ml
             image: ghcr.io/${{ github.repository_owner }}/morphio-io-worker-ml
-            context: .
+            context: morphio-io
           - name: crawler
-            dockerfile: backend/Dockerfile.crawler
+            dockerfile: morphio-io/backend/Dockerfile.crawler
             image: ghcr.io/${{ github.repository_owner }}/morphio-io-crawler
-            context: .
+            context: morphio-io
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -145,4 +145,3 @@ jobs:
           provenance: false
           cache-from: type=gha
           cache-to: type=gha,mode=max
-

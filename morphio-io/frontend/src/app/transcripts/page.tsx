@@ -6,6 +6,7 @@ import {
 	getMediaConfig,
 	getMediaProcessingStatus,
 	getUserProfile,
+	type MediaProcessingStatusResponse,
 	processMedia,
 } from "@/client";
 import { Skeleton } from "@/components/common/Skeleton";
@@ -34,6 +35,7 @@ const TranscriptPage: React.FC = () => {
 			setJobId(null);
 			setTranscriptResult("");
 			setError(null);
+			setCurrentStatus(null);
 		},
 	});
 
@@ -48,6 +50,8 @@ const TranscriptPage: React.FC = () => {
 	const [autoDetectedType, setAutoDetectedType] = useState<MediaType | null>(
 		null,
 	);
+	const [currentStatus, setCurrentStatus] =
+		useState<MediaProcessingStatusResponse | null>(null);
 
 	// Set a default value, but we'll try to get it from the API
 	const [maxUploadSize, setMaxUploadSize] = useState<number>(
@@ -175,6 +179,7 @@ const TranscriptPage: React.FC = () => {
 					);
 				}
 				if (data) {
+					setCurrentStatus(data);
 					setProgress(data.progress ?? 0);
 					setStatusMessage(data.message || "");
 					if (data.status === "completed") {

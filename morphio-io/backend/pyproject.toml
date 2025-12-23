@@ -12,18 +12,17 @@ license = { text = "Proprietary" }
 authors = [{ name = "Morphio Team" }]
 # Minimal core dependencies - each service adds what it needs via dependency-groups
 dependencies = [
-  # Shared core library (local path dependency)
-  "morphio-core",
+  # Shared core library with LLM provider SDKs (OpenAI, Anthropic, Gemini)
+  # Provider SDKs are ONLY allowed in morphio-core; see scripts/audit_imports.sh
+  "morphio-core[llm]",
 
   # Core FastAPI stack
   "aiofiles",
   "aiosqlite",
   "alembic",
-  "anthropic",
   "bcrypt",
   "email-validator",
   "fastapi",
-  "openai",
   "httpx",
   "stripe",
   "tenacity",
@@ -46,14 +45,16 @@ dependencies = [
   "uvloop",
   "httptools",
 
+  # Observability (optional, enabled via PROMETHEUS_ENABLED)
+  "prometheus-client",
+
   # Media utils (lightweight, needed by backend for yt-dlp/ffmpeg orchestration)
   "youtube-transcript-api",
   "yt-dlp",
   "pydub",
   "moviepy",
 
-  # Video summarization (API-based, lightweight)
-  "google-genai>=1.0.0",
+  # Video summarization (scene detection only; Gemini via morphio-core[llm])
   "scenedetect[opencv]>=0.6",
 ]
 

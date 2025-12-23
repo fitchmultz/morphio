@@ -35,7 +35,7 @@ def _load_pipeline():
     global _diarization_pipeline
     if _diarization_pipeline is None:
         try:
-            from pyannote.audio import Pipeline
+            from pyannote.audio import Pipeline  # type: ignore[import-untyped]
 
             hf_token = settings.HUGGING_FACE_TOKEN.get_secret_value()
             if not hf_token:
@@ -51,10 +51,10 @@ def _load_pipeline():
                 raise RuntimeError("Pipeline.from_pretrained returned None")
 
             # Move to MPS if available (Apple Silicon)
-            import torch
+            import torch  # type: ignore[import-untyped]
 
-            if torch.backends.mps.is_available():
-                loaded_pipeline = loaded_pipeline.to(torch.device("mps"))
+            if torch.backends.mps.is_available():  # type: ignore[attr-defined]
+                loaded_pipeline = loaded_pipeline.to(torch.device("mps"))  # type: ignore[attr-defined]
                 logger.info("Diarization pipeline loaded on MPS (Apple Silicon GPU)")
             else:
                 logger.info("Diarization pipeline loaded on CPU")

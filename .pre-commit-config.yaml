@@ -1,0 +1,55 @@
+# Pre-commit configuration for Morphio monorepo
+# Install: pre-commit install
+# Run manually: pre-commit run --all-files
+
+repos:
+  - repo: local
+    hooks:
+      - id: audit-imports
+        name: Audit provider SDK imports
+        entry: ./scripts/audit_imports.sh
+        language: script
+        pass_filenames: false
+        always_run: true
+        stages: [commit]
+
+      - id: ruff-check
+        name: Ruff lint (Python)
+        entry: bash -c 'cd morphio-io/backend && uv run ruff check .'
+        language: system
+        pass_filenames: false
+        types: [python]
+        stages: [commit]
+
+      - id: ruff-format
+        name: Ruff format check (Python)
+        entry: bash -c 'cd morphio-io/backend && uv run ruff format --check .'
+        language: system
+        pass_filenames: false
+        types: [python]
+        stages: [commit]
+
+      - id: biome-check
+        name: Biome check (TypeScript/JS)
+        entry: bash -c 'cd morphio-io/frontend && pnpm biome check .'
+        language: system
+        pass_filenames: false
+        types_or: [javascript, typescript, tsx, jsx]
+        stages: [commit]
+
+  # Standard pre-commit hooks for general hygiene
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: '\.lock$|\.snap$'
+      - id: end-of-file-fixer
+        exclude: '\.lock$|\.snap$'
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+      - id: check-json
+        exclude: 'tsconfig\.json$'  # tsconfig may have comments
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-merge-conflict
+      - id: detect-private-key

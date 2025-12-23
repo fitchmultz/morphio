@@ -2,9 +2,11 @@
 
 import type { FC } from "react";
 import { useCallback, useEffect, useState } from "react";
-import { client } from "@/client/client.gen";
-import { getUserProfile } from "@/client/sdk.gen";
-import type { AppSchemasAuthSchemaUserOut } from "@/client/types.gen";
+import { getUserCredits, getUserProfile } from "@/client/sdk.gen";
+import type {
+	AppSchemasAuthSchemaUserOut,
+	UserCredits,
+} from "@/client/types.gen";
 import { Skeleton } from "@/components/common/Skeleton";
 import { ChangeDisplayNameForm } from "@/components/forms/ChangeDisplayNameForm";
 import { ChangeEmailForm } from "@/components/forms/ChangeEmailForm";
@@ -12,15 +14,6 @@ import { ChangePasswordForm } from "@/components/forms/ChangePasswordForm";
 import { useAuth } from "@/contexts/AuthContext";
 import logger from "@/lib/logger";
 import { notifyError } from "@/lib/toast";
-
-interface UserCredits {
-	plan: string;
-	limit: number;
-	used: number;
-	remaining: number;
-	resets_monthly: boolean;
-	is_admin: boolean;
-}
 
 export const ProfileManagement: FC = () => {
 	const { updateUserData } = useAuth();
@@ -51,11 +44,9 @@ export const ProfileManagement: FC = () => {
 
 			// Fetch credits
 			try {
-				const creditsResponse = await client.get<{ data: UserCredits }>({
-					url: "/user/credits",
-				});
-				if (creditsResponse.data?.data) {
-					setCredits(creditsResponse.data.data);
+				const creditsResponse = await getUserCredits();
+				if (creditsResponse.data) {
+					setCredits(creditsResponse.data);
 				}
 			} catch (creditsError) {
 				logger.warn("Failed to fetch credits", { error: creditsError });

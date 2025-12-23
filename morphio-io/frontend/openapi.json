@@ -2262,6 +2262,61 @@
 				]
 			}
 		},
+		"/user/credits": {
+			"get": {
+				"tags": ["User", "User"],
+				"summary": "Get User Credits",
+				"description": "Get summary of user's credit usage for the current billing period.",
+				"operationId": "get_user_credits",
+				"responses": {
+					"200": {
+						"description": "Successful Response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserCredits"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				]
+			}
+		},
 		"/user/usage": {
 			"get": {
 				"tags": ["User", "User"],
@@ -4282,6 +4337,16 @@
 						"title": "Progress",
 						"default": 0
 					},
+					"stage": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/ProcessingStage"
+							},
+							{
+								"type": "null"
+							}
+						]
+					},
 					"message": {
 						"anyOf": [
 							{
@@ -4367,6 +4432,16 @@
 						"title": "Progress",
 						"default": 0
 					},
+					"stage": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/ProcessingStage"
+							},
+							{
+								"type": "null"
+							}
+						]
+					},
 					"message": {
 						"anyOf": [
 							{
@@ -4434,6 +4509,22 @@
 				"type": "object",
 				"required": ["items", "total", "page", "per_page"],
 				"title": "PaginatedResponse[ContentOut]"
+			},
+			"ProcessingStage": {
+				"type": "string",
+				"enum": [
+					"queued",
+					"downloading",
+					"chunking",
+					"transcribing",
+					"diarizing",
+					"generating",
+					"saving",
+					"completed",
+					"failed"
+				],
+				"title": "ProcessingStage",
+				"description": "Detailed processing stages for progress reporting.\n\nEach stage has a typical progress range:\n- QUEUED: 0-5%\n- DOWNLOADING: 5-20%\n- CHUNKING: 20-30%\n- TRANSCRIBING: 30-60%\n- DIARIZING: 50-70% (overlaps with transcribing)\n- GENERATING: 70-90%\n- SAVING: 90-100%"
 			},
 			"ResponseModel_CommentOut_": {
 				"properties": {
@@ -5108,6 +5199,46 @@
 				"type": "object",
 				"required": ["email", "display_name", "password"],
 				"title": "UserCreate"
+			},
+			"UserCredits": {
+				"properties": {
+					"plan": {
+						"type": "string",
+						"title": "Plan",
+						"description": "Current subscription plan"
+					},
+					"limit": {
+						"type": "integer",
+						"title": "Limit",
+						"description": "Total credits available in this plan"
+					},
+					"used": {
+						"type": "integer",
+						"title": "Used",
+						"description": "Credits used this period"
+					},
+					"remaining": {
+						"type": "integer",
+						"title": "Remaining",
+						"description": "Credits remaining this period"
+					},
+					"resets_monthly": {
+						"type": "boolean",
+						"title": "Resets Monthly",
+						"description": "Whether credits reset monthly",
+						"default": true
+					},
+					"is_admin": {
+						"type": "boolean",
+						"title": "Is Admin",
+						"description": "Admin users have unlimited credits",
+						"default": false
+					}
+				},
+				"type": "object",
+				"required": ["plan", "limit", "used", "remaining"],
+				"title": "UserCredits",
+				"description": "Summary of user's credit usage for the current billing period."
 			},
 			"UserLogin": {
 				"properties": {

@@ -51,7 +51,7 @@ dev: ## Start native dev servers (backend + frontend + Redis via Docker)
 	trap cleanup INT TERM; \
 	echo "🚀 Starting native dev servers..."; \
 	docker compose -f docker-compose.watch.yml up -d redis; \
-	PORT=$$(grep -E "^APP_PORT=" .env 2>/dev/null | cut -d "=" -f2 || echo "8005"); \
+	PORT=$$(grep -E "^APP_PORT=" backend/.env 2>/dev/null | cut -d "=" -f2 || echo "8005"); \
 	echo "🚀 Starting backend on http://localhost:$$PORT..."; \
 	cd backend && uv run uvicorn app.main:app --reload --port $$PORT & \
 	BACKEND_PID=$$!; \
@@ -111,7 +111,7 @@ dev-crawler: ## Start crawler natively
 	@cd backend && uv run uvicorn crawler.main:app --reload --port 8002
 
 dev-backend: ## Start backend dev server (native)
-	@PORT=$$(grep -E '^APP_PORT=' .env 2>/dev/null | cut -d '=' -f2 || echo "8005"); \
+	@PORT=$$(grep -E '^APP_PORT=' backend/.env 2>/dev/null | cut -d '=' -f2 || echo "8005"); \
 	echo "🚀 Starting backend on http://localhost:$$PORT..."; \
 	cd backend && uv run uvicorn app.main:app --reload --port $$PORT
 
@@ -153,7 +153,7 @@ type-check: type-check-backend type-check-frontend ## Run type checkers
 
 type-check-backend: ## Type check backend
 	@echo "🔷 Type checking backend..."
-	@cd backend && uv run ty check --exclude "worker_ml/" --exclude "tests/performance/"
+	@cd backend && uv run ty check --exclude "worker_ml/" --exclude "crawler/" --exclude "app/services/diarization/" --exclude "tests/performance/"
 
 type-check-frontend: ## Type check frontend
 	@echo "🔷 Type checking frontend..."

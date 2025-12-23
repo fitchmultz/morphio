@@ -9,6 +9,7 @@
 
 # Build outputs
 **/.next/
+**/.swc/
 **/build/
 **/dist/
 **/*.pyc
@@ -16,8 +17,8 @@
 # Environment & Secrets
 **/.env*
 !.env.example
+!stack.env.example
 **/*.env
-!stack.env
 
 # Database files
 **/*.db
