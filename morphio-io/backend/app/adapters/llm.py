@@ -44,10 +44,13 @@ MODEL_TOKEN_LIMITS = {
     "gpt-5.2-codex-low": 128000,
     "gpt-5.2-codex-medium": 128000,
     "gpt-5.2-codex-high": 128000,
-    # Anthropic models (no thinking/reasoning support)
+    # Anthropic models (accept extended_thinking: bool, no levels)
     "claude-4.5-opus": 16384,
+    "claude-4.5-opus-thinking": 16384,
     "claude-4.5-sonnet": 16384,
+    "claude-4.5-sonnet-thinking": 16384,
     "claude-4.5-haiku": 16384,
+    "claude-4.5-haiku-thinking": 16384,
     # Gemini 3 Flash variants (accept thinking_level)
     "gemini-3-flash-preview": 65536,
     "gemini-3-flash-preview-medium": 65536,
@@ -81,8 +84,11 @@ MODEL_DISPLAY_INFO = [
     {"id": "gpt-5.2-codex-low", "label": "GPT-5.2 Codex (Low Reasoning)"},
     # Anthropic models
     {"id": "claude-4.5-opus", "label": "Claude 4.5 Opus"},
+    {"id": "claude-4.5-opus-thinking", "label": "Claude 4.5 Opus (Thinking)"},
     {"id": "claude-4.5-sonnet", "label": "Claude 4.5 Sonnet"},
+    {"id": "claude-4.5-sonnet-thinking", "label": "Claude 4.5 Sonnet (Thinking)"},
     {"id": "claude-4.5-haiku", "label": "Claude 4.5 Haiku"},
+    {"id": "claude-4.5-haiku-thinking", "label": "Claude 4.5 Haiku (Thinking)"},
 ]
 
 
@@ -94,7 +100,7 @@ def resolve_model_alias(chosen_model: str) -> tuple[str, ProviderName, dict[str,
     - "gpt-5.2-high" -> base="gpt-5.2", provider="openai", kwargs={"reasoning_effort": "high"}
     - "gpt-5.2-codex-medium" -> base="gpt-5.2-codex", kwargs={"reasoning_effort": "medium"}
     - "gemini-3-flash-preview-medium" -> base="gemini-3-flash-preview", kwargs={"thinking_level": "medium"}
-    - "claude-4.5-sonnet" -> base="claude-4.5-sonnet", provider="anthropic", kwargs={}
+    - "claude-4.5-sonnet-thinking" -> base="claude-4.5-sonnet", kwargs={"extended_thinking": True}
 
     Args:
         chosen_model: Model ID (possibly with embedded parameters)
@@ -129,9 +135,13 @@ def resolve_model_alias(chosen_model: str) -> tuple[str, ProviderName, dict[str,
                 break
         return base_model, provider, provider_kwargs
 
-    # Claude models
+    # Claude models with optional extended thinking suffix
     if chosen_model.startswith("claude"):
-        return chosen_model, "anthropic", provider_kwargs
+        base_model = chosen_model
+        if chosen_model.endswith("-thinking"):
+            base_model = chosen_model.removesuffix("-thinking")
+            provider_kwargs["extended_thinking"] = True
+        return base_model, "anthropic", provider_kwargs
 
     # Default to OpenAI
     return chosen_model, "openai", provider_kwargs

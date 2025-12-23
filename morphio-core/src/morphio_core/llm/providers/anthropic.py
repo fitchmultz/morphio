@@ -87,6 +87,8 @@ class AnthropicProvider:
         model: str | None = None,
         max_tokens: int | None = None,
         temperature: float | None = None,
+        extended_thinking: bool = False,
+        thinking_budget: int = 10000,
         **kwargs: Any,  # Accept and ignore unknown kwargs for provider compatibility
     ) -> GenerationResult:
         """Generate a completion from messages.
@@ -96,6 +98,8 @@ class AnthropicProvider:
             model: Model override (uses provider default if None)
             max_tokens: Max tokens override
             temperature: Temperature override
+            extended_thinking: Enable extended thinking mode (Claude 3.5+)
+            thinking_budget: Token budget for thinking (default 10000, min 1024)
             **kwargs: Ignored (for provider compatibility)
 
         Returns:
@@ -110,16 +114,23 @@ class AnthropicProvider:
         anthropic_messages, system_prompt = self._convert_messages(messages)
 
         try:
-            kwargs: dict[str, Any] = {
+            api_params: dict[str, Any] = {
                 "model": model,
                 "messages": anthropic_messages,
                 "max_tokens": max_tokens,
                 "temperature": temperature,
             }
             if system_prompt:
-                kwargs["system"] = system_prompt
+                api_params["system"] = system_prompt
 
-            response = await client.messages.create(**kwargs)
+            # Enable extended thinking if requested
+            if extended_thinking:
+                api_params["thinking"] = {
+                    "type": "enabled",
+                    "budget_tokens": max(1024, thinking_budget),  # Min 1024 per API docs
+                }
+
+            response = await client.messages.create(**api_params)
 
             # Extract text from content blocks
             content = ""
@@ -149,6 +160,8 @@ class AnthropicProvider:
         model: str | None = None,
         max_tokens: int | None = None,
         temperature: float | None = None,
+        extended_thinking: bool = False,
+        thinking_budget: int = 10000,
         **kwargs: Any,  # Accept and ignore unknown kwargs for provider compatibility
     ) -> AsyncIterator[StreamEvent]:
         """Stream a completion from messages.
@@ -158,6 +171,8 @@ class AnthropicProvider:
             model: Model override (uses provider default if None)
             max_tokens: Max tokens override
             temperature: Temperature override
+            extended_thinking: Enable extended thinking mode (Claude 3.5+)
+            thinking_budget: Token budget for thinking (default 10000, min 1024)
             **kwargs: Ignored (for provider compatibility)
 
         Yields:
@@ -172,16 +187,23 @@ class AnthropicProvider:
         anthropic_messages, system_prompt = self._convert_messages(messages)
 
         try:
-            kwargs: dict[str, Any] = {
+            api_params: dict[str, Any] = {
                 "model": model,
                 "messages": anthropic_messages,
                 "max_tokens": max_tokens,
                 "temperature": temperature,
             }
             if system_prompt:
-                kwargs["system"] = system_prompt
+                api_params["system"] = system_prompt
 
-            async with client.messages.stream(**kwargs) as stream:
+            # Enable extended thinking if requested
+            if extended_thinking:
+                api_params["thinking"] = {
+                    "type": "enabled",
+                    "budget_tokens": max(1024, thinking_budget),  # Min 1024 per API docs
+                }
+
+            async with client.messages.stream(**api_params) as stream:
                 async for text in stream.text_stream:
                     yield StreamDelta(text=text)
 
