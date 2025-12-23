@@ -88,13 +88,15 @@ def resolve_model_alias(chosen_model: str) -> tuple[str, ProviderName, dict[str,
     """
     provider_kwargs: dict[str, Any] = {}
 
-    # OpenAI models with reasoning effort
-    if chosen_model.startswith("gpt-5.1"):
-        base_model = "gpt-5.1"
+    # OpenAI models with optional reasoning effort suffix
+    if chosen_model.startswith("gpt-"):
         provider: ProviderName = "openai"
+        base_model = chosen_model
         parts = chosen_model.split("-")
-        if len(parts) == 3 and parts[2] in {"low", "medium", "high"}:
-            provider_kwargs["reasoning_effort"] = parts[2]
+        # Check if the last part is a reasoning effort level
+        if len(parts) > 1 and parts[-1] in {"low", "medium", "high"}:
+            provider_kwargs["reasoning_effort"] = parts[-1]
+            base_model = "-".join(parts[:-1])
         return base_model, provider, provider_kwargs
 
     # Gemini models with thinking level
