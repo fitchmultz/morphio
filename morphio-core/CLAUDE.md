@@ -93,7 +93,7 @@ uv run ty check
 
 ## Code Style Guidelines
 
-- Python 3.11+ with type hints
+- Python 3.13+ with type hints
 - snake_case for functions/variables, PascalCase for classes
 - Use Ruff for linting and formatting
 - Asyncio patterns for async code

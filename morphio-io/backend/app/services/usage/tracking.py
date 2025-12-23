@@ -1,9 +1,11 @@
 import logging
+from decimal import Decimal
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...config import settings
+from ...models.llm_usage import LLMUsageRecord
 from ...models.subscription import Subscription
 from ...models.usage import Usage
 from ...models.user import User
@@ -12,6 +14,83 @@ from ...utils.error_handlers import ApplicationException
 from ...utils.response_utils import utc_now
 
 logger = logging.getLogger(__name__)
+
+
+async def check_usage_limit(
+    db: AsyncSession, user_id: int, usage_type: UsageType = UsageType.OTHER
+) -> bool:
+    """
+    Check if user has available credits without incrementing.
+
+    Use this BEFORE expensive operations (like LLM generation) to fail fast.
+
+    Args:
+        db: Database session
+        user_id: ID of the user to check
+        usage_type: Type of usage being checked
+
+    Returns:
+        True if user has available credits
+
+    Raises:
+        ApplicationException: If user not found or usage limit exceeded (403)
+    """
+    user = await db.get(User, user_id)
+    if not user:
+        msg = f"User {user_id} not found in DB"
+        logger.error(msg)
+        raise ApplicationException(msg, status_code=404)
+
+    # Admins always have access
+    if user.role == UserRole.ADMIN:
+        return True
+
+    # Get current usage
+    query = select(Usage).where(
+        Usage.user_id == user_id,
+        Usage.usage_type == usage_type.value,
+        Usage.deleted_at.is_(None),
+    )
+    result = await db.execute(query)
+    usage = result.scalar_one_or_none()
+
+    current_credits = 0
+    if usage:
+        now = utc_now()
+        # Check if usage should reset
+        if usage.updated_at and (
+            usage.updated_at.month != now.month or usage.updated_at.year != now.year
+        ):
+            current_credits = 0
+        else:
+            current_credits = usage.usage_credits
+
+    # Get plan limit
+    subscription_plan = "free"
+    subscription_result = await db.execute(
+        select(Subscription).where(
+            Subscription.user_id == user_id,
+            Subscription.deleted_at.is_(None),
+        )
+    )
+    user_subscriptions = subscription_result.scalars().all()
+    active_sub = next((sub for sub in user_subscriptions if sub.status == "active"), None)
+    if active_sub:
+        subscription_plan = active_sub.plan.lower()
+
+    plan_limit = settings.SUBSCRIPTION_PLAN_LIMITS.get(subscription_plan, 50)
+    cost = settings.USAGE_WEIGHTS.get(usage_type.value.upper(), 1)
+
+    # Check if would exceed limit
+    if current_credits + cost > plan_limit:
+        msg = (
+            f"You have reached the usage credit limit for your '{subscription_plan}' plan. "
+            "Please upgrade your subscription or wait for the monthly reset."
+        )
+        logger.warning(f"Usage limit check failed for user {user_id}: {msg}")
+        raise ApplicationException(msg, status_code=403)
+
+    return True
 
 
 async def increment_usage(db: AsyncSession, user_id: int, usage_type: UsageType = UsageType.OTHER):
@@ -114,3 +193,60 @@ async def increment_usage(db: AsyncSession, user_id: int, usage_type: UsageType 
         f"Usage updated for user {user_id}, type={usage_type.value}, "
         f"calls={usage.usage_count}, credits={usage.usage_credits}, plan={subscription_plan}"
     )
+
+
+async def record_llm_usage(
+    db: AsyncSession,
+    *,
+    user_id: int,
+    provider: str,
+    model: str,
+    input_tokens: int,
+    output_tokens: int,
+    model_alias: str | None = None,
+    content_id: int | None = None,
+    operation: str | None = None,
+    cost_usd: Decimal | None = None,
+) -> LLMUsageRecord:
+    """
+    Record detailed LLM token usage for a single API call.
+
+    This supplements increment_usage() by tracking the actual token counts,
+    enabling cost estimation and detailed analytics.
+
+    Args:
+        db: Database session
+        user_id: User who made the request
+        provider: LLM provider (openai, anthropic, gemini)
+        model: Actual model used (e.g., gpt-4o, claude-sonnet-4-20250514)
+        input_tokens: Input/prompt tokens used
+        output_tokens: Output/completion tokens used
+        model_alias: User-facing model name if different (e.g., gpt-5.2-high)
+        content_id: Optional linked content ID
+        operation: Type of operation (content_generation, title_generation, chat)
+        cost_usd: Optional estimated cost in USD
+
+    Returns:
+        The created LLMUsageRecord
+    """
+    record = LLMUsageRecord(
+        user_id=user_id,
+        provider=provider,
+        model=model,
+        model_alias=model_alias,
+        input_tokens=input_tokens,
+        output_tokens=output_tokens,
+        total_tokens=input_tokens + output_tokens,
+        content_id=content_id,
+        operation=operation,
+        cost_usd=cost_usd,
+    )
+    db.add(record)
+    await db.commit()
+    await db.refresh(record)
+
+    logger.debug(
+        f"LLM usage recorded: user={user_id}, provider={provider}, "
+        f"model={model}, in={input_tokens}, out={output_tokens}"
+    )
+    return record

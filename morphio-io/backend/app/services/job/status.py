@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional, Union
 from ...config import settings
 from ...schemas.job_schema import JobStatusInfo, JobStatusResponse
 from ...utils.cache_utils import cache_key_builder, get_cache, set_cache
-from ...utils.enums import JobStatus
+from ...utils.enums import JobStatus, ProcessingStage
 from ...utils.error_handlers import ApplicationException
 
 logger = logging.getLogger(__name__)
@@ -63,6 +63,7 @@ async def update_job_status(
     message: str,
     result: Optional[Union[str, Dict[str, Any]]] = None,
     error: Optional[str] = None,
+    stage: Optional[Union[ProcessingStage, str]] = None,
 ) -> None:
     """
     Update the status of a job in Redis.
@@ -73,6 +74,7 @@ async def update_job_status(
     :param message: Status message
     :param result: Optional result data
     :param error: Optional error message
+    :param stage: Optional processing stage (queued, downloading, transcribing, etc.)
     :raises ApplicationException: If updating job status fails
     """
     try:
@@ -95,6 +97,9 @@ async def update_job_status(
             job_info.result = result if isinstance(result, dict) else {"text": str(result)}
         if error is not None:
             job_info.error = error
+        if stage is not None:
+            stage_enum = stage if isinstance(stage, ProcessingStage) else ProcessingStage(stage)
+            job_info.stage = stage_enum
 
         await set_cache(redis_key, job_info.model_dump(), settings.JOB_CACHE_TTL)
     except Exception as e:

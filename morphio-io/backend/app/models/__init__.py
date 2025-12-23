@@ -2,6 +2,7 @@ from .base import Base
 from .comment import Comment
 from .content import Content
 from .conversation import ContentConversation, ConversationMessage
+from .llm_usage import LLMUsageRecord
 from .subscription import Subscription
 from .tag import Tag
 from .template import Template
@@ -15,6 +16,7 @@ __all__ = [
     "Content",
     "ContentConversation",
     "ConversationMessage",
+    "LLMUsageRecord",
     "Tag",
     "Template",
     "Subscription",

@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from ..utils.enums import JobStatus
+from ..utils.enums import JobStatus, ProcessingStage
 
 
 class JobBase(BaseModel):
@@ -34,6 +34,7 @@ class JobInDB(JobBase):
 class JobOut(JobInDB):
     progress: int = Field(default=0, ge=0, le=100)
     message: Optional[str] = None
+    stage: Optional[ProcessingStage] = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -43,6 +44,7 @@ class JobStatusResponse(BaseModel):
     status: JobStatus
     progress: int = Field(default=0, ge=0, le=100)
     message: Optional[str] = None
+    stage: Optional[ProcessingStage] = None
     result: Optional[Dict[str, Any]] = None
     error: Optional[str] = None
     user_id: Optional[int] = None
@@ -56,6 +58,7 @@ class JobStatusInfo(BaseModel):
     status: JobStatus
     progress: int = Field(default=0, ge=0, le=100)
     message: Optional[str] = None
+    stage: Optional[ProcessingStage] = None
     result: Optional[Dict[str, Any]] = None
     error: Optional[str] = None
     user_id: Optional[int] = None

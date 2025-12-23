@@ -206,10 +206,8 @@ morphio transcribe audio.mp3 --model base --output result.json
 
 ## Requirements
 
-- Python 3.11+ (library supports 3.11, 3.12, 3.13)
+- Python 3.13+
 - FFmpeg (for audio/video processing)
-
-> **Note:** When developing in the morphio-all monorepo, Python 3.13+ is required due to morphio-io backend dependencies.
 
 ## License
 
