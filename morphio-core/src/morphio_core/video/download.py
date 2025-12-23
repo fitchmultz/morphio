@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from ..exceptions import DownloadError, UnsupportedURLError
-from .types import DownloadConfig, DownloadResult
+from .types import DownloadConfig, DownloadResult, OutputMode
 from .url_utils import is_supported_url
 
 
@@ -59,9 +59,9 @@ async def download_video_audio(
         "noplaylist": cfg.no_playlist,
         "retries": cfg.retries,
         "concurrent_fragment_downloads": cfg.concurrent_fragments,
-        "quiet": cfg.quiet,
-        "no_warnings": cfg.quiet,
-        "verbose": cfg.verbose,
+        "quiet": cfg.output_mode == OutputMode.QUIET,
+        "no_warnings": cfg.output_mode == OutputMode.QUIET,
+        "verbose": cfg.output_mode == OutputMode.VERBOSE,
         # YouTube-specific to reduce PO token issues
         "extractor_args": {"youtube": {"player_client": [cfg.youtube_player_client]}},
     }

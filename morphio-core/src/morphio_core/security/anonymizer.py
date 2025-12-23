@@ -4,6 +4,7 @@ Content anonymization utilities.
 Pure regex-based PII anonymization with reversible mappings.
 """
 
+import ipaddress
 import logging
 import re
 
@@ -60,8 +61,8 @@ class Anonymizer:
         # Social security numbers
         content = self._replace_pattern(content, r"\b\d{3}-\d{2}-\d{4}\b", "SSN")
 
-        # IP addresses
-        content = self._replace_pattern(content, r"\b(?:\d{1,3}\.){3}\d{1,3}\b", "IP_ADDRESS")
+        # IP addresses (validated with ipaddress module)
+        content = self._replace_valid_ips(content)
 
         return content
 
@@ -97,6 +98,42 @@ class Anonymizer:
             return placeholder
 
         return re.sub(pattern, replace_match, content)
+
+    def _replace_valid_ips(self, content: str) -> str:
+        """Replace valid IPv4 addresses with placeholders.
+
+        Uses the ipaddress module to validate IPs, ensuring only
+        valid addresses (0-255 per octet) are anonymized.
+        """
+        prefix = "IP_ADDRESS"
+        if prefix not in self.counters:
+            self.counters[prefix] = 0
+
+        # Match IP-like patterns, then validate each
+        pattern = r"\b(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\b"
+
+        def replace_if_valid(match: re.Match) -> str:
+            ip = match.group(1)
+
+            # Validate with ipaddress module
+            try:
+                ipaddress.IPv4Address(ip)
+            except ipaddress.AddressValueError:
+                # Invalid IP - leave unchanged
+                return ip
+
+            # Already mapped
+            if ip in self.mapping:
+                return self.mapping[ip]
+
+            # Create new placeholder
+            self.counters[prefix] += 1
+            placeholder = f"[{prefix}_{self.counters[prefix]}]"
+            self.mapping[ip] = placeholder
+            self.reverse_mapping[placeholder] = ip
+            return placeholder
+
+        return re.sub(pattern, replace_if_valid, content)
 
 
 def anonymize_content(content: str, enabled: bool = False) -> str:

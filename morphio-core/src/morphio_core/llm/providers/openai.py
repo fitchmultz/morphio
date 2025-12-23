@@ -107,12 +107,11 @@ class OpenAIProvider:
         if reasoning_effort:
             effort = reasoning_effort.lower()
             if effort not in VALID_REASONING_EFFORTS:
-                logger.warning(
-                    f"Invalid reasoning_effort '{reasoning_effort}', ignoring. "
+                raise LLMProviderError(
+                    f"Invalid reasoning_effort '{reasoning_effort}'. "
                     f"Valid values: {VALID_REASONING_EFFORTS}"
                 )
-            else:
-                api_params["reasoning_effort"] = effort
+            api_params["reasoning_effort"] = effort
 
         try:
             response = await client.chat.completions.create(**api_params)
@@ -180,12 +179,11 @@ class OpenAIProvider:
         if reasoning_effort:
             effort = reasoning_effort.lower()
             if effort not in VALID_REASONING_EFFORTS:
-                logger.warning(
-                    f"Invalid reasoning_effort '{reasoning_effort}', ignoring. "
+                raise LLMProviderError(
+                    f"Invalid reasoning_effort '{reasoning_effort}'. "
                     f"Valid values: {VALID_REASONING_EFFORTS}"
                 )
-            else:
-                api_params["reasoning_effort"] = effort
+            api_params["reasoning_effort"] = effort
 
         try:
             stream = await client.chat.completions.create(**api_params)

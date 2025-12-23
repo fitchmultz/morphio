@@ -101,8 +101,8 @@ def extract_json_from_response(content: str) -> str:
     if fenced_match:
         return fenced_match.group(1).strip()
 
-    # Try to find JSON object or array
-    json_match = re.search(r"(\{[\s\S]*\}|\[[\s\S]*\])", content)
+    # Try to find JSON object or array (non-greedy to match first complete JSON)
+    json_match = re.search(r"(\{[\s\S]*?\}|\[[\s\S]*?\])", content)
     if json_match:
         return json_match.group(1).strip()
 

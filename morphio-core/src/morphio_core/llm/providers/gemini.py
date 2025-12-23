@@ -123,22 +123,19 @@ class GeminiProvider:
         if thinking_level:
             level = thinking_level.lower()
             if level not in VALID_THINKING_LEVELS:
-                logger.warning(
-                    f"Invalid thinking_level '{thinking_level}', ignoring. "
+                raise LLMProviderError(
+                    f"Invalid thinking_level '{thinking_level}'. "
                     f"Valid values: {VALID_THINKING_LEVELS}"
                 )
-            else:
-                # Check Pro model restrictions
-                if "pro" in model.lower() and level not in PRO_THINKING_LEVELS:
-                    logger.warning(
-                        f"Gemini Pro models only support {PRO_THINKING_LEVELS}, "
-                        f"got '{level}'. Defaulting to 'high'."
-                    )
-                    level = "high"
-
-                config_params["thinking_config"] = types.ThinkingConfig(
-                    thinking_level=level.upper()
+            # Check Pro model restrictions
+            if "pro" in model.lower() and level not in PRO_THINKING_LEVELS:
+                raise LLMProviderError(
+                    f"Gemini Pro models only support {PRO_THINKING_LEVELS}, got '{level}'. "
+                    f"Use 'high' or 'low' for Pro models."
                 )
+            config_params["thinking_config"] = types.ThinkingConfig(
+                thinking_level=level.upper()
+            )
 
         return types.GenerateContentConfig(**config_params)
 

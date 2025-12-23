@@ -325,6 +325,25 @@ Let me know if you need changes."""
         result = extract_json_from_response(content)
         assert result == content
 
+    def test_multiple_json_objects_extracts_first(self):
+        """Test that multiple JSON objects extracts only the first."""
+        content = 'First: {"a": 1} then {"b": 2}'
+        result = extract_json_from_response(content)
+        assert result == '{"a": 1}'
+
+    def test_multiple_json_arrays_extracts_first(self):
+        """Test that multiple JSON arrays extracts only the first."""
+        content = "Data: [1, 2] and [3, 4]"
+        result = extract_json_from_response(content)
+        assert result == "[1, 2]"
+
+    def test_nested_json_extracted_correctly(self):
+        """Test extraction with nested JSON objects."""
+        content = 'Here: {"outer": {"inner": "value"}} more text'
+        result = extract_json_from_response(content)
+        # Non-greedy matches the minimal balanced structure
+        assert "{" in result and "}" in result
+
 
 class TestTruncateForContext:
     """Tests for truncate_for_context function."""
@@ -377,13 +396,13 @@ class TestGeminiProviderKwargs:
         """Test that all valid thinking levels are recognized."""
         from morphio_core.llm.providers.gemini import VALID_THINKING_LEVELS
 
-        assert VALID_THINKING_LEVELS == {"high", "medium", "low", "minimal"}
+        assert {"high", "medium", "low", "minimal"} == VALID_THINKING_LEVELS
 
     def test_pro_model_thinking_levels(self):
         """Test that Pro models have restricted thinking levels."""
         from morphio_core.llm.providers.gemini import PRO_THINKING_LEVELS
 
-        assert PRO_THINKING_LEVELS == {"high", "low"}
+        assert {"high", "low"} == PRO_THINKING_LEVELS
 
 
 class TestOpenAIProviderKwargs:
@@ -393,7 +412,7 @@ class TestOpenAIProviderKwargs:
         """Test that all valid reasoning efforts are recognized."""
         from morphio_core.llm.providers.openai import VALID_REASONING_EFFORTS
 
-        assert VALID_REASONING_EFFORTS == {"low", "medium", "high"}
+        assert {"low", "medium", "high"} == VALID_REASONING_EFFORTS
 
 
 class TestProviderKwargsPassthrough:

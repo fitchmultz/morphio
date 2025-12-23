@@ -8,7 +8,7 @@ Provides:
 """
 
 from .download import download_video_audio, has_ytdlp
-from .types import DownloadConfig, DownloadResult, VideoPlatform
+from .types import DownloadConfig, DownloadResult, OutputMode, VideoPlatform
 from .url_utils import (
     detect_platform,
     extract_youtube_id,
@@ -22,6 +22,7 @@ __all__ = [
     # Types
     "DownloadConfig",
     "DownloadResult",
+    "OutputMode",
     "VideoPlatform",
     # URL utilities
     "detect_platform",

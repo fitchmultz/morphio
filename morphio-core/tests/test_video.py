@@ -6,6 +6,7 @@ from morphio_core.exceptions import DownloadError, UnsupportedURLError
 from morphio_core.video import (
     DownloadConfig,
     DownloadResult,
+    OutputMode,
     detect_platform,
     extract_youtube_id,
     has_ytdlp,
@@ -172,20 +173,32 @@ class TestDownloadConfig:
         assert config.no_playlist is True
         assert config.retries == 5
         assert config.concurrent_fragments == 16
-        assert config.quiet is True
-        assert config.verbose is False
+        assert config.output_mode == OutputMode.QUIET
         assert config.youtube_player_client == "android"
+
+    def test_output_mode_quiet(self):
+        """Test quiet output mode (default)."""
+        config = DownloadConfig(output_mode=OutputMode.QUIET)
+        assert config.output_mode == OutputMode.QUIET
+
+    def test_output_mode_normal(self):
+        """Test normal output mode."""
+        config = DownloadConfig(output_mode=OutputMode.NORMAL)
+        assert config.output_mode == OutputMode.NORMAL
+
+    def test_output_mode_verbose(self):
+        """Test verbose output mode."""
+        config = DownloadConfig(output_mode=OutputMode.VERBOSE)
+        assert config.output_mode == OutputMode.VERBOSE
 
     def test_custom_config(self):
         """Test custom configuration."""
         config = DownloadConfig(
             retries=10,
-            quiet=False,
-            verbose=True,
+            output_mode=OutputMode.VERBOSE,
         )
         assert config.retries == 10
-        assert config.quiet is False
-        assert config.verbose is True
+        assert config.output_mode == OutputMode.VERBOSE
 
 
 class TestDownloadResult:
