@@ -74,12 +74,28 @@ class NotificationType(SerializableEnum):
     IN_APP = "in_app"
 
 
-class ProcessingStage(SerializableEnum):
-    UPLOAD = "upload"
-    TRANSCRIPTION = "transcription"
-    ANALYSIS = "analysis"
-    GENERATION = "generation"
-    REVIEW = "review"
+class ProcessingStage(str, SerializableEnum):
+    """Detailed processing stages for progress reporting.
+
+    Each stage has a typical progress range:
+    - QUEUED: 0-5%
+    - DOWNLOADING: 5-20%
+    - CHUNKING: 20-30%
+    - TRANSCRIBING: 30-60%
+    - DIARIZING: 50-70% (overlaps with transcribing)
+    - GENERATING: 70-90%
+    - SAVING: 90-100%
+    """
+
+    QUEUED = "queued"
+    DOWNLOADING = "downloading"
+    CHUNKING = "chunking"
+    TRANSCRIBING = "transcribing"
+    DIARIZING = "diarizing"
+    GENERATING = "generating"
+    SAVING = "saving"
+    COMPLETED = "completed"
+    FAILED = "failed"
 
 
 class ResponseStatus(str, SerializableEnum):

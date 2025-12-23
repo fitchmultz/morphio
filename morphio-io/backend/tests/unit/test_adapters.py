@@ -101,6 +101,27 @@ class TestModelAliasResolution:
         assert provider == "openai"
         assert kwargs == {}
 
+    def test_resolve_claude_thinking(self):
+        """Test resolving Claude model with extended thinking."""
+        base, provider, kwargs = resolve_model_alias("claude-4.5-sonnet-thinking")
+        assert base == "claude-4.5-sonnet"
+        assert provider == "anthropic"
+        assert kwargs == {"extended_thinking": True}
+
+    def test_resolve_claude_opus_thinking(self):
+        """Test resolving Claude Opus with extended thinking."""
+        base, provider, kwargs = resolve_model_alias("claude-4.5-opus-thinking")
+        assert base == "claude-4.5-opus"
+        assert provider == "anthropic"
+        assert kwargs == {"extended_thinking": True}
+
+    def test_resolve_openai_codex_reasoning(self):
+        """Test resolving OpenAI Codex with reasoning effort."""
+        base, provider, kwargs = resolve_model_alias("gpt-5.2-codex-high")
+        assert base == "gpt-5.2-codex"
+        assert provider == "openai"
+        assert kwargs == {"reasoning_effort": "high"}
+
 
 class TestModelTokenLimits:
     """Tests for model token limits."""
@@ -185,3 +206,93 @@ class TestConvertToMessages:
         """Test converting empty list."""
         result = convert_to_messages([])
         assert result == []
+
+
+class TestVideoAdapter:
+    """Tests for video adapter exception translation."""
+
+    def test_is_supported_video_url_youtube(self):
+        """Test YouTube URL detection."""
+        from app.adapters.video import is_supported_video_url
+
+        assert is_supported_video_url("https://www.youtube.com/watch?v=dQw4w9WgXcQ") is True
+        assert is_supported_video_url("https://youtu.be/dQw4w9WgXcQ") is True
+
+    def test_is_supported_video_url_invalid(self):
+        """Test invalid URL detection."""
+        from app.adapters.video import is_supported_video_url
+
+        assert is_supported_video_url("https://example.com/video") is False
+        assert is_supported_video_url("not a url") is False
+
+    def test_get_yt_video_id(self):
+        """Test YouTube ID extraction."""
+        from app.adapters.video import get_yt_video_id
+
+        assert get_yt_video_id("https://www.youtube.com/watch?v=dQw4w9WgXcQ") == "dQw4w9WgXcQ"
+        assert get_yt_video_id("https://youtu.be/dQw4w9WgXcQ") == "dQw4w9WgXcQ"
+        assert get_yt_video_id("https://example.com") is None
+
+
+class TestUrlValidationAdapter:
+    """Tests for URL validation adapter."""
+
+    def test_is_url_safe_public_urls(self):
+        """Test that public URLs are safe."""
+        from app.adapters.url_validation import is_url_safe
+
+        assert is_url_safe("https://example.com") is True
+        assert is_url_safe("https://api.github.com/users") is True
+
+    def test_is_url_safe_private_ips(self):
+        """Test that private IPs are blocked."""
+        from app.adapters.url_validation import is_url_safe
+
+        assert is_url_safe("http://127.0.0.1") is False
+        assert is_url_safe("http://localhost") is False
+        assert is_url_safe("http://192.168.1.1") is False
+        assert is_url_safe("http://10.0.0.1") is False
+
+    def test_validate_url_raises_for_blocked(self):
+        """Test that validate_url raises ApplicationException for blocked URLs."""
+        import pytest
+        from app.adapters.url_validation import validate_url
+        from app.utils.error_handlers import ApplicationException
+
+        with pytest.raises(ApplicationException) as exc_info:
+            validate_url("http://127.0.0.1")
+        assert exc_info.value.status_code == 400
+
+
+class TestAnonymizerAdapter:
+    """Tests for anonymizer adapter."""
+
+    def test_anonymize_content(self):
+        """Test content anonymization with Anonymizer class."""
+        from app.adapters.anonymizer import Anonymizer
+
+        anonymizer = Anonymizer()
+        result = anonymizer.anonymize("Contact john@example.com for info.")
+        assert "john@example.com" not in result
+        assert "[EMAIL_" in result  # Check placeholder format
+
+    def test_deanonymize_content(self):
+        """Test content deanonymization with Anonymizer class."""
+        from app.adapters.anonymizer import Anonymizer
+
+        anonymizer = Anonymizer()
+        original = "Contact john@example.com for info."
+        anonymized = anonymizer.anonymize(original)
+        restored = anonymizer.deanonymize(anonymized)
+        assert restored == original
+
+    def test_anonymize_multiple_types(self):
+        """Test anonymizing multiple PII types."""
+        from app.adapters.anonymizer import Anonymizer
+
+        anonymizer = Anonymizer()
+        content = "Email john@test.com, call 555-123-4567, from 192.168.1.1"
+        result = anonymizer.anonymize(content)
+        assert "john@test.com" not in result
+        assert "555-123-4567" not in result
+        assert "192.168.1.1" not in result

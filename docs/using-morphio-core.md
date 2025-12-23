@@ -100,6 +100,15 @@ result = await router.generate(
     thinking_level="medium",  # "minimal", "low", "medium", "high"
 )
 
+# Anthropic extended thinking (Claude 3.5+)
+result = await router.generate(
+    messages,
+    provider="anthropic",
+    model="claude-sonnet-4-20250514",
+    extended_thinking=True,  # Enable deep reasoning mode
+    thinking_budget=10000,   # Optional token budget for thinking
+)
+
 # Stream with advanced reasoning
 async for event in router.stream(
     messages,
