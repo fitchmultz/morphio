@@ -1,16 +1,17 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
 	getAdminUsage,
+	getLlmUsageSummary,
 	getSubscriptions,
 	type SubscriptionOut,
 } from "@/client";
 import { Skeleton } from "@/components/common/Skeleton";
 import { useAuth } from "@/contexts/AuthContext";
 import logger from "@/lib/logger";
-import { notifyError } from "@/lib/toast";
+import { notifyError, notifySuccess } from "@/lib/toast";
 
 type UsageStat = {
 	usage_id: number;
@@ -25,6 +26,18 @@ type UsageStat = {
 	updated_at?: string;
 };
 
+type LLMUsageSummary = {
+	total_requests: number;
+	total_tokens: number;
+	total_cost_usd: number;
+	by_provider: Array<{
+		provider: string;
+		requests: number;
+		tokens: number;
+		cost_usd: number;
+	}>;
+};
+
 export default function AdminPage() {
 	const { isAuthenticated, userData, loading } = useAuth();
 	const router = useRouter();
@@ -32,6 +45,11 @@ export default function AdminPage() {
 	const [isLoadingUsage, setIsLoadingUsage] = useState(true);
 	const [subscriptions, setSubscriptions] = useState<SubscriptionOut[]>([]);
 	const [isLoadingSubs, setIsLoadingSubs] = useState(true);
+	const [llmSummary, setLLMSummary] = useState<LLMUsageSummary | null>(null);
+	const [isLoadingLLM, setIsLoadingLLM] = useState(true);
+	const [exportStartDate, setExportStartDate] = useState<string>("");
+	const [exportEndDate, setExportEndDate] = useState<string>("");
+	const [isExporting, setIsExporting] = useState(false);
 
 	useEffect(() => {
 		// Only allow admins
@@ -46,11 +64,57 @@ export default function AdminPage() {
 		}
 	}, [loading, isAuthenticated, userData, router]);
 
-	useEffect(() => {
-		// Helper to extract error message
-		const toUserMessage = (err: unknown, fallback: string): string =>
-			err instanceof Error ? err.message : fallback;
+	// Helper to extract error message
+	const toUserMessage = useCallback(
+		(err: unknown, fallback: string): string =>
+			err instanceof Error ? err.message : fallback,
+		[],
+	);
 
+	const handleExportCSV = useCallback(async () => {
+		if (!userData || userData.role?.toLowerCase() !== "admin") return;
+		setIsExporting(true);
+		try {
+			const params = new URLSearchParams();
+			if (exportStartDate) params.append("start", exportStartDate);
+			if (exportEndDate) params.append("end", exportEndDate);
+			params.append("format", "csv");
+
+			const response = await fetch(
+				`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8005"}/admin/usage/export?${params.toString()}`,
+				{
+					credentials: "include",
+				},
+			);
+
+			if (!response.ok) {
+				throw new Error("Failed to export usage data");
+			}
+
+			const blob = await response.blob();
+			const url = window.URL.createObjectURL(blob);
+			const a = document.createElement("a");
+			a.href = url;
+			a.download =
+				response.headers
+					.get("Content-Disposition")
+					?.match(/filename="(.+)"/)?.[1] || "llm_usage.csv";
+			document.body.appendChild(a);
+			a.click();
+			window.URL.revokeObjectURL(url);
+			a.remove();
+
+			notifySuccess("Usage data exported successfully");
+		} catch (err) {
+			const message = toUserMessage(err, "Failed to export usage data");
+			logger.warn("Export failed", { error: message });
+			notifyError(message);
+		} finally {
+			setIsExporting(false);
+		}
+	}, [userData, exportStartDate, exportEndDate, toUserMessage]);
+
+	useEffect(() => {
 		const fetchUsageStats = async () => {
 			if (!userData || userData.role?.toLowerCase() !== "admin") return;
 			try {
@@ -101,9 +165,40 @@ export default function AdminPage() {
 			}
 		};
 
+		const fetchLLMSummary = async () => {
+			if (!userData || userData.role?.toLowerCase() !== "admin") return;
+			try {
+				setIsLoadingLLM(true);
+				const { data, error } = await getLlmUsageSummary();
+				if (error) {
+					throw new Error(
+						(error as { detail?: string }).detail ||
+							"Failed to retrieve LLM usage summary",
+					);
+				}
+				const responseData = data as {
+					status?: string;
+					data?: LLMUsageSummary;
+				} | null;
+				if (responseData?.status === "success" && responseData.data) {
+					setLLMSummary(responseData.data);
+				}
+			} catch (err) {
+				const message = toUserMessage(
+					err,
+					"Failed to retrieve LLM usage summary",
+				);
+				logger.warn("LLM summary fetch failed", { error: message });
+				// Non-fatal - don't show error toast
+			} finally {
+				setIsLoadingLLM(false);
+			}
+		};
+
 		fetchUsageStats();
 		fetchSubsData();
-	}, [userData]);
+		fetchLLMSummary();
+	}, [userData, toUserMessage]);
 
 	if (loading) {
 		return (
@@ -130,6 +225,127 @@ export default function AdminPage() {
 	return (
 		<div className="max-w-7xl mx-auto py-8 px-4">
 			<h1 className="morphio-h2 mb-8">Admin Dashboard</h1>
+
+			{/* LLM Usage Summary and Export */}
+			<section className="morphio-card p-6 mb-8">
+				<div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+					<h2 className="morphio-h3 mb-4 md:mb-0">LLM Usage Summary</h2>
+					<div className="flex flex-col sm:flex-row gap-3">
+						<div className="flex items-center gap-2">
+							<label
+								htmlFor="startDate"
+								className="morphio-body-sm text-gray-600 dark:text-gray-400"
+							>
+								From:
+							</label>
+							<input
+								type="date"
+								id="startDate"
+								value={exportStartDate}
+								onChange={(e) => setExportStartDate(e.target.value)}
+								className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-sm"
+							/>
+						</div>
+						<div className="flex items-center gap-2">
+							<label
+								htmlFor="endDate"
+								className="morphio-body-sm text-gray-600 dark:text-gray-400"
+							>
+								To:
+							</label>
+							<input
+								type="date"
+								id="endDate"
+								value={exportEndDate}
+								onChange={(e) => setExportEndDate(e.target.value)}
+								className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-sm"
+							/>
+						</div>
+						<button
+							type="button"
+							onClick={handleExportCSV}
+							disabled={isExporting}
+							className="morphio-button px-4 py-1.5 text-sm disabled:opacity-50"
+						>
+							{isExporting ? "Exporting..." : "Export CSV"}
+						</button>
+					</div>
+				</div>
+
+				{isLoadingLLM ? (
+					<div className="py-4 text-center">
+						<p className="morphio-body-sm">Loading LLM usage summary...</p>
+					</div>
+				) : llmSummary ? (
+					<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+						<div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+							<p className="morphio-body-sm text-blue-600 dark:text-blue-400">
+								Total Requests
+							</p>
+							<p className="morphio-h3 text-blue-800 dark:text-blue-200">
+								{llmSummary.total_requests.toLocaleString()}
+							</p>
+						</div>
+						<div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+							<p className="morphio-body-sm text-green-600 dark:text-green-400">
+								Total Tokens
+							</p>
+							<p className="morphio-h3 text-green-800 dark:text-green-200">
+								{llmSummary.total_tokens.toLocaleString()}
+							</p>
+						</div>
+						<div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+							<p className="morphio-body-sm text-purple-600 dark:text-purple-400">
+								Estimated Cost
+							</p>
+							<p className="morphio-h3 text-purple-800 dark:text-purple-200">
+								${llmSummary.total_cost_usd.toFixed(2)}
+							</p>
+						</div>
+					</div>
+				) : (
+					<p className="morphio-body-sm text-gray-500">
+						No LLM usage data available yet.
+					</p>
+				)}
+
+				{llmSummary && llmSummary.by_provider.length > 0 && (
+					<div>
+						<h3 className="morphio-body font-medium mb-3">Usage by Provider</h3>
+						<div className="overflow-x-auto">
+							<table className="min-w-full text-sm">
+								<thead className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+									<tr>
+										<th className="p-3 text-left font-medium">Provider</th>
+										<th className="p-3 text-right font-medium">Requests</th>
+										<th className="p-3 text-right font-medium">Tokens</th>
+										<th className="p-3 text-right font-medium">Cost</th>
+									</tr>
+								</thead>
+								<tbody>
+									{llmSummary.by_provider.map((p) => (
+										<tr
+											key={p.provider}
+											className="border-b border-gray-200 dark:border-gray-700"
+										>
+											<td className="p-3 capitalize">{p.provider}</td>
+											<td className="p-3 text-right">
+												{p.requests.toLocaleString()}
+											</td>
+											<td className="p-3 text-right">
+												{p.tokens.toLocaleString()}
+											</td>
+											<td className="p-3 text-right">
+												${p.cost_usd.toFixed(2)}
+											</td>
+										</tr>
+									))}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				)}
+			</section>
 
 			<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 				{/* Usage Stats */}

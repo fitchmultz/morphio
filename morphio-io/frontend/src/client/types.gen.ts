@@ -5,6 +5,26 @@ export type ClientOptions = {
 };
 
 /**
+ * APIKeyCreate
+ *
+ * Request body for creating an API key.
+ */
+export type ApiKeyCreate = {
+    /**
+     * Name
+     *
+     * Friendly name for the key
+     */
+    name: string;
+    /**
+     * Scopes
+     *
+     * Optional list of permission scopes
+     */
+    scopes?: Array<string> | null;
+};
+
+/**
  * AuthTokenPayload
  *
  * Payload for auth token responses (login, register, refresh).
@@ -1150,6 +1170,18 @@ export type UserCredits = {
      * Credits remaining this period
      */
     remaining: number;
+    /**
+     * Remaining Pct
+     *
+     * Percentage of credits remaining (0-100)
+     */
+    remaining_pct: number;
+    /**
+     * Reset Date
+     *
+     * ISO date when credits reset
+     */
+    reset_date?: string | null;
     /**
      * Resets Monthly
      *
@@ -2882,6 +2914,313 @@ export type GetSubscriptionsResponses = {
 };
 
 export type GetSubscriptionsResponse = GetSubscriptionsResponses[keyof GetSubscriptionsResponses];
+
+export type ExportLlmUsageData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Start
+         *
+         * Start date (inclusive)
+         */
+        start?: string | null;
+        /**
+         * End
+         *
+         * End date (inclusive)
+         */
+        end?: string | null;
+        /**
+         * Format
+         *
+         * Export format (only csv supported)
+         */
+        format?: string;
+    };
+    url: '/admin/usage/export';
+};
+
+export type ExportLlmUsageErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Not authorized
+     */
+    403: unknown;
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+    /**
+     * Too Many Requests
+     */
+    429: unknown;
+    /**
+     * Internal Server Error
+     */
+    500: unknown;
+};
+
+export type ExportLlmUsageError = ExportLlmUsageErrors[keyof ExportLlmUsageErrors];
+
+export type ExportLlmUsageResponses = {
+    /**
+     * CSV file download
+     */
+    200: unknown;
+};
+
+export type GetLlmUsageSummaryData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Start
+         *
+         * Start date (inclusive)
+         */
+        start?: string | null;
+        /**
+         * End
+         *
+         * End date (inclusive)
+         */
+        end?: string | null;
+    };
+    url: '/admin/usage/summary';
+};
+
+export type GetLlmUsageSummaryErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Not authorized
+     */
+    403: unknown;
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+    /**
+     * Too Many Requests
+     */
+    429: unknown;
+    /**
+     * Internal Server Error
+     */
+    500: unknown;
+};
+
+export type GetLlmUsageSummaryError = GetLlmUsageSummaryErrors[keyof GetLlmUsageSummaryErrors];
+
+export type GetLlmUsageSummaryResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type CreateCheckoutSessionData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * Plan
+         */
+        plan: string;
+    };
+    url: '/billing/checkout-session';
+};
+
+export type CreateCheckoutSessionErrors = {
+    /**
+     * Invalid plan
+     */
+    400: unknown;
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+    /**
+     * Too Many Requests
+     */
+    429: unknown;
+    /**
+     * Internal Server Error
+     */
+    500: unknown;
+    /**
+     * Stripe not configured
+     */
+    503: unknown;
+};
+
+export type CreateCheckoutSessionError = CreateCheckoutSessionErrors[keyof CreateCheckoutSessionErrors];
+
+export type CreateCheckoutSessionResponses = {
+    /**
+     * Checkout session created
+     */
+    200: unknown;
+};
+
+export type CreatePortalSessionData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/billing/portal-session';
+};
+
+export type CreatePortalSessionErrors = {
+    /**
+     * No Stripe customer found
+     */
+    400: unknown;
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Too Many Requests
+     */
+    429: unknown;
+    /**
+     * Internal Server Error
+     */
+    500: unknown;
+    /**
+     * Stripe not configured
+     */
+    503: unknown;
+};
+
+export type CreatePortalSessionResponses = {
+    /**
+     * Portal session created
+     */
+    200: unknown;
+};
+
+export type ListApiKeysData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/user/api-keys';
+};
+
+export type ListApiKeysErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Too Many Requests
+     */
+    429: unknown;
+    /**
+     * Internal Server Error
+     */
+    500: unknown;
+};
+
+export type ListApiKeysResponses = {
+    /**
+     * List of API keys
+     */
+    200: unknown;
+};
+
+export type CreateApiKeyData = {
+    body: ApiKeyCreate;
+    path?: never;
+    query?: never;
+    url: '/user/api-keys';
+};
+
+export type CreateApiKeyErrors = {
+    /**
+     * Invalid request
+     */
+    400: unknown;
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+    /**
+     * Too Many Requests
+     */
+    429: unknown;
+    /**
+     * Internal Server Error
+     */
+    500: unknown;
+};
+
+export type CreateApiKeyError = CreateApiKeyErrors[keyof CreateApiKeyErrors];
+
+export type CreateApiKeyResponses = {
+    /**
+     * API key created successfully
+     */
+    200: unknown;
+};
+
+export type RevokeApiKeyData = {
+    body?: never;
+    path: {
+        /**
+         * Key Id
+         */
+        key_id: number;
+    };
+    query?: never;
+    url: '/user/api-keys/{key_id}';
+};
+
+export type RevokeApiKeyErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * API key not found
+     */
+    404: unknown;
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+    /**
+     * Too Many Requests
+     */
+    429: unknown;
+    /**
+     * Internal Server Error
+     */
+    500: unknown;
+};
+
+export type RevokeApiKeyError = RevokeApiKeyErrors[keyof RevokeApiKeyErrors];
+
+export type RevokeApiKeyResponses = {
+    /**
+     * API key revoked
+     */
+    200: unknown;
+};
 
 export type HealthCheckData = {
     body?: never;

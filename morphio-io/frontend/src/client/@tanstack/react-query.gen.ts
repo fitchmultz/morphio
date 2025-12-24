@@ -3,8 +3,8 @@
 import { type DefaultError, type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { changeDisplayName, changeEmail, changePassword, continueConversation, createComment, createItem, deleteComment, deleteContent, deleteConversation, deleteTemplate, generateSplunkConfig, getAdminUsage, getAvailableModels, getContent, getConversationThread, getCsrfToken, getLogConfig, getLogsProcessingStatus, getMediaConfig, getMediaProcessingStatus, getSubscriptions, getTemplate, getUserCredits, getUserProfile, getUserUsage, getWebProcessingStatus, healthCheck, listComments, listContentConversations, listContents, listTemplates, login, logout, type Options, processLogs, processMedia, processWeb, readItem, readUsersMe, refreshToken, register, saveContent, saveTemplate, updateComment, updateContent, updateContentTitle, updateMultipleContents, updateTemplate } from '../sdk.gen';
-import type { ChangeDisplayNameData, ChangeDisplayNameError, ChangeDisplayNameResponse, ChangeEmailData, ChangeEmailError, ChangeEmailResponse, ChangePasswordData, ChangePasswordError, ContinueConversationData, ContinueConversationError, ContinueConversationResponse, CreateCommentData, CreateCommentError, CreateCommentResponse, CreateItemData, CreateItemError, CreateItemResponse, DeleteCommentData, DeleteCommentError, DeleteCommentResponse, DeleteContentData, DeleteContentError, DeleteConversationData, DeleteConversationError, DeleteConversationResponse, DeleteTemplateData, DeleteTemplateError, DeleteTemplateResponse, GenerateSplunkConfigData, GenerateSplunkConfigError, GenerateSplunkConfigResponse, GetAdminUsageData, GetAdminUsageResponse, GetAvailableModelsData, GetAvailableModelsResponse, GetContentData, GetContentError, GetContentResponse, GetConversationThreadData, GetConversationThreadError, GetConversationThreadResponse, GetCsrfTokenData, GetCsrfTokenResponse, GetLogConfigData, GetLogConfigResponse, GetLogsProcessingStatusData, GetLogsProcessingStatusError, GetLogsProcessingStatusResponse, GetMediaConfigData, GetMediaConfigResponse, GetMediaProcessingStatusData, GetMediaProcessingStatusError, GetMediaProcessingStatusResponse, GetSubscriptionsData, GetSubscriptionsResponse, GetTemplateData, GetTemplateError, GetTemplateResponse, GetUserCreditsData, GetUserCreditsResponse, GetUserProfileData, GetUserProfileResponse, GetUserUsageData, GetWebProcessingStatusData, GetWebProcessingStatusError, GetWebProcessingStatusResponse, HealthCheckData, ListCommentsData, ListCommentsError, ListCommentsResponse, ListContentConversationsData, ListContentConversationsError, ListContentConversationsResponse, ListContentsData, ListContentsError, ListContentsResponse, ListTemplatesData, ListTemplatesResponse, LoginData, LoginError, LoginResponse, LogoutData, ProcessLogsData, ProcessLogsError, ProcessLogsResponse, ProcessMediaData, ProcessMediaError, ProcessMediaResponse, ProcessWebData, ProcessWebError, ProcessWebResponse, ReadItemData, ReadItemError, ReadUsersMeData, RefreshTokenData, RefreshTokenResponse, RegisterData, RegisterError, RegisterResponse, SaveContentData, SaveContentError, SaveContentResponse, SaveTemplateData, SaveTemplateError, SaveTemplateResponse, UpdateCommentData, UpdateCommentError, UpdateCommentResponse, UpdateContentData, UpdateContentError, UpdateContentResponse, UpdateContentTitleData, UpdateContentTitleError, UpdateContentTitleResponse, UpdateMultipleContentsData, UpdateMultipleContentsError, UpdateMultipleContentsResponse, UpdateTemplateData, UpdateTemplateError, UpdateTemplateResponse } from '../types.gen';
+import { changeDisplayName, changeEmail, changePassword, continueConversation, createApiKey, createCheckoutSession, createComment, createItem, createPortalSession, deleteComment, deleteContent, deleteConversation, deleteTemplate, exportLlmUsage, generateSplunkConfig, getAdminUsage, getAvailableModels, getContent, getConversationThread, getCsrfToken, getLlmUsageSummary, getLogConfig, getLogsProcessingStatus, getMediaConfig, getMediaProcessingStatus, getSubscriptions, getTemplate, getUserCredits, getUserProfile, getUserUsage, getWebProcessingStatus, healthCheck, listApiKeys, listComments, listContentConversations, listContents, listTemplates, login, logout, type Options, processLogs, processMedia, processWeb, readItem, readUsersMe, refreshToken, register, revokeApiKey, saveContent, saveTemplate, updateComment, updateContent, updateContentTitle, updateMultipleContents, updateTemplate } from '../sdk.gen';
+import type { ChangeDisplayNameData, ChangeDisplayNameError, ChangeDisplayNameResponse, ChangeEmailData, ChangeEmailError, ChangeEmailResponse, ChangePasswordData, ChangePasswordError, ContinueConversationData, ContinueConversationError, ContinueConversationResponse, CreateApiKeyData, CreateApiKeyError, CreateCheckoutSessionData, CreateCheckoutSessionError, CreateCommentData, CreateCommentError, CreateCommentResponse, CreateItemData, CreateItemError, CreateItemResponse, CreatePortalSessionData, DeleteCommentData, DeleteCommentError, DeleteCommentResponse, DeleteContentData, DeleteContentError, DeleteConversationData, DeleteConversationError, DeleteConversationResponse, DeleteTemplateData, DeleteTemplateError, DeleteTemplateResponse, ExportLlmUsageData, ExportLlmUsageError, GenerateSplunkConfigData, GenerateSplunkConfigError, GenerateSplunkConfigResponse, GetAdminUsageData, GetAdminUsageResponse, GetAvailableModelsData, GetAvailableModelsResponse, GetContentData, GetContentError, GetContentResponse, GetConversationThreadData, GetConversationThreadError, GetConversationThreadResponse, GetCsrfTokenData, GetCsrfTokenResponse, GetLlmUsageSummaryData, GetLlmUsageSummaryError, GetLogConfigData, GetLogConfigResponse, GetLogsProcessingStatusData, GetLogsProcessingStatusError, GetLogsProcessingStatusResponse, GetMediaConfigData, GetMediaConfigResponse, GetMediaProcessingStatusData, GetMediaProcessingStatusError, GetMediaProcessingStatusResponse, GetSubscriptionsData, GetSubscriptionsResponse, GetTemplateData, GetTemplateError, GetTemplateResponse, GetUserCreditsData, GetUserCreditsResponse, GetUserProfileData, GetUserProfileResponse, GetUserUsageData, GetWebProcessingStatusData, GetWebProcessingStatusError, GetWebProcessingStatusResponse, HealthCheckData, ListApiKeysData, ListCommentsData, ListCommentsError, ListCommentsResponse, ListContentConversationsData, ListContentConversationsError, ListContentConversationsResponse, ListContentsData, ListContentsError, ListContentsResponse, ListTemplatesData, ListTemplatesResponse, LoginData, LoginError, LoginResponse, LogoutData, ProcessLogsData, ProcessLogsError, ProcessLogsResponse, ProcessMediaData, ProcessMediaError, ProcessMediaResponse, ProcessWebData, ProcessWebError, ProcessWebResponse, ReadItemData, ReadItemError, ReadUsersMeData, RefreshTokenData, RefreshTokenResponse, RegisterData, RegisterError, RegisterResponse, RevokeApiKeyData, RevokeApiKeyError, SaveContentData, SaveContentError, SaveContentResponse, SaveTemplateData, SaveTemplateError, SaveTemplateResponse, UpdateCommentData, UpdateCommentError, UpdateCommentResponse, UpdateContentData, UpdateContentError, UpdateContentResponse, UpdateContentTitleData, UpdateContentTitleError, UpdateContentTitleResponse, UpdateMultipleContentsData, UpdateMultipleContentsError, UpdateMultipleContentsResponse, UpdateTemplateData, UpdateTemplateError, UpdateTemplateResponse } from '../types.gen';
 
 /**
  * Login
@@ -883,6 +883,217 @@ export const getSubscriptionsOptions = (options?: Options<GetSubscriptionsData>)
     },
     queryKey: getSubscriptionsQueryKey(options)
 });
+
+export const exportLlmUsageQueryKey = (options?: Options<ExportLlmUsageData>) => createQueryKey('exportLlmUsage', options);
+
+/**
+ * Export Llm Usage
+ *
+ * Export LLM usage records as CSV for billing and analytics.
+ *
+ * Aggregates usage by date, user, provider, and model.
+ * Returns: date, user_id, user_email, provider, model, total_tokens, estimated_cost
+ */
+export const exportLlmUsageOptions = (options?: Options<ExportLlmUsageData>) => queryOptions<unknown, ExportLlmUsageError, unknown, ReturnType<typeof exportLlmUsageQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await exportLlmUsage({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: exportLlmUsageQueryKey(options)
+});
+
+export const exportLlmUsageInfiniteQueryKey = (options?: Options<ExportLlmUsageData>): QueryKey<Options<ExportLlmUsageData>> => createQueryKey('exportLlmUsage', options, true);
+
+/**
+ * Export Llm Usage
+ *
+ * Export LLM usage records as CSV for billing and analytics.
+ *
+ * Aggregates usage by date, user, provider, and model.
+ * Returns: date, user_id, user_email, provider, model, total_tokens, estimated_cost
+ */
+export const exportLlmUsageInfiniteOptions = (options?: Options<ExportLlmUsageData>) => infiniteQueryOptions<unknown, ExportLlmUsageError, InfiniteData<unknown>, QueryKey<Options<ExportLlmUsageData>>, string | null | Pick<QueryKey<Options<ExportLlmUsageData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+// @ts-ignore
+{
+    queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<QueryKey<Options<ExportLlmUsageData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+            query: {
+                start: pageParam
+            }
+        };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await exportLlmUsage({
+            ...options,
+            ...params,
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: exportLlmUsageInfiniteQueryKey(options)
+});
+
+export const getLlmUsageSummaryQueryKey = (options?: Options<GetLlmUsageSummaryData>) => createQueryKey('getLlmUsageSummary', options);
+
+/**
+ * Get Llm Usage Summary
+ *
+ * Get summary statistics of LLM usage for display in admin dashboard.
+ */
+export const getLlmUsageSummaryOptions = (options?: Options<GetLlmUsageSummaryData>) => queryOptions<unknown, GetLlmUsageSummaryError, unknown, ReturnType<typeof getLlmUsageSummaryQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getLlmUsageSummary({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getLlmUsageSummaryQueryKey(options)
+});
+
+export const getLlmUsageSummaryInfiniteQueryKey = (options?: Options<GetLlmUsageSummaryData>): QueryKey<Options<GetLlmUsageSummaryData>> => createQueryKey('getLlmUsageSummary', options, true);
+
+/**
+ * Get Llm Usage Summary
+ *
+ * Get summary statistics of LLM usage for display in admin dashboard.
+ */
+export const getLlmUsageSummaryInfiniteOptions = (options?: Options<GetLlmUsageSummaryData>) => infiniteQueryOptions<unknown, GetLlmUsageSummaryError, InfiniteData<unknown>, QueryKey<Options<GetLlmUsageSummaryData>>, string | null | Pick<QueryKey<Options<GetLlmUsageSummaryData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+// @ts-ignore
+{
+    queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<QueryKey<Options<GetLlmUsageSummaryData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+            query: {
+                start: pageParam
+            }
+        };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await getLlmUsageSummary({
+            ...options,
+            ...params,
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getLlmUsageSummaryInfiniteQueryKey(options)
+});
+
+/**
+ * Create Checkout Session
+ *
+ * Create a Stripe Checkout Session for upgrading to a paid plan.
+ *
+ * Returns a URL to redirect the user to Stripe's hosted checkout page.
+ */
+export const createCheckoutSessionMutation = (options?: Partial<Options<CreateCheckoutSessionData>>): UseMutationOptions<unknown, CreateCheckoutSessionError, Options<CreateCheckoutSessionData>> => {
+    const mutationOptions: UseMutationOptions<unknown, CreateCheckoutSessionError, Options<CreateCheckoutSessionData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createCheckoutSession({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Create Portal Session
+ *
+ * Create a Stripe Customer Portal session for managing subscriptions.
+ *
+ * Returns a URL to redirect the user to Stripe's billing portal.
+ */
+export const createPortalSessionMutation = (options?: Partial<Options<CreatePortalSessionData>>): UseMutationOptions<unknown, DefaultError, Options<CreatePortalSessionData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<CreatePortalSessionData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createPortalSession({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const listApiKeysQueryKey = (options?: Options<ListApiKeysData>) => createQueryKey('listApiKeys', options);
+
+/**
+ * List Api Keys
+ *
+ * List all API keys for the current user.
+ *
+ * The plaintext key is not returned - only the prefix for identification.
+ */
+export const listApiKeysOptions = (options?: Options<ListApiKeysData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof listApiKeysQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listApiKeys({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listApiKeysQueryKey(options)
+});
+
+/**
+ * Create Api Key
+ *
+ * Create a new API key for the current user.
+ *
+ * The plaintext key is only returned once at creation time.
+ * Store it securely - it cannot be retrieved later.
+ */
+export const createApiKeyMutation = (options?: Partial<Options<CreateApiKeyData>>): UseMutationOptions<unknown, CreateApiKeyError, Options<CreateApiKeyData>> => {
+    const mutationOptions: UseMutationOptions<unknown, CreateApiKeyError, Options<CreateApiKeyData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createApiKey({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Revoke Api Key
+ *
+ * Revoke (delete) an API key.
+ *
+ * The key will immediately stop working for authentication.
+ */
+export const revokeApiKeyMutation = (options?: Partial<Options<RevokeApiKeyData>>): UseMutationOptions<unknown, RevokeApiKeyError, Options<RevokeApiKeyData>> => {
+    const mutationOptions: UseMutationOptions<unknown, RevokeApiKeyError, Options<RevokeApiKeyData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await revokeApiKey({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
 
 export const healthCheckQueryKey = (options?: Options<HealthCheckData>) => createQueryKey('healthCheck', options);
 

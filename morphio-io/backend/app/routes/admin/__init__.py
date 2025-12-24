@@ -1,3 +1,5 @@
+"""Admin routes package."""
+
 import logging
 from typing import Annotated
 
@@ -6,17 +8,18 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
-from ..database import get_db
-from ..models.subscription import Subscription
-from ..models.usage import Usage
-from ..models.user import User
-from ..schemas.response_schema import ResponseModel
-from ..schemas.subscription_schema import SubscriptionOut
-from ..services.security import get_current_user
-from ..utils.decorators import require_auth
-from ..utils.enums import ResponseStatus
-from ..utils.response_utils import create_response
-from ..utils.route_helpers import common_responses, handle_route_errors
+from ...database import get_db
+from ...models.subscription import Subscription
+from ...models.usage import Usage
+from ...models.user import User
+from ...schemas.response_schema import ResponseModel
+from ...schemas.subscription_schema import SubscriptionOut
+from ...services.security import get_current_user
+from ...utils.decorators import require_auth
+from ...utils.enums import ResponseStatus
+from ...utils.response_utils import create_response
+from ...utils.route_helpers import common_responses, handle_route_errors
+from .usage import router as usage_router
 
 logger = logging.getLogger(__name__)
 
@@ -115,3 +118,6 @@ async def get_subscriptions(
         message="Subscription data retrieved",
         data=subs_out,
     )
+
+
+__all__ = ["router", "usage_router"]

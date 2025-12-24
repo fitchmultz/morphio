@@ -149,6 +149,22 @@ app.include_router(media.router, prefix="/media", tags=["Media Processing"])
 app.include_router(docs.router, tags=["Documentation"])
 app.include_router(web.router, prefix="/web", tags=["Web Scraping"])
 app.include_router(admin.router, prefix="/admin", tags=["Admin"])
+
+# Admin sub-routers for extended functionality
+from .routes.admin import usage_router as admin_usage_router
+
+app.include_router(admin_usage_router, prefix="/admin", tags=["Admin"])
+
+# Billing routes (Stripe integration)
+from .routes import billing
+
+app.include_router(billing.router, tags=["Billing"])
+
+# API Keys routes
+from .routes import api_keys
+
+app.include_router(api_keys.router, tags=["API Keys"])
+
 app.include_router(health.router, prefix="/health", tags=["Health"])
 app.include_router(logs.router, prefix="/logs", tags=["Logs"])
 

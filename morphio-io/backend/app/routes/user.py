@@ -151,14 +151,23 @@ async def get_user_credits(
     if is_admin:
         remaining = 999999999
         plan_limit = 999999999
+        remaining_pct = 100.0
     else:
         remaining = max(0, plan_limit - total_used)
+        remaining_pct = (remaining / plan_limit * 100) if plan_limit > 0 else 0.0
+
+    # Calculate reset date (first of next month)
+    next_month = now.month % 12 + 1
+    next_year = now.year if now.month < 12 else now.year + 1
+    reset_date = f"{next_year:04d}-{next_month:02d}-01"
 
     credits_data = UserCredits(
         plan=subscription_plan,
         limit=plan_limit,
         used=total_used,
         remaining=remaining,
+        remaining_pct=round(remaining_pct, 1),
+        reset_date=reset_date,
         resets_monthly=True,
         is_admin=is_admin,
     )

@@ -12,7 +12,37 @@ os.environ["JWT_SECRET_KEY"] = "test_secret_key"  # Set before imports
 
 from app.database import get_db
 from app.main import app
-from app.models.base import Base
+
+# Import all models to ensure they are registered with Base.metadata before create_all
+from app.models import (
+    APIKey,
+    Base,
+    Comment,
+    Content,
+    ContentConversation,
+    ConversationMessage,
+    LLMUsageRecord,
+    Subscription,
+    Tag,
+    Template,
+    Usage,
+    User,
+)
+
+# Ensure models are registered
+_ = [
+    APIKey,
+    Comment,
+    Content,
+    ContentConversation,
+    ConversationMessage,
+    LLMUsageRecord,
+    Subscription,
+    Tag,
+    Template,
+    Usage,
+    User,
+]
 
 TEST_DATABASE_URL = "sqlite+aiosqlite://"
 

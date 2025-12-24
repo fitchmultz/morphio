@@ -2991,6 +2991,573 @@
 				]
 			}
 		},
+		"/admin/usage/export": {
+			"get": {
+				"tags": ["Admin", "Admin"],
+				"summary": "Export Llm Usage",
+				"description": "Export LLM usage records as CSV for billing and analytics.\n\nAggregates usage by date, user, provider, and model.\nReturns: date, user_id, user_email, provider, model, total_tokens, estimated_cost",
+				"operationId": "export_llm_usage",
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "start",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"type": "string",
+									"format": "date"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"description": "Start date (inclusive)",
+							"title": "Start"
+						},
+						"description": "Start date (inclusive)"
+					},
+					{
+						"name": "end",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"type": "string",
+									"format": "date"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"description": "End date (inclusive)",
+							"title": "End"
+						},
+						"description": "End date (inclusive)"
+					},
+					{
+						"name": "format",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"description": "Export format (only csv supported)",
+							"default": "csv",
+							"title": "Format"
+						},
+						"description": "Export format (only csv supported)"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "CSV file download",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					},
+					"403": {
+						"description": "Not authorized"
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/admin/usage/summary": {
+			"get": {
+				"tags": ["Admin", "Admin"],
+				"summary": "Get Llm Usage Summary",
+				"description": "Get summary statistics of LLM usage for display in admin dashboard.",
+				"operationId": "get_llm_usage_summary",
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "start",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"type": "string",
+									"format": "date"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"description": "Start date (inclusive)",
+							"title": "Start"
+						},
+						"description": "Start date (inclusive)"
+					},
+					{
+						"name": "end",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"type": "string",
+									"format": "date"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"description": "End date (inclusive)",
+							"title": "End"
+						},
+						"description": "End date (inclusive)"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successful Response",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					},
+					"403": {
+						"description": "Not authorized"
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/billing/checkout-session": {
+			"post": {
+				"tags": ["Billing", "Billing"],
+				"summary": "Create Checkout Session",
+				"description": "Create a Stripe Checkout Session for upgrading to a paid plan.\n\nReturns a URL to redirect the user to Stripe's hosted checkout page.",
+				"operationId": "create_checkout_session",
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "plan",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"title": "Plan"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Checkout session created",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid plan"
+					},
+					"503": {
+						"description": "Stripe not configured"
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/billing/portal-session": {
+			"post": {
+				"tags": ["Billing", "Billing"],
+				"summary": "Create Portal Session",
+				"description": "Create a Stripe Customer Portal session for managing subscriptions.\n\nReturns a URL to redirect the user to Stripe's billing portal.",
+				"operationId": "create_portal_session",
+				"responses": {
+					"200": {
+						"description": "Portal session created",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					},
+					"400": {
+						"description": "No Stripe customer found"
+					},
+					"503": {
+						"description": "Stripe not configured"
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				]
+			}
+		},
+		"/user/api-keys": {
+			"get": {
+				"tags": ["API Keys", "API Keys"],
+				"summary": "List Api Keys",
+				"description": "List all API keys for the current user.\n\nThe plaintext key is not returned - only the prefix for identification.",
+				"operationId": "list_api_keys",
+				"responses": {
+					"200": {
+						"description": "List of API keys",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				]
+			},
+			"post": {
+				"tags": ["API Keys", "API Keys"],
+				"summary": "Create Api Key",
+				"description": "Create a new API key for the current user.\n\nThe plaintext key is only returned once at creation time.\nStore it securely - it cannot be retrieved later.",
+				"operationId": "create_api_key",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/APIKeyCreate"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"description": "API key created successfully",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid request"
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				]
+			}
+		},
+		"/user/api-keys/{key_id}": {
+			"delete": {
+				"tags": ["API Keys", "API Keys"],
+				"summary": "Revoke Api Key",
+				"description": "Revoke (delete) an API key.\n\nThe key will immediately stop working for authentication.",
+				"operationId": "revoke_api_key",
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "key_id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"title": "Key Id"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "API key revoked",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					},
+					"404": {
+						"description": "API key not found"
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "Validation Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/health/": {
 			"get": {
 				"tags": ["Health", "Health"],
@@ -3366,6 +3933,36 @@
 	},
 	"components": {
 		"schemas": {
+			"APIKeyCreate": {
+				"properties": {
+					"name": {
+						"type": "string",
+						"maxLength": 100,
+						"minLength": 1,
+						"title": "Name",
+						"description": "Friendly name for the key"
+					},
+					"scopes": {
+						"anyOf": [
+							{
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Scopes",
+						"description": "Optional list of permission scopes"
+					}
+				},
+				"type": "object",
+				"required": ["name"],
+				"title": "APIKeyCreate",
+				"description": "Request body for creating an API key."
+			},
 			"AuthTokenPayload": {
 				"properties": {
 					"access_token": {
@@ -5222,6 +5819,23 @@
 						"title": "Remaining",
 						"description": "Credits remaining this period"
 					},
+					"remaining_pct": {
+						"type": "number",
+						"title": "Remaining Pct",
+						"description": "Percentage of credits remaining (0-100)"
+					},
+					"reset_date": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Reset Date",
+						"description": "ISO date when credits reset"
+					},
 					"resets_monthly": {
 						"type": "boolean",
 						"title": "Resets Monthly",
@@ -5236,7 +5850,7 @@
 					}
 				},
 				"type": "object",
-				"required": ["plan", "limit", "used", "remaining"],
+				"required": ["plan", "limit", "used", "remaining", "remaining_pct"],
 				"title": "UserCredits",
 				"description": "Summary of user's credit usage for the current billing period."
 			},

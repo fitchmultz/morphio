@@ -197,6 +197,13 @@ class Settings(BaseSettings):
     STRIPE_WEBHOOK_SECRET: SecretStr = Field(
         default=SecretStr(""), json_schema_extra={"env": "STRIPE_WEBHOOK_SECRET"}
     )
+    STRIPE_PRO_PRICE_ID: str = Field(default="", json_schema_extra={"env": "STRIPE_PRO_PRICE_ID"})
+    STRIPE_ENTERPRISE_PRICE_ID: str = Field(
+        default="", json_schema_extra={"env": "STRIPE_ENTERPRISE_PRICE_ID"}
+    )
+    FRONTEND_URL: str = Field(
+        default="http://localhost:3005", json_schema_extra={"env": "FRONTEND_URL"}
+    )
 
     # Usage weighting and plan-limits
     USAGE_WEIGHTS: Dict[str, int] = Field(

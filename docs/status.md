@@ -84,6 +84,24 @@ Repository normalization completed on 2025-12-23:
 - [x] Add `/user/credits` endpoint
 - [x] Add usage/credits panel to Profile
 
+## Product Features (Phase 4) ✅ Complete
+
+Completed on 2025-12-23:
+
+### Admin Dashboard ✅
+- [x] Export LLM usage reports (CSV) with date range filters
+- [x] LLM usage summary by provider (requests, tokens, cost)
+
+### User Billing ✅
+- [x] Usage alerts when credits < 20% (warning) or < 5% (critical)
+- [x] Stripe checkout integration for plan upgrades
+- [x] Billing portal for subscription management
+
+### Programmatic Access ✅
+- [x] API key model with SHA256 hashing
+- [x] API key CRUD endpoints (`POST/GET/DELETE /user/api-keys`)
+- [x] Bearer token authentication for API keys
+
 ## Related Documentation
 
 - [Configuration Guide](./configuration.md) - Environment variables and setup

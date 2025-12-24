@@ -78,6 +78,8 @@ class UserCredits(BaseModel):
     limit: int = Field(..., description="Total credits available in this plan")
     used: int = Field(..., description="Credits used this period")
     remaining: int = Field(..., description="Credits remaining this period")
+    remaining_pct: float = Field(..., description="Percentage of credits remaining (0-100)")
+    reset_date: Optional[str] = Field(None, description="ISO date when credits reset")
     resets_monthly: bool = Field(default=True, description="Whether credits reset monthly")
     is_admin: bool = Field(default=False, description="Admin users have unlimited credits")
 
