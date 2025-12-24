@@ -23,7 +23,7 @@ def generate_api_key() -> str:
 
 def hash_api_key(key: str) -> str:
     """Hash an API key for storage."""
-    return hashlib.sha256(key.encode()).hexdigest()
+    return hashlib.sha256(key.encode("utf-8")).hexdigest()
 
 
 class APIKey(Base, SoftDeleteMixin):

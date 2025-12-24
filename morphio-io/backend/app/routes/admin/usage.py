@@ -160,32 +160,19 @@ async def get_llm_usage_summary(
             detail="Not authorized to view usage summary",
         )
 
-    # Build base query
-    base_query = select(LLMUsageRecord).where(LLMUsageRecord.deleted_at.is_(None))
-
+    # Build date filters (shared between queries)
+    filters = [LLMUsageRecord.deleted_at.is_(None)]
     if start:
-        start_datetime = datetime.combine(start, datetime.min.time())
-        base_query = base_query.where(LLMUsageRecord.created_at >= start_datetime)
-
+        filters.append(LLMUsageRecord.created_at >= datetime.combine(start, datetime.min.time()))
     if end:
-        end_datetime = datetime.combine(end, datetime.max.time())
-        base_query = base_query.where(LLMUsageRecord.created_at <= end_datetime)
+        filters.append(LLMUsageRecord.created_at <= datetime.combine(end, datetime.max.time()))
 
     # Total tokens and cost
     totals_query = select(
         func.count(LLMUsageRecord.id).label("total_requests"),
         func.sum(LLMUsageRecord.total_tokens).label("total_tokens"),
         func.sum(LLMUsageRecord.cost_usd).label("total_cost"),
-    ).where(LLMUsageRecord.deleted_at.is_(None))
-
-    if start:
-        totals_query = totals_query.where(
-            LLMUsageRecord.created_at >= datetime.combine(start, datetime.min.time())
-        )
-    if end:
-        totals_query = totals_query.where(
-            LLMUsageRecord.created_at <= datetime.combine(end, datetime.max.time())
-        )
+    ).where(*filters)
 
     totals_result = await db.execute(totals_query)
     totals = totals_result.one()
@@ -198,19 +185,10 @@ async def get_llm_usage_summary(
             func.sum(LLMUsageRecord.total_tokens).label("tokens"),
             func.sum(LLMUsageRecord.cost_usd).label("cost"),
         )
-        .where(LLMUsageRecord.deleted_at.is_(None))
+        .where(*filters)
         .group_by(LLMUsageRecord.provider)
         .order_by(func.sum(LLMUsageRecord.total_tokens).desc())
     )
-
-    if start:
-        provider_query = provider_query.where(
-            LLMUsageRecord.created_at >= datetime.combine(start, datetime.min.time())
-        )
-    if end:
-        provider_query = provider_query.where(
-            LLMUsageRecord.created_at <= datetime.combine(end, datetime.max.time())
-        )
 
     provider_result = await db.execute(provider_query)
     providers = provider_result.all()
