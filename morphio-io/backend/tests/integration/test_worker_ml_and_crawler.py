@@ -1,16 +1,12 @@
 import io
 
+import importlib.util
+
 import pytest
 from fastapi.testclient import TestClient
 
 # Check if playwright is available (crawler dependency)
-_playwright_available = False
-try:
-    import playwright  # noqa: F401
-
-    _playwright_available = True
-except ImportError:
-    pass
+_playwright_available = importlib.util.find_spec("playwright") is not None
 
 
 def test_worker_ml_transcribe_mocked():
