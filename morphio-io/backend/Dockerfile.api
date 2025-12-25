@@ -1,3 +1,17 @@
+# Stage 1: Build Rust extension
+FROM python:3.13-slim AS rust-builder
+
+RUN apt-get update && apt-get install -y curl build-essential && rm -rf /var/lib/apt/lists/*
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain 1.75
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+RUN pip install maturin
+
+WORKDIR /build
+COPY morphio-native/ .
+RUN maturin build --release
+
+# Stage 2: Runtime
 FROM python:3.13-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -8,10 +22,15 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
     DEBIAN_FRONTEND=noninteractive
 
+# Copy and install Rust wheel (before Python deps so uv sync doesn't try to build it)
+COPY --from=rust-builder /build/target/wheels/*.whl /tmp/wheels/
+RUN pip install /tmp/wheels/*.whl && rm -rf /tmp/wheels
+
 WORKDIR /app
 
-COPY backend/pyproject.toml /build/pyproject.toml
-COPY backend/uv.lock /build/uv.lock
+# NOTE: Build context is now repo root, so paths are relative to that
+COPY morphio-io/backend/pyproject.toml /build/pyproject.toml
+COPY morphio-io/backend/uv.lock /build/uv.lock
 
 RUN set -eux; \
     apt-get update; \
@@ -26,7 +45,7 @@ ENV PATH="/root/.local/bin:${PATH}" \
 RUN uv venv /opt/venv \
  && UV_PROJECT_ENVIRONMENT=/opt/venv uv sync --no-dev --frozen
 
-COPY backend /app
+COPY morphio-io/backend /app
 RUN chmod +x /app/docker-entrypoint.sh && adduser --disabled-password --gecos '' appuser \
     && chown -R appuser:appuser /app
 

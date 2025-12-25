@@ -18,12 +18,17 @@ uv run ruff check .
 
 ## IMPORTANT: This project uses UV exclusively
 
-**NEVER use pip, poetry, or other package managers.** All commands use `uv`:
+**NEVER use `pip install`, `uv pip install`, or any direct package installation.** All dependencies must be declared in `pyproject.toml` files and installed via `make install` or `uv sync`.
 
 ```bash
-uv add <package>           # Add dependency
-uv sync                    # Install dependencies (run from root)
+# To add a dependency, edit pyproject.toml then:
+make install               # From monorepo root
+uv sync                    # Install dependencies
 uv run <command>           # Run command in venv
+
+# NEVER run:
+# pip install X
+# uv pip install X
 ```
 
 ## Pre-Commit Requirements

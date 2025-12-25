@@ -2,7 +2,10 @@
 
 This monorepo uses **uv workspaces** with a single `.venv` at the root.
 
-**IMPORTANT: Always use `make install` from the project root to install dependencies. Do not use `uv sync`, `pip`, or other methods.**
+**IMPORTANT**: This is a **uv-managed project**. NEVER use `pip install`, `uv pip install`, or any direct package installation. All dependencies must be declared in `pyproject.toml` files and installed via `make install` or `uv sync`.
+
+- **To add a dependency**: Edit the appropriate `pyproject.toml` and run `make install`
+- **NEVER run**: `pip install X`, `uv pip install X`, or similar commands
 
 | Project | Description | Path |
 |---------|-------------|------|

@@ -18,7 +18,11 @@ classifiers = [
 ]
 dependencies = [
     "pydantic>=2.10.0",
+    "morphio-native",  # Required Rust extension, no fallback
 ]
+
+[tool.uv.sources]
+morphio-native = { workspace = true }
 
 [project.optional-dependencies]
 # LLM providers - split for minimal installs

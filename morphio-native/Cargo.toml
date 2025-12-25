@@ -1,0 +1,25 @@
+[package]
+name = "morphio_native"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+
+[lib]
+name = "morphio_native"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.22", features = ["extension-module"] }
+regex = "1.10"
+intervaltree = "0.2"
+ahash = "0.8"
+xxhash-rust = { version = "0.8", features = ["xxh3"] }
+thiserror = "2.0"
+
+[dev-dependencies]
+# Rust tests only - Python benchmarks use pytest-benchmark
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true

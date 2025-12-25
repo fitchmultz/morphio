@@ -1,8 +1,8 @@
 services:
   backend:
     build:
-      context: .
-      dockerfile: backend/Dockerfile.api
+      context: ../..  # Repo root for morphio-native access
+      dockerfile: morphio-io/backend/Dockerfile.api
     container_name: morphio-io-backend
     ports:
       - '8000:8000'

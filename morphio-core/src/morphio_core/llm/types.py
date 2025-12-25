@@ -8,12 +8,9 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from decimal import Decimal
 from enum import StrEnum
-from typing import Any, Literal, TypeVar
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, SecretStr
-
-# TypeVar for generic StrEnum validation
-_E = TypeVar("_E", bound=StrEnum)
 
 # Type alias for provider factory functions
 # A factory takes a ProviderConfig and returns an LLMProvider-compatible instance
@@ -47,7 +44,7 @@ VALID_THINKING_LEVELS: frozenset[str] = frozenset(e.value for e in ThinkingLevel
 VALID_REASONING_EFFORTS: frozenset[str] = frozenset(e.value for e in ReasoningEffort)
 
 
-def _validate_str_enum(value: str | None, enum_cls: type[_E], param_name: str) -> _E | None:
+def _validate_str_enum[E: StrEnum](value: str | None, enum_cls: type[E], param_name: str) -> E | None:
     """Validate and normalize a string value against a StrEnum.
 
     Args:
