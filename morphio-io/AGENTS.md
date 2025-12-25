@@ -13,7 +13,7 @@ make check      # Run all checks (required before commits)
 
 ## Project Structure & Module Organization
 - `backend/` – FastAPI app (`app/{routes,services,models,schemas,utils}`), Alembic in `db/`.
-- `frontend/` – Next.js 15 app (`src/app`, `src/components`, `src/utils`).
+- `frontend/` – Next.js 16.1.1 app (`src/app`, `src/components`, `src/utils`).
 - `docs/` – project docs; `log_files/`, `uploads/` for local data.
 - Env examples: `backend/.env.example`, `frontend/.env.example`.
 
@@ -40,7 +40,7 @@ make check      # Run all checks (required before commits)
   - Type check: `uv run ty check`
   - Run API: `source ../.env && uv run uvicorn app.main:app --reload --port 8005`
 
-- **Frontend (Node >= 22, pnpm)**:
+- **Frontend (Node >= 24, pnpm)**:
   - Setup: `corepack enable && pnpm install`
   - Dev server: `pnpm dev` (http://localhost:3005)
   - Build: `pnpm build`
@@ -50,8 +50,8 @@ make check      # Run all checks (required before commits)
 ## Development Ports
 
 - **Frontend**: Port 3005 (http://localhost:3005)
-- **Backend API**: Port 8005 (http://localhost:8005)
-- **Redis**: Port 6384 (localhost:6384)
+- **Backend API**: Port 8005 (http://localhost:8005), prod 8000
+- **Redis**: Host 6384 (localhost:6384), container 6379
 
 ## Coding Style & Naming Conventions
 

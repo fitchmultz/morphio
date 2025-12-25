@@ -18,9 +18,10 @@ Morphio is a monorepo containing two main projects:
 | **Node.js** | ≥24.0.0 |
 | **Next.js** | 16.1.1 |
 | **Python** | ≥3.13 |
-| **Backend API** | Port 8000 |
+| **Backend API** | Port 8005 (dev), 8000 (prod) |
 | **Frontend Dev** | Port 3005 |
 | **Frontend Docker** | 3500 → 3000 |
+| **Redis** | Host 6384 (container 6379) |
 
 ## Quick Start
 

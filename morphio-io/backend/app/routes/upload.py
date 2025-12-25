@@ -25,7 +25,7 @@ UPLOAD_DIR = Path(settings.UPLOAD_DIR)
 TEMP_DIR = UPLOAD_DIR / "temp"
 TEMP_DIR.mkdir(parents=True, exist_ok=True)
 
-# Maximum file size (100MB default, can be configured)
+# Maximum file size (defaults to settings.MAX_UPLOAD_SIZE, 3GB in config.py)
 MAX_UPLOAD_SIZE = getattr(settings, "MAX_UPLOAD_SIZE", 100 * 1024 * 1024)
 MAX_CHUNKS = 10000  # Reasonable maximum number of chunks
 

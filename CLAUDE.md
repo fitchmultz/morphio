@@ -11,6 +11,7 @@ This monorepo uses **uv workspaces** with a single `.venv` at the root.
 |---------|-------------|------|
 | **morphio-io** | Full-stack web application (FastAPI + Next.js) | `morphio-io/` |
 | **morphio-core** | Standalone library for audio/LLM/security utilities | `morphio-core/` |
+| **morphio-native** | Native binaries and accelerators | `morphio-native/` |
 
 ## Quick Start
 

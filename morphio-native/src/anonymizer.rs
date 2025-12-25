@@ -107,7 +107,10 @@ pub fn anonymize(content: &str) -> PyResult<AnonymizationResult> {
         result,
         mapping.into_iter().collect(),
         reverse_mapping.into_iter().collect(),
-        counters.into_iter().map(|(k, v)| (k.to_string(), v)).collect(),
+        counters
+            .into_iter()
+            .map(|(k, v)| (k.to_string(), v))
+            .collect(),
         content_hash,
     ))
 }
