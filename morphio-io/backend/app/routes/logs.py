@@ -94,13 +94,26 @@ async def process_logs(
     upload_dir.mkdir(parents=True, exist_ok=True)
     file_path = upload_dir / sanitized_filename
 
+    max_upload_size = settings.MAX_UPLOAD_SIZE
+    total_size = 0
+
     try:
         async with aiofiles.open(file_path, "wb") as buffer:
             while True:
                 chunk = await log_file.read(1024 * 1024)  # 1MB chunks
                 if not chunk:
                     break
+                total_size += len(chunk)
+                if total_size > max_upload_size:
+                    raise ApplicationException(
+                        "Log file exceeds maximum upload size.",
+                        status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                    )
                 await buffer.write(chunk)
+    except ApplicationException:
+        if file_path.exists():
+            file_path.unlink()
+        raise
     except Exception as e:
         logger.error(f"Failed to save file {sanitized_filename}: {str(e)}")
         raise ApplicationException(
@@ -256,13 +269,26 @@ async def generate_splunk_config(
     upload_dir.mkdir(parents=True, exist_ok=True)
     file_path = upload_dir / sanitized_filename
 
+    max_upload_size = settings.MAX_UPLOAD_SIZE
+    total_size = 0
+
     try:
         async with aiofiles.open(file_path, "wb") as buffer:
             while True:
                 chunk = await log_file.read(1024 * 1024)  # 1MB chunks
                 if not chunk:
                     break
+                total_size += len(chunk)
+                if total_size > max_upload_size:
+                    raise ApplicationException(
+                        "Log file exceeds maximum upload size.",
+                        status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                    )
                 await buffer.write(chunk)
+    except ApplicationException:
+        if file_path.exists():
+            file_path.unlink()
+        raise
     except Exception as e:
         logger.error(f"Failed to save file {sanitized_filename}: {str(e)}")
         raise ApplicationException(
@@ -299,7 +325,10 @@ async def generate_splunk_config(
                     "example": {
                         "status": "success",
                         "message": "Log file configuration",
-                        "data": {"allowed_extensions": ["csv", "json", "log", "md", "txt"]},
+                        "data": {
+                            "allowed_extensions": ["csv", "json", "log", "md", "txt"],
+                            "max_upload_size": 3221225472,
+                        },
                     }
                 }
             },
@@ -313,7 +342,10 @@ async def get_log_file_configuration():
     """Get log file configuration including allowed extensions."""
     logger.info("Retrieving log file configuration")
 
-    config = {"allowed_extensions": settings.ALLOWED_LOG_EXTENSIONS}
+    config = {
+        "allowed_extensions": settings.ALLOWED_LOG_EXTENSIONS,
+        "max_upload_size": settings.MAX_UPLOAD_SIZE,
+    }
 
     return create_response(
         status=ResponseStatus.SUCCESS,

@@ -3,10 +3,13 @@
 import type { FC } from "react";
 import { useCallback, useEffect, useState } from "react";
 import {
+	createApiKey,
 	createCheckoutSession,
 	createPortalSession,
 	getUserCredits,
 	getUserProfile,
+	listApiKeys,
+	revokeApiKey,
 } from "@/client/sdk.gen";
 import type {
 	AppSchemasAuthSchemaUserOut,
@@ -18,7 +21,20 @@ import { ChangeEmailForm } from "@/components/forms/ChangeEmailForm";
 import { ChangePasswordForm } from "@/components/forms/ChangePasswordForm";
 import { useAuth } from "@/contexts/AuthContext";
 import logger from "@/lib/logger";
-import { notifyError } from "@/lib/toast";
+import { notifyError, notifySuccess } from "@/lib/toast";
+
+type ApiKey = {
+	id: number;
+	name: string;
+	key_prefix: string;
+	scopes: string[];
+	last_used_at: string | null;
+	created_at: string;
+};
+
+type ApiKeyCreated = ApiKey & {
+	key: string;
+};
 
 export const ProfileManagement: FC = () => {
 	const { updateUserData } = useAuth();
@@ -28,6 +44,13 @@ export const ProfileManagement: FC = () => {
 	const [loading, setLoading] = useState(true);
 	const [fetchError, setFetchError] = useState<string | null>(null);
 	const [isUpgrading, setIsUpgrading] = useState(false);
+	const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
+	const [apiKeysLoading, setApiKeysLoading] = useState(true);
+	const [apiKeyError, setApiKeyError] = useState<string | null>(null);
+	const [apiKeyName, setApiKeyName] = useState("");
+	const [isCreatingKey, setIsCreatingKey] = useState(false);
+	const [newApiKey, setNewApiKey] = useState<ApiKeyCreated | null>(null);
+	const [revokingKeyId, setRevokingKeyId] = useState<number | null>(null);
 
 	const fetchUserProfile = useCallback(async () => {
 		try {
@@ -73,6 +96,42 @@ export const ProfileManagement: FC = () => {
 		fetchUserProfile();
 	}, [fetchUserProfile]);
 
+	const fetchApiKeys = useCallback(async () => {
+		try {
+			setApiKeysLoading(true);
+			setApiKeyError(null);
+			const { data, error } = await listApiKeys();
+			if (error) {
+				throw new Error(
+					typeof error === "object" && error && "detail" in error
+						? String((error as { detail?: string }).detail)
+						: "Failed to load API keys",
+				);
+			}
+			const responseData = data as {
+				status?: string;
+				data?: ApiKey[];
+				message?: string;
+			} | null;
+			if (responseData?.status === "success" && responseData.data) {
+				setApiKeys(responseData.data);
+			} else {
+				throw new Error(responseData?.message || "Failed to load API keys");
+			}
+		} catch (error) {
+			const message =
+				error instanceof Error ? error.message : "Failed to load API keys";
+			setApiKeyError(message);
+			logger.warn("Failed to fetch API keys", { error });
+		} finally {
+			setApiKeysLoading(false);
+		}
+	}, []);
+
+	useEffect(() => {
+		fetchApiKeys();
+	}, [fetchApiKeys]);
+
 	const handleProfileUpdate = (
 		updateKey: keyof AppSchemasAuthSchemaUserOut,
 		newValue: string,
@@ -109,6 +168,99 @@ export const ProfileManagement: FC = () => {
 		}
 	};
 
+	const handleCreateApiKey = async () => {
+		const trimmedName = apiKeyName.trim();
+		if (!trimmedName) {
+			notifyError("Please enter a name for the API key.");
+			return;
+		}
+
+		try {
+			setIsCreatingKey(true);
+			const { data, error } = await createApiKey({
+				body: { name: trimmedName },
+			});
+			if (error) {
+				throw new Error(
+					typeof error === "object" && error && "detail" in error
+						? String((error as { detail?: string }).detail)
+						: "Failed to create API key",
+				);
+			}
+			const responseData = data as {
+				status?: string;
+				data?: ApiKeyCreated;
+				message?: string;
+			} | null;
+			if (responseData?.status === "success" && responseData.data) {
+				setNewApiKey(responseData.data);
+				setApiKeyName("");
+				await fetchApiKeys();
+				notifySuccess("API key created. Store it securely.");
+			} else {
+				throw new Error(responseData?.message || "Failed to create API key");
+			}
+		} catch (error) {
+			logger.error("Failed to create API key", { error });
+			notifyError("Failed to create API key. Please try again.");
+		} finally {
+			setIsCreatingKey(false);
+		}
+	};
+
+	const handleCopyApiKey = async (key: string) => {
+		try {
+			await navigator.clipboard.writeText(key);
+			notifySuccess("API key copied to clipboard.");
+		} catch (error) {
+			logger.warn("Clipboard copy failed, falling back", { error });
+			const input = document.createElement("input");
+			input.value = key;
+			document.body.appendChild(input);
+			input.select();
+			document.execCommand("copy");
+			input.remove();
+			notifySuccess("API key copied to clipboard.");
+		}
+	};
+
+	const handleRevokeApiKey = async (keyId: number) => {
+		if (
+			!window.confirm("Revoke this API key? It will stop working immediately.")
+		) {
+			return;
+		}
+
+		try {
+			setRevokingKeyId(keyId);
+			const { data, error } = await revokeApiKey({
+				path: { key_id: keyId },
+			});
+			if (error) {
+				throw new Error(
+					typeof error === "object" && error && "detail" in error
+						? String((error as { detail?: string }).detail)
+						: "Failed to revoke API key",
+				);
+			}
+			const responseData = data as {
+				status?: string;
+				message?: string;
+			} | null;
+			if (responseData?.status === "success") {
+				await fetchApiKeys();
+				notifySuccess("API key revoked.");
+			} else {
+				throw new Error(responseData?.message || "Failed to revoke API key");
+			}
+		} catch (error) {
+			logger.error("Failed to revoke API key", { error });
+			notifyError("Failed to revoke API key. Please try again.");
+		} finally {
+			setRevokingKeyId(null);
+		}
+	};
+
 	const handleManageBilling = async () => {
 		try {
 			setIsUpgrading(true);
@@ -135,6 +287,9 @@ export const ProfileManagement: FC = () => {
 			{content}
 		</div>
 	);
+
+	const formatDateTime = (value: string | null) =>
+		value ? new Date(value).toLocaleString() : "Never";
 
 	if (loading) {
 		return (
@@ -321,6 +476,118 @@ export const ProfileManagement: FC = () => {
 						)}
 					</div>,
 				)}
+			{renderProfileSection(
+				"API Keys",
+				<div className="space-y-4">
+					<div className="space-y-2">
+						<label
+							htmlFor="apiKeyName"
+							className="morphio-body-sm text-gray-600 dark:text-gray-300"
+						>
+							Create a new API key
+						</label>
+						<div className="flex flex-col sm:flex-row gap-3">
+							<input
+								id="apiKeyName"
+								type="text"
+								value={apiKeyName}
+								onChange={(event) => setApiKeyName(event.target.value)}
+								placeholder="Key name (e.g. CLI access)"
+								className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-sm"
+							/>
+							<button
+								type="button"
+								onClick={handleCreateApiKey}
+								disabled={isCreatingKey}
+								className="morphio-button px-4 py-2 text-sm"
+							>
+								{isCreatingKey ? "Creating..." : "Create Key"}
+							</button>
+						</div>
+					</div>
+
+					{newApiKey && (
+						<div className="p-4 border border-amber-200 dark:border-amber-700 rounded-lg bg-amber-50 dark:bg-amber-900/20 space-y-2">
+							<p className="morphio-body-sm font-medium text-amber-800 dark:text-amber-200">
+								Save this key now. It will not be shown again.
+							</p>
+							<div className="flex flex-col sm:flex-row sm:items-center gap-3">
+								<code className="px-3 py-2 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-900 dark:text-amber-100 text-sm break-all">
+									{newApiKey.key}
+								</code>
+								<button
+									type="button"
+									onClick={() => handleCopyApiKey(newApiKey.key)}
+									className="morphio-button-secondary px-3 py-2 text-sm"
+								>
+									Copy
+								</button>
+							</div>
+							<p className="morphio-caption text-amber-700 dark:text-amber-300">
+								Key name: {newApiKey.name} • Prefix: {newApiKey.key_prefix}
+							</p>
+						</div>
+					)}
+
+					<div className="space-y-3">
+						<h4 className="morphio-body font-medium">Existing API keys</h4>
+						{apiKeysLoading ? (
+							<p className="morphio-body-sm">Loading API keys...</p>
+						) : apiKeyError ? (
+							<p className="morphio-body-sm text-red-600 dark:text-red-400">
+								{apiKeyError}
+							</p>
+						) : apiKeys.length === 0 ? (
+							<p className="morphio-body-sm text-gray-500">
+								No API keys created yet.
+							</p>
+						) : (
+							<div className="overflow-x-auto">
+								<table className="min-w-full text-sm">
+									<thead className="bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
+										<tr>
+											<th className="p-3 text-left font-medium">Name</th>
+											<th className="p-3 text-left font-medium">Prefix</th>
+											<th className="p-3 text-left font-medium">Created</th>
+											<th className="p-3 text-left font-medium">Last Used</th>
+											<th className="p-3 text-right font-medium">Actions</th>
+										</tr>
+									</thead>
+									<tbody>
+										{apiKeys.map((key) => (
+											<tr
+												key={key.id}
+												className="border-b border-gray-200 dark:border-gray-600"
+											>
+												<td className="p-3">{key.name}</td>
+												<td className="p-3 font-mono">{key.key_prefix}</td>
+												<td className="p-3">
+													{formatDateTime(key.created_at)}
+												</td>
+												<td className="p-3">
+													{formatDateTime(key.last_used_at)}
+												</td>
+												<td className="p-3 text-right">
+													<button
+														type="button"
+														onClick={() => handleRevokeApiKey(key.id)}
+														disabled={revokingKeyId === key.id}
+														className="morphio-button-secondary px-3 py-1.5 text-xs"
+													>
+														{revokingKeyId === key.id
+															? "Revoking..."
+															: "Revoke"}
+													</button>
+												</td>
+											</tr>
+										))}
+									</tbody>
+								</table>
+							</div>
+						)}
+					</div>
+				</div>,
+			)}
 		</div>
 	);
 };
