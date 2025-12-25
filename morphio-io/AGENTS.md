@@ -81,6 +81,21 @@ make check      # Run all checks (required before commits)
 make openapi  # From project root, no server needed
 ```
 
+## Docker Builds
+
+Docker images pull from GHCR and require authentication:
+
+```bash
+source ~/.secrets  # Export GITHUB_TOKEN for GHCR access
+docker build -f backend/Dockerfile.dev ..
+```
+
+**Platform constraint**: `worker-ml` is amd64-only (torchcodec lacks ARM64 wheels). Docker Compose files include `platform: linux/amd64`. For manual builds on ARM64:
+
+```bash
+DOCKER_DEFAULT_PLATFORM=linux/amd64 docker build -f backend/Dockerfile.worker-ml ..
+```
+
 ## Security & Configuration
 
 - Never commit secrets; use `*.env.example` files as templates.

@@ -156,6 +156,12 @@ While the exact AI models aren't specified in the codebase, the structure sugges
    ./start-docker-dev.sh  # Start all services
    ```
 
+   **Platform Note**: The `worker-ml` service is amd64-only due to `torchcodec` (a `pyannote-audio` dependency) lacking Linux ARM64 wheels. Docker Compose files include `platform: linux/amd64` for this service. For manual builds on ARM64:
+
+   ```bash
+   DOCKER_DEFAULT_PLATFORM=linux/amd64 docker build -f backend/Dockerfile.worker-ml ..
+   ```
+
 6. **Access**:
    - Frontend: `http://localhost:3005`
    - Backend API: `http://localhost:8000`

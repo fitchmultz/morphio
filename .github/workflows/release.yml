@@ -13,6 +13,46 @@ env:
   IMAGE_OWNER: ${{ github.repository_owner }}
 
 jobs:
+  build-wheels:
+    name: Build Wheels (${{ matrix.target }})
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            manylinux: "2_17"
+          - os: macos-latest
+            target: aarch64-apple-darwin
+          - os: macos-13
+            target: x86_64-apple-darwin
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ matrix.target }}
+          args: --release --out dist
+          manylinux: ${{ matrix.manylinux || 'auto' }}
+          working-directory: morphio-native
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.target }}
+          path: morphio-native/dist/*.whl
+
+  publish-wheels:
+    name: Publish Wheels
+    needs: [build-wheels]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wheels-*
+          path: dist/
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.whl
+
   build-api:
     runs-on: ubuntu-latest
     outputs:
@@ -40,7 +80,7 @@ jobs:
         id: build
         uses: docker/build-push-action@v6
         with:
-          context: morphio-io
+          context: .  # Repo root for morphio-native access
           file: morphio-io/backend/Dockerfile.api
           push: true
           tags: ${{ steps.meta.outputs.tags }}
@@ -76,7 +116,7 @@ jobs:
         id: build
         uses: docker/build-push-action@v6
         with:
-          context: morphio-io
+          context: .
           file: morphio-io/backend/Dockerfile.worker-ml
           push: true
           tags: ${{ steps.meta.outputs.tags }}
@@ -112,7 +152,7 @@ jobs:
         id: build
         uses: docker/build-push-action@v6
         with:
-          context: morphio-io
+          context: .
           file: morphio-io/backend/Dockerfile.crawler
           push: true
           tags: ${{ steps.meta.outputs.tags }}

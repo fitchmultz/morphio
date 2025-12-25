@@ -29,5 +29,5 @@ build/
 # Node
 node_modules/
 
-# Editor settings (keep .claude for Claude Code)
-.vscode/
+# Rust build artifacts
+morphio-native/target/

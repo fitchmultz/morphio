@@ -1,8 +1,8 @@
 services:
   frontend:
     build:
-      context: .
-      dockerfile: frontend/Dockerfile.dev
+      context: ..
+      dockerfile: morphio-io/frontend/Dockerfile.dev
     container_name: morphio-dev-frontend
     ports:
       - "3005:3005"
@@ -34,8 +34,8 @@ services:
 
   backend:
     build:
-      context: .
-      dockerfile: backend/Dockerfile.dev
+      context: ..
+      dockerfile: morphio-io/backend/Dockerfile.dev
     platform: linux/amd64  # Required: torchcodec lacks Linux ARM64 wheel
     container_name: morphio-dev-backend
     ports:
@@ -90,8 +90,8 @@ services:
 
   worker-ml:
     build:
-      context: .
-      dockerfile: backend/Dockerfile.worker-ml
+      context: ..
+      dockerfile: morphio-io/backend/Dockerfile.worker-ml
     platform: linux/amd64  # Required: torch/torchcodec lack Linux ARM64 wheels
     container_name: morphio-dev-worker-ml
     environment:
@@ -104,8 +104,8 @@ services:
 
   crawler:
     build:
-      context: .
-      dockerfile: backend/Dockerfile.crawler
+      context: ..
+      dockerfile: morphio-io/backend/Dockerfile.crawler
     platform: linux/amd64  # Required: torchcodec lacks Linux ARM64 wheel
     container_name: morphio-dev-crawler
     healthcheck:

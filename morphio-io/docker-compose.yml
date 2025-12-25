@@ -1,8 +1,8 @@
 services:
   backend:
     build:
-      context: .
-      dockerfile: backend/Dockerfile.api
+      context: ..  # Repo root for morphio-native access
+      dockerfile: morphio-io/backend/Dockerfile.api
     container_name: morphio-io-backend
     ports:
       - '8000:8000'
@@ -70,8 +70,9 @@ services:
 
   worker-ml:
     build:
-      context: .
-      dockerfile: backend/Dockerfile.worker-ml
+      context: ..
+      dockerfile: morphio-io/backend/Dockerfile.worker-ml
+    platform: linux/amd64  # Required: torchcodec lacks Linux ARM64 wheels
     container_name: morphio-io-worker-ml
     environment:
       - WHISPER_MODEL=${WHISPER_MODEL:-small}
@@ -84,8 +85,8 @@ services:
 
   crawler:
     build:
-      context: .
-      dockerfile: backend/Dockerfile.crawler
+      context: ..
+      dockerfile: morphio-io/backend/Dockerfile.crawler
     container_name: morphio-io-crawler
     restart: unless-stopped
     healthcheck:

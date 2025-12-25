@@ -16,12 +16,69 @@ env:
   IMAGE_OWNER: ${{ github.repository_owner }}
 
 jobs:
-  backend-checks:
-    name: Backend • Ruff + ty + Lock drift
+  native-build:
+    name: Native • Rust Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Set up Rust 1.75
+        uses: dtolnay/rust-action@stable
+        with:
+          toolchain: "1.75"
+          components: clippy, rustfmt
+
+      - name: Cache Cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: morphio-native
+
+      - name: Rust format check
+        working-directory: morphio-native
+        run: cargo fmt --check
+
+      - name: Rust clippy
+        working-directory: morphio-native
+        run: cargo clippy -- -D warnings
+
+      - name: Rust tests
+        working-directory: morphio-native
+        run: cargo test
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Build wheel for CI
+        run: |
+          pip install maturin
+          cd morphio-native && maturin build --release
+
+      - name: Upload wheel artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: morphio-native-wheel
+          path: morphio-native/target/wheels/*.whl
+
+  backend-checks:
+    name: Backend • Ruff + ty + Lock drift
+    needs: [native-build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Rust 1.75
+        uses: dtolnay/rust-action@stable
+        with:
+          toolchain: "1.75"
+
+      - name: Cache Cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: morphio-native
 
       - name: Set up Python 3.13
         uses: actions/setup-python@v5
@@ -34,22 +91,19 @@ jobs:
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Sync (frozen) with dev deps
-        working-directory: morphio-io/backend
         run: |
           uv venv .venv
-          UV_PROJECT_ENVIRONMENT=.venv uv sync --dev --frozen
+          UV_PROJECT_ENVIRONMENT=.venv uv sync --project morphio-io/backend --dev --frozen
 
       - name: Ruff (lint)
-        working-directory: morphio-io/backend
-        run: uv run ruff check .
+        run: UV_PROJECT_ENVIRONMENT=.venv uv run --project morphio-io/backend ruff check morphio-io/backend
 
       - name: Ruff (format check)
-        working-directory: morphio-io/backend
-        run: uv run ruff format --check .
+        run: UV_PROJECT_ENVIRONMENT=.venv uv run --project morphio-io/backend ruff format --check morphio-io/backend
 
       - name: ty (type check)
         working-directory: morphio-io/backend
-        run: uv run ty check
+        run: UV_PROJECT_ENVIRONMENT=../../.venv uv run ty check
 
   frontend-checks:
     name: Frontend • Biome + TypeScript
@@ -94,15 +148,16 @@ jobs:
           - name: api
             dockerfile: morphio-io/backend/Dockerfile.api
             image: ghcr.io/${{ github.repository_owner }}/morphio-io-backend-api
-            context: morphio-io
+            context: .  # Repo root for morphio-native access
           - name: worker-ml
             dockerfile: morphio-io/backend/Dockerfile.worker-ml
             image: ghcr.io/${{ github.repository_owner }}/morphio-io-worker-ml
-            context: morphio-io
+            context: .  # Repo root for morphio-native access
+            platforms: linux/amd64  # torchcodec lacks Linux ARM64 wheels
           - name: crawler
             dockerfile: morphio-io/backend/Dockerfile.crawler
             image: ghcr.io/${{ github.repository_owner }}/morphio-io-crawler
-            context: morphio-io
+            context: .  # Repo root for morphio-native access
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -139,6 +194,7 @@ jobs:
         with:
           context: ${{ matrix.context }}
           file: ${{ matrix.dockerfile }}
+          platforms: ${{ matrix.platforms }}
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

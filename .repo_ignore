@@ -1,2 +1,7 @@
 archive/
 morphio-io/candace_ep280_transcript.md
+log_files/
+morphio-io/.claude/
+.claude/
+morphio-io/.cursor/
+morphio-native/target/

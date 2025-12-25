@@ -2,7 +2,10 @@
 
 This monorepo uses **uv workspaces** with a single `.venv` at the root.
 
-**IMPORTANT: Always use `make install` from the project root to install dependencies. Do not use `uv sync`, `pip`, or other methods.**
+**IMPORTANT**: This is a **uv-managed project**. NEVER use `pip install`, `uv pip install`, or any direct package installation. All dependencies must be declared in `pyproject.toml` files and installed via `make install` or `uv sync`.
+
+- **To add a dependency**: Edit the appropriate `pyproject.toml` and run `make install`
+- **NEVER run**: `pip install X`, `uv pip install X`, or similar commands
 
 | Project | Description | Path |
 |---------|-------------|------|
@@ -103,6 +106,32 @@ morphio-io uses thin adapters (`app/adapters/`) that:
 - Library exceptions only - no HTTP status codes
 - Protocol-first interfaces for testability
 - SDK client injection for mocking
+
+## Docker Builds
+
+Docker images pull from GHCR (ghcr.io) and require authentication:
+
+```bash
+# Source secrets before Docker builds
+source ~/.secrets
+
+# Build examples
+docker build -f morphio-io/backend/Dockerfile.dev .
+docker build -f morphio-io/backend/Dockerfile.api .
+```
+
+**Note**: `~/.secrets` should export `GITHUB_TOKEN` or configure Docker credential helpers for GHCR access.
+
+### Platform Constraints
+
+**worker-ml is amd64-only**: The ML stack depends on `torchcodec` (via `pyannote-audio`), which only publishes x86_64 wheels. Until upstream provides Linux ARM64 wheels, worker-ml must be built for amd64:
+
+```bash
+# Manual ARM64 host build
+DOCKER_DEFAULT_PLATFORM=linux/amd64 docker build -f morphio-io/backend/Dockerfile.worker-ml .
+```
+
+Docker Compose files already include `platform: linux/amd64` for worker-ml.
 
 ## Common Tasks
 
