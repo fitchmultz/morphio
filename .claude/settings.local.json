@@ -13,7 +13,9 @@
       "mcp__RepoPrompt__select_window",
       "mcp__RepoPrompt__chat_send",
       "Bash(./scripts/audit_imports.sh:*)",
-      "Skill(compound-engineering:workflows:work)"
+      "Skill(compound-engineering:workflows:work)",
+      "Bash(cargo build:*)",
+      "Bash(cargo test:*)"
     ]
   }
 }
