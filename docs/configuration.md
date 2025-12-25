@@ -8,11 +8,12 @@ This document defines the canonical configuration contract for the Morphio monor
 
 | Service | Port | Notes |
 |---------|------|-------|
-| Backend API | 8000 | FastAPI server |
+| Backend API (dev) | 8005 | FastAPI server |
+| Backend API (prod) | 8000 | FastAPI server |
 | Frontend Dev | 3005 | Next.js dev server (`pnpm dev`) |
 | Frontend Docker | 3500 → 3000 | Published port maps to container port 3000 |
 | PostgreSQL | 5432 | Production database |
-| Redis | 6379 | Caching and job queues |
+| Redis | 6384 | Host port (container 6379) |
 
 ## Environment Variable Sources
 
@@ -34,7 +35,18 @@ This document defines the canonical configuration contract for the Morphio monor
 | `JWT_SECRET_KEY` | **Prod** | `dev_jwt_secret_key` | JWT signing key |
 | `OPENAI_API_KEY` | Yes | - | OpenAI API key |
 | `DATABASE_URL` | **Prod** | SQLite | PostgreSQL connection string |
-| `REDIS_URL` | Yes | `redis://localhost:6379/0` | Redis connection URL |
+| `REDIS_URL` | Yes | `redis://localhost:6384/0` | Redis connection URL |
+| `REDIS_DB` | No | `0` | Redis database index |
+| `FRONTEND_URL` | No | `http://localhost:3005` | Frontend origin for redirects |
+| `PROMETHEUS_ENABLED` | No | `false` | Enable Prometheus metrics |
+| `USER_ROUTES_RATE_LIMIT` | No | `60` | Requests per window for user routes |
+| `USER_ROUTES_RATE_WINDOW` | No | `60` | Rate limit window in seconds |
+| `CSRF_COOKIE_EXPIRE_SECONDS` | No | `86400` | CSRF cookie lifetime in seconds |
+| `STRIPE_PRO_PRICE_ID` | No | - | Stripe Pro price ID |
+| `STRIPE_ENTERPRISE_PRICE_ID` | No | - | Stripe Enterprise price ID |
+| `WORKER_ML_URL` | No | - | Optional ML worker URL |
+| `CRAWLER_URL` | No | - | Optional crawler service URL |
+| `SERVICE_TIMEOUT` | No | `60` | Upstream service timeout in seconds |
 
 **AI/LLM Keys:**
 - `OPENAI_API_KEY` - Required
@@ -47,6 +59,10 @@ This document defines the canonical configuration contract for the Morphio monor
 - `WHISPER_MODEL` / `WHISPER_MLX_MODEL` - Default: `small`
 - `TITLE_GENERATION_MODEL` - Default: `gemini-3-flash-preview-minimal`
 - `CONTENT_MODEL` - Default: `gemini-3-flash-preview`
+- `DIARIZATION_ENABLED` - Enable diarization
+- `DIARIZATION_MODEL` - Default: `pyannote/speaker-diarization-3.1`
+- `DIARIZATION_MIN_SPEAKERS` / `DIARIZATION_MAX_SPEAKERS` - Optional bounds
+- `DIARIZATION_USE_SUBPROCESS` - Run diarization in a subprocess
 
 ### Frontend
 
@@ -60,11 +76,11 @@ This document defines the canonical configuration contract for the Morphio monor
 
 | Variable | Description |
 |----------|-------------|
-| `REDIS_URL` | Full URL with DB index: `redis://localhost:6379/0` |
+| `REDIS_URL` | Full URL with DB index: `redis://localhost:6384/0` |
 | `REDIS_PASSWORD` | Password (optional in dev, recommended in prod) |
 
 **URL Format:**
-- Development: `redis://localhost:6379/0`
+- Development: `redis://localhost:6384/0`
 - Docker: `redis://redis:6379/0`
 - Production with auth: `redis://:PASSWORD@redis:6379/0`
 
@@ -77,18 +93,18 @@ backend:
   environment:
     - REDIS_URL=redis://redis:6379/0
   ports:
-    - "8000:8000"
+    - "8005:8005"
 
 frontend:
   environment:
-    - NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+    - NEXT_PUBLIC_API_BASE_URL=http://localhost:8005
   ports:
     - "3500:3000"
 
 redis:
   image: redis:7.4-alpine
   ports:
-    - "6379:6379"
+    - "6384:6379"
 ```
 
 ### Production (`docker-compose.prod.yml`)

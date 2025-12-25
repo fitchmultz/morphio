@@ -8,6 +8,7 @@ This monorepo contains related Morphio projects for AI-powered content generatio
 |---------|-------------|------|
 | **morphio-io** | Full-stack web application (FastAPI + Next.js) | `morphio-io/` |
 | **morphio-core** | Standalone Python library for audio/LLM/security utilities | `morphio-core/` |
+| **morphio-native** | Native binaries and accelerators | `morphio-native/` |
 
 ## Documentation
 
@@ -134,7 +135,7 @@ morphio-io uses thin adapters (`app/adapters/`) that:
 - **Backend**: Python 3.13+, FastAPI, SQLAlchemy, PostgreSQL, Redis
 - **Frontend**: Next.js 16.1.1, React 19, TypeScript, TailwindCSS 4
 - **Node.js**: ≥24.0.0
-- **Ports**: Backend 8000, Frontend dev 3005, Frontend Docker 3500→3000
+- **Ports**: Backend dev 8005 (prod 8000), Frontend dev 3005, Frontend Docker 3500→3000, Redis host 6384 (container 6379)
 - **DevOps**: Docker, GitHub Actions
 
 ### morphio-core
