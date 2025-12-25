@@ -15,7 +15,11 @@
       "Bash(./scripts/audit_imports.sh:*)",
       "Skill(compound-engineering:workflows:work)",
       "Bash(cargo build:*)",
-      "Bash(cargo test:*)"
+      "Bash(cargo test:*)",
+      "mcp__RepoPrompt__manage_workspaces",
+      "mcp__RepoPrompt__manage_selection",
+      "Bash(cargo clippy:*)",
+      "Bash(maturin build:*)"
     ]
   }
 }
