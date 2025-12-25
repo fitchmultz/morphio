@@ -1,15 +1,31 @@
-# Stage 1: Build Rust extension
-FROM python:3.13-slim AS rust-builder
+# Stage 1: Build with Rust and uv
+FROM python:3.13-slim AS builder
 
-RUN apt-get update && apt-get install -y curl build-essential && rm -rf /var/lib/apt/lists/*
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain 1.75
-ENV PATH="/root/.cargo/bin:${PATH}"
+WORKDIR /app
 
-RUN pip install maturin
+# Install uv from official image
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
-WORKDIR /build
-COPY morphio-native/ .
-RUN maturin build --release
+# Install Rust for morphio-native
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl build-essential \
+ && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain 1.75 \
+ && rm -rf /var/lib/apt/lists/*
+
+ENV PATH="/root/.cargo/bin:${PATH}" \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_PROJECT_ENVIRONMENT=/app/.venv
+
+# Copy workspace configuration and members
+COPY pyproject.toml uv.lock ./
+COPY morphio-core/ morphio-core/
+COPY morphio-native/ morphio-native/
+COPY morphio-io/backend/ morphio-io/backend/
+
+# Install dependencies (including building morphio-native)
+# --no-editable ensures runtime doesn't need source paths
+RUN uv sync --project morphio-io/backend --frozen --no-dev --no-editable
 
 # Stage 2: Runtime
 FROM python:3.13-slim
@@ -19,35 +35,25 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     APP_ENV=production \
     APP_PORT=8000 \
     UVICORN_WORKERS=4 \
-    PIP_NO_CACHE_DIR=1 \
     DEBIAN_FRONTEND=noninteractive
-
-# Copy and install Rust wheel (before Python deps so uv sync doesn't try to build it)
-COPY --from=rust-builder /build/target/wheels/*.whl /tmp/wheels/
-RUN pip install /tmp/wheels/*.whl && rm -rf /tmp/wheels
 
 WORKDIR /app
 
-# NOTE: Build context is now repo root, so paths are relative to that
-COPY morphio-io/backend/pyproject.toml /build/pyproject.toml
-COPY morphio-io/backend/uv.lock /build/uv.lock
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+ && rm -rf /var/lib/apt/lists/*
 
-RUN set -eux; \
-    apt-get update; \
-    apt-get install -y --no-install-recommends curl; \
-    rm -rf /var/lib/apt/lists/*; \
-    curl -LsSf https://astral.sh/uv/install.sh | sh -s -- -y
+# Copy venv and app from builder
+COPY --from=builder /app/.venv /app/.venv
+COPY --from=builder /app/morphio-io/backend /app
 
-ENV PATH="/root/.local/bin:${PATH}" \
-    VIRTUAL_ENV=/opt/venv \
-    PATH=/opt/venv/bin:$PATH
+ENV PATH="/app/.venv/bin:$PATH"
 
-RUN uv venv /opt/venv \
- && UV_PROJECT_ENVIRONMENT=/opt/venv uv sync --no-dev --frozen
-
-COPY morphio-io/backend /app
-RUN chmod +x /app/docker-entrypoint.sh && adduser --disabled-password --gecos '' appuser \
-    && chown -R appuser:appuser /app
+# Setup entrypoint and user
+RUN chmod +x /app/docker-entrypoint.sh \
+ && adduser --disabled-password --gecos '' appuser \
+ && chown -R appuser:appuser /app
 
 USER appuser
 
@@ -56,4 +62,3 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
   CMD curl -fsS http://localhost:8000/health/ || exit 1
 
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
-

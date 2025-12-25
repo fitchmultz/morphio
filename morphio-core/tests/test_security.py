@@ -24,6 +24,7 @@ class TestAnonymizer:
 
         assert "test@example.com" not in result
         assert "[EMAIL_1]" in result
+        assert anonymizer.counters.get("EMAIL") == 1
 
     def test_anonymize_phone(self):
         """Test phone number anonymization."""
@@ -35,6 +36,7 @@ class TestAnonymizer:
         assert "(555) 987-6543" not in result
         assert "[PHONE_1]" in result
         assert "[PHONE_2]" in result
+        assert anonymizer.counters.get("PHONE") == 2
 
     def test_anonymize_ssn(self):
         """Test SSN anonymization."""

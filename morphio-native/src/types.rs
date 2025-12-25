@@ -11,6 +11,8 @@ pub struct AnonymizationResult {
     #[pyo3(get)]
     pub reverse_mapping: HashMap<String, String>,
     #[pyo3(get)]
+    pub counters: HashMap<String, usize>,
+    #[pyo3(get)]
     pub content_hash: String,
 }
 
@@ -21,12 +23,14 @@ impl AnonymizationResult {
         text: String,
         mapping: HashMap<String, String>,
         reverse_mapping: HashMap<String, String>,
+        counters: HashMap<String, usize>,
         content_hash: String,
     ) -> Self {
         Self {
             text,
             mapping,
             reverse_mapping,
+            counters,
             content_hash,
         }
     }

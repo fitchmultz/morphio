@@ -6,6 +6,7 @@ class AnonymizationResult:
     text: str
     mapping: dict[str, str]
     reverse_mapping: dict[str, str]
+    counters: dict[str, int]
     content_hash: str
 
     def __init__(
@@ -13,6 +14,7 @@ class AnonymizationResult:
         text: str,
         mapping: dict[str, str],
         reverse_mapping: dict[str, str],
+        counters: dict[str, int],
         content_hash: str,
     ) -> None: ...
 

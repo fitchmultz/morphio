@@ -16,7 +16,7 @@ class Anonymizer:
         result = _native_anonymize(content)
         self.mapping = dict(result.mapping)
         self.reverse_mapping = dict(result.reverse_mapping)
-        self.counters = {}
+        self.counters = dict(result.counters)
         return result.text
 
     def deanonymize(self, content: str) -> str:
@@ -26,9 +26,11 @@ class Anonymizer:
         partial matches when one placeholder is a prefix of another.
         """
         result = content
-        # Sort by placeholder length descending to handle prefix cases
+        # Sort by placeholder length descending, then by placeholder itself for determinism
         # e.g., [EMAIL_10] must be replaced before [EMAIL_1]
-        sorted_items = sorted(self.reverse_mapping.items(), key=lambda x: len(x[0]), reverse=True)
+        sorted_items = sorted(
+            self.reverse_mapping.items(), key=lambda x: (len(x[0]), x[0]), reverse=True
+        )
         for placeholder, original in sorted_items:
             result = result.replace(placeholder, original)
         return result
@@ -47,8 +49,10 @@ def deanonymize_content(content: str, anonymized_content: str, enabled: bool = F
         return anonymized_content
     result = _native_anonymize(content)
     output = anonymized_content
-    # Sort by placeholder length descending to handle prefix cases
-    sorted_items = sorted(result.reverse_mapping.items(), key=lambda x: len(x[0]), reverse=True)
+    # Sort by placeholder length descending, then by placeholder itself for determinism
+    sorted_items = sorted(
+        result.reverse_mapping.items(), key=lambda x: (len(x[0]), x[0]), reverse=True
+    )
     for placeholder, original in sorted_items:
         output = output.replace(placeholder, original)
     return output

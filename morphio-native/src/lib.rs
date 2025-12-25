@@ -1,7 +1,6 @@
-// PyO3 macro expansion can trigger false positive clippy warnings
-#![allow(clippy::useless_conversion)]
-
+#[allow(clippy::useless_conversion)]
 mod alignment;
+#[allow(clippy::useless_conversion)]
 mod anonymizer;
 mod types;
 

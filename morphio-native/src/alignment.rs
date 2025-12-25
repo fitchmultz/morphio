@@ -218,11 +218,9 @@ pub fn merge_cross_chunk_speakers(
         if let Some(last) = merged.last_mut() {
             if last.speaker_id == segment.speaker_id {
                 last.end_time = segment.end_time;
-                // Append text with space
-                let mut new_text = last.text.clone();
-                new_text.push(' ');
-                new_text.push_str(&segment.text);
-                last.text = new_text;
+                // Append text in place (avoid cloning)
+                last.text.push(' ');
+                last.text.push_str(&segment.text);
                 continue;
             }
         }

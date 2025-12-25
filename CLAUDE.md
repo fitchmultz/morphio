@@ -107,6 +107,21 @@ morphio-io uses thin adapters (`app/adapters/`) that:
 - Protocol-first interfaces for testability
 - SDK client injection for mocking
 
+## Docker Builds
+
+Docker images pull from GHCR (ghcr.io) and require authentication:
+
+```bash
+# Source secrets before Docker builds
+source ~/.secrets
+
+# Build examples
+docker build -f morphio-io/backend/Dockerfile.dev .
+docker build -f morphio-io/backend/Dockerfile.api .
+```
+
+**Note**: `~/.secrets` should export `GITHUB_TOKEN` or configure Docker credential helpers for GHCR access.
+
 ## Common Tasks
 
 | Task | Command |

@@ -1,36 +1,55 @@
-FROM python:3.13-slim
+FROM python:3.13-slim AS builder
 
 WORKDIR /app
 
 # Install uv from official image
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
-# UV optimization flags
-ENV UV_COMPILE_BYTECODE=1 \
-    UV_LINK_MODE=copy
+# Install Rust for morphio-native
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl build-essential \
+ && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain 1.75 \
+ && rm -rf /var/lib/apt/lists/*
 
-# Install system dependencies with cache
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    apt-get update && apt-get install -y --no-install-recommends \
-    curl ffmpeg
+ENV PATH="/root/.cargo/bin:${PATH}" \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_PROJECT_ENVIRONMENT=/app/.venv
 
-# Copy dependency files
-COPY backend/pyproject.toml backend/uv.lock ./
+# Copy workspace configuration and members
+COPY pyproject.toml uv.lock ./
+COPY morphio-core/ morphio-core/
+COPY morphio-native/ morphio-native/
+COPY morphio-io/backend/ morphio-io/backend/
 
-# Install dependencies with cache mount (sharing=locked for exclusive access)
-RUN --mount=type=cache,target=/root/.cache/uv,sharing=locked \
-    uv sync --frozen --no-install-project
+# Install dependencies (including building morphio-native)
+# --no-editable ensures runtime doesn't need source paths
+RUN uv sync --project morphio-io/backend --frozen --no-dev --no-editable
 
-# Copy source
-COPY backend/ ./
+# Stage 2: Runtime
+FROM python:3.13-slim
+
+WORKDIR /app
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl ffmpeg \
+ && rm -rf /var/lib/apt/lists/*
+
+# Copy uv binary (needed by docker-entrypoint.dev.sh)
+COPY --from=builder /usr/local/bin/uv /usr/local/bin/uv
+
+# Copy venv and app from builder
+COPY --from=builder /app/.venv /app/.venv
+COPY --from=builder /app/morphio-io/backend /app
+
+ENV PATH="/app/.venv/bin:$PATH" \
+    WATCHFILES_FORCE_POLLING=true
 
 # Copy dev entrypoint
-COPY backend/docker-entrypoint.dev.sh /docker-entrypoint.dev.sh
+COPY morphio-io/backend/docker-entrypoint.dev.sh /docker-entrypoint.dev.sh
 RUN chmod +x /docker-entrypoint.dev.sh
 
 EXPOSE 8005 5678
-
-ENV WATCHFILES_FORCE_POLLING=true
 
 CMD ["/docker-entrypoint.dev.sh"]

@@ -1,0 +1,66 @@
+# Root .dockerignore for monorepo builds
+# Docker compose files use repo root as context (context: ../..)
+
+# Version control
+.git
+**/.git
+
+# Python artifacts
+**/.venv
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/.pytest_cache
+**/.ruff_cache
+**/.mypy_cache
+**/htmlcov
+**/.coverage
+**/.tox
+
+# Node artifacts
+**/node_modules
+**/.next
+**/.turbo
+**/out
+**/dist
+
+# IDE/Editor
+.idea/
+.vscode/
+**/*.swp
+**/*.swo
+**/.DS_Store
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+**/stack.env
+!**/stack.env.example
+**/*.key
+**/*.pem
+**/secrets/
+
+# Caches and logs
+**/.cache
+**/*.log
+**/logs/
+
+# Data files
+**/*.db
+**/*.sqlite
+**/*.sqlite3
+
+# Build artifacts
+morphio-native/target/
+
+# Test artifacts
+**/.hypothesis
+
+# Documentation build
+**/site/
+
+# Temporary files
+**/tmp/
+**/*.tmp

@@ -1,36 +1,54 @@
+FROM python:3.13-slim AS builder
+
+WORKDIR /app
+
+# Install uv from official image
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
+# Install Rust for morphio-native
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl build-essential \
+ && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain 1.75 \
+ && rm -rf /var/lib/apt/lists/*
+
+ENV PATH="/root/.cargo/bin:${PATH}" \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_PROJECT_ENVIRONMENT=/app/.venv
+
+# Copy workspace configuration and members
+COPY pyproject.toml uv.lock ./
+COPY morphio-core/ morphio-core/
+COPY morphio-native/ morphio-native/
+COPY morphio-io/backend/ morphio-io/backend/
+
+# Install dependencies (including building morphio-native)
+# --no-editable ensures runtime doesn't need source paths
+RUN uv sync --project morphio-io/backend --frozen --group ml --no-dev --no-editable
+
+# Stage 2: Runtime
 FROM python:3.13-slim
+
+WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     DEBIAN_FRONTEND=noninteractive \
-    WHISPER_MODEL=small \
-    UV_COMPILE_BYTECODE=1 \
-    UV_LINK_MODE=copy \
-    VIRTUAL_ENV=/opt/venv \
-    PATH=/opt/venv/bin:$PATH
+    WHISPER_MODEL=small
 
-WORKDIR /app
+# System deps
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl ffmpeg \
+ && rm -rf /var/lib/apt/lists/*
 
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+# Copy venv and app from builder
+COPY --from=builder /app/.venv /app/.venv
+COPY --from=builder /app/morphio-io/backend /app
 
-# System deps with apt cache
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    apt-get update && apt-get install -y --no-install-recommends \
-    curl ffmpeg
+ENV PATH="/app/.venv/bin:$PATH"
 
-# Copy deps files
-COPY backend/pyproject.toml backend/uv.lock ./
-
-# Install core + ml deps, then replace torch with CPU-only version
-RUN --mount=type=cache,target=/root/.cache/uv,sharing=locked \
-    uv venv /opt/venv && \
-    UV_PROJECT_ENVIRONMENT=/opt/venv uv sync --frozen --group ml && \
-    uv pip uninstall torch torchaudio torchvision triton --python /opt/venv/bin/python && \
-    uv pip install torch torchaudio torchvision --index-url https://download.pytorch.org/whl/cpu --python /opt/venv/bin/python
-
-# Copy source
-COPY backend ./
+# Replace torch with CPU version to keep image size manageable in Docker
+RUN pip install torch torchaudio torchvision --index-url https://download.pytorch.org/whl/cpu
 
 EXPOSE 8001
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \

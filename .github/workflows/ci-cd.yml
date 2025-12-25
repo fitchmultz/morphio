@@ -70,19 +70,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Download native wheel
-        uses: actions/download-artifact@v4
+      - name: Set up Rust 1.75
+        uses: dtolnay/rust-action@stable
         with:
-          name: morphio-native-wheel
-          path: wheels/
+          toolchain: "1.75"
+
+      - name: Cache Cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: morphio-native
 
       - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-
-      - name: Install native wheel
-        run: pip install wheels/*.whl
 
       - name: Install uv
         run: |
@@ -90,22 +91,19 @@ jobs:
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Sync (frozen) with dev deps
-        working-directory: morphio-io/backend
         run: |
           uv venv .venv
-          UV_PROJECT_ENVIRONMENT=.venv uv sync --dev --frozen
+          UV_PROJECT_ENVIRONMENT=.venv uv sync --project morphio-io/backend --dev --frozen
 
       - name: Ruff (lint)
-        working-directory: morphio-io/backend
-        run: uv run ruff check .
+        run: UV_PROJECT_ENVIRONMENT=.venv uv run --project morphio-io/backend ruff check morphio-io/backend
 
       - name: Ruff (format check)
-        working-directory: morphio-io/backend
-        run: uv run ruff format --check .
+        run: UV_PROJECT_ENVIRONMENT=.venv uv run --project morphio-io/backend ruff format --check morphio-io/backend
 
       - name: ty (type check)
         working-directory: morphio-io/backend
-        run: uv run ty check
+        run: UV_PROJECT_ENVIRONMENT=../../.venv uv run ty check
 
   frontend-checks:
     name: Frontend • Biome + TypeScript
@@ -154,11 +152,11 @@ jobs:
           - name: worker-ml
             dockerfile: morphio-io/backend/Dockerfile.worker-ml
             image: ghcr.io/${{ github.repository_owner }}/morphio-io-worker-ml
-            context: morphio-io
+            context: .  # Repo root for morphio-native access
           - name: crawler
             dockerfile: morphio-io/backend/Dockerfile.crawler
             image: ghcr.io/${{ github.repository_owner }}/morphio-io-crawler
-            context: morphio-io
+            context: .  # Repo root for morphio-native access
     steps:
       - name: Checkout
         uses: actions/checkout@v4
