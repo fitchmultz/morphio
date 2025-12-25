@@ -171,9 +171,12 @@ app.include_router(logs.router, prefix="/logs", tags=["Logs"])
 # Optional Prometheus metrics endpoint (disabled by default)
 if settings.PROMETHEUS_ENABLED:
     from .routes import metrics
+    from .middlewares.metrics import prometheus_metrics_middleware
 
+    app.middleware("http")(prometheus_metrics_middleware)
     app.include_router(metrics.router)
     logger.info("Prometheus metrics endpoint enabled at /metrics")
+    logger.info("Prometheus request metrics middleware enabled")
 
 register_exception_handlers(app)
 security = HTTPBearer()
