@@ -149,14 +149,17 @@ jobs:
             dockerfile: morphio-io/backend/Dockerfile.api
             image: ghcr.io/${{ github.repository_owner }}/morphio-io-backend-api
             context: .  # Repo root for morphio-native access
+            platforms: linux/amd64
           - name: worker-ml
             dockerfile: morphio-io/backend/Dockerfile.worker-ml
             image: ghcr.io/${{ github.repository_owner }}/morphio-io-worker-ml
             context: .  # Repo root for morphio-native access
+            platforms: linux/amd64  # torchcodec lacks Linux ARM64 wheels
           - name: crawler
             dockerfile: morphio-io/backend/Dockerfile.crawler
             image: ghcr.io/${{ github.repository_owner }}/morphio-io-crawler
             context: .  # Repo root for morphio-native access
+            platforms: linux/amd64
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -193,6 +196,7 @@ jobs:
         with:
           context: ${{ matrix.context }}
           file: ${{ matrix.dockerfile }}
+          platforms: ${{ matrix.platforms }}
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

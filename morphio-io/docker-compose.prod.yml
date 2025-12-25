@@ -35,6 +35,7 @@ services:
     build:
       context: ..
       dockerfile: morphio-io/backend/Dockerfile.worker-ml
+    platform: linux/amd64  # Required: torchcodec lacks Linux ARM64 wheels
     container_name: morphio-io-worker-ml
     environment:
       - WHISPER_MODEL=small

@@ -122,6 +122,17 @@ docker build -f morphio-io/backend/Dockerfile.api .
 
 **Note**: `~/.secrets` should export `GITHUB_TOKEN` or configure Docker credential helpers for GHCR access.
 
+### Platform Constraints
+
+**worker-ml is amd64-only**: The ML stack depends on `torchcodec` (via `pyannote-audio`), which only publishes x86_64 wheels. Until upstream provides Linux ARM64 wheels, worker-ml must be built for amd64:
+
+```bash
+# Manual ARM64 host build
+DOCKER_DEFAULT_PLATFORM=linux/amd64 docker build -f morphio-io/backend/Dockerfile.worker-ml .
+```
+
+Docker Compose files already include `platform: linux/amd64` for worker-ml.
+
 ## Common Tasks
 
 | Task | Command |
