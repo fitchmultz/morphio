@@ -12,7 +12,7 @@
 	lint lint-native lint-core lint-io \
 	format format-native format-core format-io \
 	check check-native check-core check-io audit-imports \
-	clean check-rust
+	clean check-rust rmds
 
 # Default target
 help: ## Show this help message
@@ -144,7 +144,7 @@ format-io: ## Format morphio-io (backend + frontend)
 # Full Check (CI/Pre-commit)
 # ============================================================================
 
-check: check-native check-core check-io audit-imports ## Full CI check for entire monorepo (required before commits)
+check: rmds check-native check-core check-io audit-imports ## Full CI check for entire monorepo (required before commits)
 	@echo ""
 	@echo "============================================"
 	@echo "✅ All checks passed for entire monorepo!"
@@ -184,6 +184,9 @@ clean: ## Clean all build artifacts
 	@echo "🧹 Cleaning morphio-io..."
 	@cd morphio-io && $(MAKE) clean
 	@echo "✅ Clean complete!"
+
+rmds: ## Remove .DS_Store files
+	find . -name .DS_Store -type f -print -delete
 
 # ============================================================================
 # Project-specific commands (pass-through)
