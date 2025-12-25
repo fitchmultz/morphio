@@ -6,7 +6,7 @@ It is only enabled when PROMETHEUS_ENABLED=true in the configuration.
 Metrics are collected automatically by prometheus_client from:
 - Default process metrics (CPU, memory, file descriptors)
 - Default Python metrics (GC, threads)
-- Custom application metrics (defined in app/metrics.py if created)
+- Custom application metrics (request count and latency via metrics middleware)
 
 Usage:
   1. Set PROMETHEUS_ENABLED=true in .env
