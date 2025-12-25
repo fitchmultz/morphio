@@ -3891,7 +3891,8 @@
 									"status": "success",
 									"message": "Log file configuration",
 									"data": {
-										"allowed_extensions": ["csv", "json", "log", "md", "txt"]
+										"allowed_extensions": ["csv", "json", "log", "md", "txt"],
+										"max_upload_size": 3221225472
 									}
 								}
 							}

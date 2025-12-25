@@ -6,7 +6,8 @@ import { SubmitButton } from "@/components/common/FormFields";
 import { FormWrapper } from "@/components/common/FormWrapper";
 import FileUpload from "@/components/features/content-generation/FileUpload";
 import logger from "@/lib/logger";
-import { MAX_FILE_SIZE } from "@/utils/constants";
+
+const DEFAULT_MAX_UPLOAD_SIZE = 3221225472;
 
 type ProcessType = "logs" | "splunk";
 
@@ -35,6 +36,9 @@ export const LogUploadForm: FC<LogUploadFormProps> = ({
 		"json",
 		"md",
 	]);
+	const [maxUploadSize, setMaxUploadSize] = useState<number>(
+		DEFAULT_MAX_UPLOAD_SIZE,
+	);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
@@ -43,9 +47,15 @@ export const LogUploadForm: FC<LogUploadFormProps> = ({
 			try {
 				const { data } = await getLogConfig();
 				if (data?.status === "success" && data.data) {
-					const configData = data.data as { allowed_extensions?: string[] };
+					const configData = data.data as {
+						allowed_extensions?: string[];
+						max_upload_size?: number;
+					};
 					if (configData.allowed_extensions) {
 						setAllowedExtensions(configData.allowed_extensions);
+					}
+					if (configData.max_upload_size) {
+						setMaxUploadSize(configData.max_upload_size);
 					}
 				}
 			} catch (error: unknown) {
@@ -105,7 +115,7 @@ export const LogUploadForm: FC<LogUploadFormProps> = ({
 							setAutoDetectedType={() => {}} // Not needed for logs
 							isLoading={isDisabled}
 							hasUrl={false}
-							maxUploadSize={MAX_FILE_SIZE}
+							maxUploadSize={maxUploadSize}
 							acceptedTypes={acceptedFileTypes}
 							helpText={helpText}
 						/>

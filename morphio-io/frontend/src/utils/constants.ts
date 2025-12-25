@@ -2,7 +2,7 @@ export const API_BASE_URL =
 	process.env.NEXT_PUBLIC_API_BASE_URL ||
 	(process.env.NODE_ENV === "production"
 		? "https://api.morphio.io"
-		: "http://localhost:8000");
+		: "http://localhost:8005");
 
 export const ROUTES = {
 	HOME: "/",
@@ -15,8 +15,6 @@ export const ROUTES = {
 } as const;
 
 export const AUTH_COOKIE_NAME = "auth_token";
-
-export const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
 
 // Note: These are fallback values. The application now
 // dynamically fetches allowed media extensions from the backend.

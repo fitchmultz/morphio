@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/common/Skeleton";
 import { useAuth } from "@/contexts/AuthContext";
 import logger from "@/lib/logger";
 import { notifyError, notifySuccess } from "@/lib/toast";
+import { API_BASE_URL } from "@/utils/constants";
 
 type UsageStat = {
 	usage_id: number;
@@ -39,7 +40,7 @@ type LLMUsageSummary = {
 };
 
 export default function AdminPage() {
-	const { isAuthenticated, userData, loading } = useAuth();
+	const { isAuthenticated, userData, loading, getToken } = useAuth();
 	const router = useRouter();
 	const [usageData, setUsageData] = useState<UsageStat[]>([]);
 	const [isLoadingUsage, setIsLoadingUsage] = useState(true);
@@ -79,11 +80,17 @@ export default function AdminPage() {
 			if (exportStartDate) params.append("start", exportStartDate);
 			if (exportEndDate) params.append("end", exportEndDate);
 			params.append("format", "csv");
+			const token = getToken();
+			const headers: HeadersInit = {};
+			if (token) {
+				headers.Authorization = `Bearer ${token}`;
+			}
 
 			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8005"}/admin/usage/export?${params.toString()}`,
+				`${API_BASE_URL}/admin/usage/export?${params.toString()}`,
 				{
 					credentials: "include",
+					headers,
 				},
 			);
 
@@ -112,7 +119,7 @@ export default function AdminPage() {
 		} finally {
 			setIsExporting(false);
 		}
-	}, [userData, exportStartDate, exportEndDate, toUserMessage]);
+	}, [userData, exportStartDate, exportEndDate, getToken, toUserMessage]);
 
 	useEffect(() => {
 		const fetchUsageStats = async () => {
