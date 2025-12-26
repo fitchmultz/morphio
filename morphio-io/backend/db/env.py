@@ -46,6 +46,7 @@ def run_migrations_online() -> None:
     async def run_async_migrations():
         async with connectable.connect() as connection:
             await connection.run_sync(do_migrations)
+        await connectable.dispose()
 
     import asyncio
 
