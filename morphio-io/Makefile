@@ -11,13 +11,9 @@ help: ## Show this help message
 setup: ## Initial setup: install deps, copy env files
 	@echo "Setting up Morphio monorepo..."
 	@$(MAKE) install
-	@if [ ! -f backend/.env ]; then \
-		echo "Copying backend/.env.example to backend/.env"; \
-		cp backend/.env.example backend/.env || true; \
-	fi
-	@if [ ! -f frontend/.env.local ]; then \
-		echo "Copying frontend/.env.example to frontend/.env.local"; \
-		cp frontend/.env.example frontend/.env.local || true; \
+	@if [ ! -f .env ]; then \
+		echo "Copying stack.env.example to .env"; \
+		cp stack.env.example .env || true; \
 	fi
 	@echo "✅ Setup complete!"
 
@@ -51,7 +47,7 @@ dev: ## Start native dev servers (backend + frontend + Redis via Docker)
 	trap cleanup INT TERM; \
 	echo "🚀 Starting native dev servers..."; \
 	docker compose -f docker-compose.watch.yml up -d redis; \
-	PORT=$$(grep -E "^APP_PORT=" backend/.env 2>/dev/null | cut -d "=" -f2 || echo "8005"); \
+	PORT=$$(grep -E "^APP_PORT=" .env 2>/dev/null | cut -d "=" -f2 || echo "8005"); \
 	echo "🚀 Starting backend on http://localhost:$$PORT..."; \
 	cd backend && uv run uvicorn app.main:app --reload --port $$PORT & \
 	BACKEND_PID=$$!; \
@@ -111,7 +107,7 @@ dev-crawler: ## Start crawler natively
 	@cd backend && uv run uvicorn crawler.main:app --reload --port 8002
 
 dev-backend: ## Start backend dev server (native)
-	@PORT=$$(grep -E '^APP_PORT=' backend/.env 2>/dev/null | cut -d '=' -f2 || echo "8005"); \
+	@PORT=$$(grep -E '^APP_PORT=' .env 2>/dev/null | cut -d '=' -f2 || echo "8005"); \
 	echo "🚀 Starting backend on http://localhost:$$PORT..."; \
 	cd backend && uv run uvicorn app.main:app --reload --port $$PORT
 
@@ -159,7 +155,10 @@ type-check-frontend: ## Type check frontend
 	@echo "🔷 Type checking frontend..."
 	@cd frontend && pnpm type-check
 
-check: openapi format type-check lint build-frontend test ## Run openapi, format, type check, lint, build, and tests (full pre-commit check)
+audit-env: ## Audit env template matches backend config
+	@python3 scripts/audit_env_template.py
+
+check: openapi format type-check lint build-frontend test audit-env ## Run openapi, format, type check, lint, build, tests, and env audit (full pre-commit check)
 	@echo "✅ All checks passed!"
 
 openapi: openapi-export openapi-generate ## Regenerate frontend API types from backend (no server needed)

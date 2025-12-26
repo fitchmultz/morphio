@@ -1,5 +1,33 @@
 // @ts-check
 import type { NextConfig } from "next";
+import fs from "node:fs";
+import path from "node:path";
+
+const envRoot = path.resolve(__dirname, "..");
+const envFiles = [".env", ".env.local"].map((name) => path.join(envRoot, name));
+
+const loadEnvFile = (filePath: string, override = false) => {
+	if (!fs.existsSync(filePath)) return;
+	const contents = fs.readFileSync(filePath, "utf-8");
+	for (const rawLine of contents.split(/\r?\n/)) {
+		const line = rawLine.trim();
+		if (!line || line.startsWith("#") || !line.includes("=")) {
+			continue;
+		}
+		const [key, ...rest] = line.split("=");
+		const value = rest.join("=").trim();
+		if (!key) continue;
+		if (!override && process.env[key] !== undefined) continue;
+		const normalized =
+			value.startsWith("\"") && value.endsWith("\"")
+				? value.slice(1, -1)
+				: value;
+		process.env[key] = normalized;
+	}
+};
+
+loadEnvFile(envFiles[0]);
+loadEnvFile(envFiles[1], true);
 
 const nextConfig: NextConfig = {
 	productionBrowserSourceMaps: false,
