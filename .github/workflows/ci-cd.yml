@@ -209,6 +209,3 @@ jobs:
 
       - name: Docker smoke
         run: bash morphio-io/scripts/smoke_docker.sh
-          provenance: false
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
