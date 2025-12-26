@@ -135,7 +135,7 @@ class TestIsValidUrl:
     def test_valid_urls(self):
         """Test valid URLs return True."""
         assert is_valid_url("https://example.com/video.mp4")
-        assert is_valid_url("http://localhost:8000/test")
+        assert is_valid_url("http://localhost:8005/test")
         assert is_valid_url("ftp://files.example.com/data")
 
     def test_invalid_urls(self):

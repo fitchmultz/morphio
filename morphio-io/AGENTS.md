@@ -50,8 +50,8 @@ make check      # Run all checks (required before commits)
 ## Development Ports
 
 - **Frontend**: Port 3005 (http://localhost:3005)
-- **Backend API**: Port 8005 (http://localhost:8005), prod 8000
-- **Redis**: Host 6384 (localhost:6384), container 6379
+- **Backend API**: Port 8005 (http://localhost:8005)
+- **Redis**: Port 6384 (localhost:6384)
 
 ## Coding Style & Naming Conventions
 

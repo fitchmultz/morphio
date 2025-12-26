@@ -121,7 +121,7 @@ While the exact AI models aren't specified in the codebase, the structure sugges
    - Node.js >= 24.0.0
    - Python 3.13
    - Docker and Docker Compose
-   - PostgreSQL and Redis instances (or use Docker; Redis host port 6384, container 6379)
+   - PostgreSQL and Redis instances (or use Docker; Redis port 6384)
 
 2. **Clone the Repository**:
 
@@ -164,7 +164,7 @@ While the exact AI models aren't specified in the codebase, the structure sugges
 
 6. **Access**:
    - Frontend: `http://localhost:3005`
-   - Backend API (dev): `http://localhost:8005` (prod: `http://localhost:8000`)
+   - Backend API: `http://localhost:8005`
 
 ## Secrets & Production
 
@@ -210,7 +210,7 @@ While the exact AI models aren't specified in the codebase, the structure sugges
   printf '%s' 'postgresql+asyncpg://user:pass@postgres:5432/morphio' > secrets/DATABASE_URL
   openssl rand -base64 48 > secrets/SECRET_KEY
   openssl rand -base64 48 > secrets/JWT_SECRET_KEY
-  printf '%s' 'redis://:$(cat secrets/REDIS_PASSWORD)@redis:6379/0' > secrets/REDIS_URL
+  printf '%s' 'redis://:$(cat secrets/REDIS_PASSWORD)@redis:6384/0' > secrets/REDIS_URL
   openssl rand -hex 24 > secrets/REDIS_PASSWORD
 
   # Bring up stack (API will refuse to start if required secrets are missing or invalid)

@@ -5,13 +5,13 @@ services:
       dockerfile: morphio-io/backend/Dockerfile.api
     container_name: morphio-io-backend
     ports:
-      - '8000:8000'
+      - '8005:8005'
     env_file:
       - stack.env
     environment:
       - APP_ENV=${APP_ENV}
       - APP_PORT=${APP_PORT}
-      - REDIS_URL=redis://redis:6379/0
+      - REDIS_URL=redis://redis:6384/0
       - WORKER_ML_URL=http://worker-ml:8001
       - CRAWLER_URL=http://crawler:8002
     depends_on:
@@ -25,7 +25,7 @@ services:
     volumes:
       - sqlite_data:/app/db
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://localhost:8000/health/"]
+      test: ["CMD", "curl", "-fsS", "http://localhost:8005/health/"]
       interval: 30s
       timeout: 5s
       retries: 5
@@ -35,7 +35,7 @@ services:
     image: ghcr.io/fitchmultz/morphio-io-frontend:latest
     container_name: morphio-io-frontend
     ports:
-      - '3500:3000'
+      - '3500:3005'
     env_file:
       - stack.env
     environment:
@@ -46,7 +46,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000"]
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3005"]
       interval: 30s
       timeout: 5s
       retries: 5
@@ -57,13 +57,13 @@ services:
     container_name: morphio-io-redis
     command: redis-server /usr/local/etc/redis/redis.conf
     ports:
-      - '6379:6379'
+      - '6384:6384'
     volumes:
       - ${REDIS_CONF_PATH}:/usr/local/etc/redis/redis.conf
       - redisdata:/data
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "redis-cli", "-p", "6384", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5

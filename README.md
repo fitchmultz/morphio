@@ -135,7 +135,7 @@ morphio-io uses thin adapters (`app/adapters/`) that:
 - **Backend**: Python 3.13+, FastAPI, SQLAlchemy, PostgreSQL, Redis
 - **Frontend**: Next.js 16.1.1, React 19, TypeScript, TailwindCSS 4
 - **Node.js**: ≥24.0.0
-- **Ports**: Backend dev 8005 (prod 8000), Frontend dev 3005, Frontend Docker 3500→3000, Redis host 6384 (container 6379)
+- **Ports**: Backend 8005, Frontend 3005 (Docker 3500→3005), Redis 6384
 - **DevOps**: Docker, GitHub Actions
 
 ### morphio-core

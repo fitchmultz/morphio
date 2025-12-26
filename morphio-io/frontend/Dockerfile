@@ -48,9 +48,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 
 USER nextjs
 
-EXPOSE 3000
+ENV PORT=3005
+EXPOSE 3005
 
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD wget -q --spider http://localhost:3000 || exit 1
+    CMD wget -q --spider http://localhost:3005 || exit 1
 
 CMD ["pnpm", "start"]

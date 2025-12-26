@@ -122,7 +122,7 @@ uv sync --dev
 2. Run the API locally:
 
 ```bash
-uv run uvicorn app.main:app --reload --port 8000
+uv run uvicorn app.main:app --reload --port 8005
 ```
 
 3. Lint and type-check:
@@ -153,11 +153,11 @@ uv run pytest -q
 ### k6 baseline
 
 - Script: `perf/k6/api-baseline.js`
-- Run locally (API at http://localhost:8000):
+- Run locally (API at http://localhost:8005):
 
 ```bash
 docker run --rm -it \
-  -e BASE_URL=http://host.docker.internal:8000 \
+  -e BASE_URL=http://host.docker.internal:8005 \
   -e VUS=50 -e DURATION=5m \
   -v "$PWD":/work -w /work grafana/k6:0.48.0 \
   run perf/k6/api-baseline.js
@@ -174,7 +174,7 @@ Metrics to watch: `http_reqs`, `http_req_duration{p(95)}`, error rate.
 docker run --rm -it -p 8089:8089 \
   -v "$PWD/perf/locust":/mnt/locust \
   --add-host host.docker.internal:host-gateway \
-  -e LOCUST_HOST=http://host.docker.internal:8000 \
+  -e LOCUST_HOST=http://host.docker.internal:8005 \
   locustio/locust:2.32.2 -f /mnt/locust/locustfile.py
 ```
 

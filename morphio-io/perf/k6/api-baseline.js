@@ -15,7 +15,7 @@ export const options = {
   },
 };
 
-const BASE_URL = __ENV.BASE_URL || 'http://localhost:8000';
+const BASE_URL = __ENV.BASE_URL || 'http://localhost:8005';
 
 export function setup() {
   const email = `k6_${Math.random().toString(36).slice(2, 8)}@example.com`;
@@ -55,4 +55,3 @@ export default function (data) {
 
   sleep(1);
 }
-

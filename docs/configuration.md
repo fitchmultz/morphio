@@ -8,12 +8,11 @@ This document defines the canonical configuration contract for the Morphio monor
 
 | Service | Port | Notes |
 |---------|------|-------|
-| Backend API (dev) | 8005 | FastAPI server |
-| Backend API (prod) | 8000 | FastAPI server |
+| Backend API | 8005 | FastAPI server |
 | Frontend Dev | 3005 | Next.js dev server (`pnpm dev`) |
-| Frontend Docker | 3500 → 3000 | Published port maps to container port 3000 |
+| Frontend Docker | 3500 → 3005 | Published port maps to container port 3005 |
 | PostgreSQL | 5432 | Production database |
-| Redis | 6384 | Host port (container 6379) |
+| Redis | 6384 | Host and container port |
 
 ## Environment Variable Sources
 
@@ -81,8 +80,8 @@ This document defines the canonical configuration contract for the Morphio monor
 
 **URL Format:**
 - Development: `redis://localhost:6384/0`
-- Docker: `redis://redis:6379/0`
-- Production with auth: `redis://:PASSWORD@redis:6379/0`
+- Docker: `redis://redis:6384/0`
+- Production with auth: `redis://:PASSWORD@redis:6384/0`
 
 ## Docker Compose Configuration
 
@@ -91,7 +90,7 @@ This document defines the canonical configuration contract for the Morphio monor
 ```yaml
 backend:
   environment:
-    - REDIS_URL=redis://redis:6379/0
+    - REDIS_URL=redis://redis:6384/0
   ports:
     - "8005:8005"
 
@@ -99,12 +98,12 @@ frontend:
   environment:
     - NEXT_PUBLIC_API_BASE_URL=http://localhost:8005
   ports:
-    - "3500:3000"
+    - "3500:3005"
 
 redis:
   image: redis:7.4-alpine
   ports:
-    - "6384:6379"
+    - "6384:6384"
 ```
 
 ### Production (`docker-compose.prod.yml`)
@@ -134,7 +133,7 @@ ALLOWED_LOG_EXTENSIONS=["csv","json","log","md","txt"]
 
 ```env
 # JSON array format
-CORS_ORIGINS=["http://localhost:3000","http://localhost:3005","https://morphio.io"]
+CORS_ORIGINS=["http://localhost:3005","http://localhost:3500","https://morphio.io"]
 ```
 
 ## Usage & Subscription

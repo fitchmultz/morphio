@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     APP_ENV: str = Field(default="production", json_schema_extra={"env": "APP_ENV"})
     DEBUG: bool = Field(default=False, json_schema_extra={"env": "DEBUG"})
     LOG_LEVEL: str = Field(default="INFO", json_schema_extra={"env": "LOG_LEVEL"})
-    APP_PORT: int = Field(default=8000, ge=1024, le=65535, json_schema_extra={"env": "APP_PORT"})
+    APP_PORT: int = Field(default=8005, ge=1024, le=65535, json_schema_extra={"env": "APP_PORT"})
     UVICORN_WORKERS: int = Field(default=2, json_schema_extra={"env": "UVICORN_WORKERS"})
     REGISTRATION_ENABLED: bool = Field(
         default=True, json_schema_extra={"env": "REGISTRATION_ENABLED"}
@@ -47,10 +47,8 @@ class Settings(BaseSettings):
     CORS_ORIGINS: List[str] = Field(
         default=[
             "http://localhost:3005",
-            "http://localhost:3000",
-            "http://frontend:3000",
-            "http://localhost:3001",
-            "http://frontend:3001",
+            "http://localhost:3500",
+            "http://frontend:3005",
             "https://morphio.io",
             "http://morphio.io",
             "https://www.morphio.io",
@@ -60,7 +58,7 @@ class Settings(BaseSettings):
         json_schema_extra={"env": "CORS_ORIGINS"},
     )
     REDIS_URL: str = Field(
-        default="redis://localhost:6379/0", json_schema_extra={"env": "REDIS_URL"}
+        default="redis://localhost:6384/0", json_schema_extra={"env": "REDIS_URL"}
     )
     REDIS_PASSWORD: str = Field(default="", json_schema_extra={"env": "REDIS_PASSWORD"})
     REDIS_DB: int = Field(default=0, json_schema_extra={"env": "REDIS_DB"})
