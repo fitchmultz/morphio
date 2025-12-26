@@ -2,13 +2,11 @@ FROM python:3.13-slim AS builder
 
 WORKDIR /app
 
-# Install uv from official image
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
-
-# Install Rust for morphio-native
+# Install Rust for morphio-native and uv
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl build-essential \
  && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain 1.75 \
+ && pip install --no-cache-dir uv==0.9.18 \
  && rm -rf /var/lib/apt/lists/*
 
 ENV PATH="/root/.cargo/bin:${PATH}" \
@@ -35,9 +33,6 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl ffmpeg \
  && rm -rf /var/lib/apt/lists/*
-
-# Copy uv binary (needed by docker-entrypoint.dev.sh)
-COPY --from=builder /usr/local/bin/uv /usr/local/bin/uv
 
 # Copy venv and app from builder
 COPY --from=builder /app/.venv /app/.venv
