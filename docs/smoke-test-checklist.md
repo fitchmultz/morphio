@@ -5,6 +5,7 @@ Use this checklist after local changes or before release candidates.
 ## Services
 
 - Start dev: `make dev` (native) or `docker compose -f morphio-io/docker-compose.watch.yml up -d --build`
+- Full stack (worker-ml + crawler): `docker compose -f morphio-io/docker-compose.watch.yml --profile full up -d --build`
 - Backend health: `curl -fsS http://localhost:8005/health/`
 - Database health: `curl -fsS http://localhost:8005/health/db`
 - Redis health: `curl -fsS http://localhost:8005/health/redis`

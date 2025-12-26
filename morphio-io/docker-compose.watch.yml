@@ -94,6 +94,7 @@ services:
       dockerfile: morphio-io/backend/Dockerfile.worker-ml
     platform: linux/amd64  # Required: torch/torchcodec lack Linux ARM64 wheels
     container_name: morphio-dev-worker-ml
+    profiles: ["full"]
     environment:
       - WHISPER_MODEL=${WHISPER_MODEL:-small}
     healthcheck:
@@ -108,6 +109,7 @@ services:
       dockerfile: morphio-io/backend/Dockerfile.crawler
     platform: linux/amd64  # Required: torchcodec lacks Linux ARM64 wheel
     container_name: morphio-dev-crawler
+    profiles: ["full"]
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:8002/health/"]
       interval: 30s
