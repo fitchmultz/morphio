@@ -198,6 +198,17 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  docker-smoke:
+    name: Docker • Smoke (Compose)
+    needs: [ backend-checks, frontend-checks ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Docker smoke
+        run: bash morphio-io/scripts/smoke_docker.sh
           provenance: false
           cache-from: type=gha
           cache-to: type=gha,mode=max
