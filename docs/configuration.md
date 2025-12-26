@@ -19,9 +19,8 @@ This document defines the canonical configuration contract for the Morphio monor
 | File | Purpose |
 |------|---------|
 | `morphio-io/backend/app/config.py` | **Canonical source** - all backend env vars |
-| `morphio-io/backend/.env.example` | Backend local development |
-| `morphio-io/frontend/.env.example` | Frontend local development |
-| `morphio-io/stack.env.example` | Docker Compose stack |
+| `morphio-io/.env.example` | Single env template for local dev and Docker |
+| `morphio-io/.env.local` | Optional local overrides (not committed) |
 
 ## Required Variables by Service
 

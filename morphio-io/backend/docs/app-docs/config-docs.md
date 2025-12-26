@@ -65,5 +65,5 @@ The app **refuses to start** if these aren't met.
 ## Related Files
 
 - `app/config.py` - Settings class definition
-- `.env.example` - Local development template
-- `../stack.env.example` - Docker Compose template
+- `.env.example` - Local development template (repo root)
+- `.env.local` - Local overrides (repo root, not committed)

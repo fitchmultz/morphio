@@ -133,8 +133,8 @@ While the exact AI models aren't specified in the codebase, the structure sugges
 3. **Backend Setup**:
 
   ```bash
+  cp .env.example .env  # Edit with your credentials (optional overrides in .env.local)
   cd backend
-  cp .env.example .env  # Edit with your credentials
   uv sync --dev         # Install project deps + dev tools (ruff, pytest, etc.)
   alembic upgrade head  # Run database migrations
   ```
@@ -143,7 +143,6 @@ While the exact AI models aren't specified in the codebase, the structure sugges
 
    ```bash
    cd frontend
-   cp .env.example .env.local  # Configure API base URL
    pnpm install
    pnpm dev  # Start development server
    ```
@@ -151,7 +150,7 @@ While the exact AI models aren't specified in the codebase, the structure sugges
 5. **Docker Setup**:
 
    ```bash
-   cp stack.env.example stack.env  # Configure environment variables
+   cp .env.example .env  # Configure environment variables
    ./build-docker.sh
    ./start-docker-dev.sh  # Start all services
    ```
@@ -221,7 +220,7 @@ While the exact AI models aren't specified in the codebase, the structure sugges
     - `APP_ENV=production` and `SECRET_KEY`/`JWT_SECRET_KEY` are missing or still dev defaults
     - `DATABASE_URL` is missing or points to SQLite
 
-See `backend/.env.example` for more details.
+See `.env.example` for more details.
 
 ## Releases
 
