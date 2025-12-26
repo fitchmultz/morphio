@@ -20,7 +20,7 @@ wait_for() {
   local timeout="${2:-180}"
   local start=$SECONDS
   while (( SECONDS - start < timeout )); do
-    if curl -fsS "$url" >/dev/null; then
+    if curl -fsS --max-time 5 "$url" >/dev/null 2>&1; then
       return 0
     fi
     sleep 2
