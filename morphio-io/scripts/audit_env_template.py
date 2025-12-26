@@ -8,7 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 CONFIG_PATH = ROOT / "backend" / "app" / "config.py"
-TEMPLATE_PATH = ROOT / "stack.env.example"
+TEMPLATE_PATH = ROOT / ".env.example"
 
 
 def extract_env_keys(config_text: str) -> set[str]:
