@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional
 
 from dotenv import load_dotenv
 from pydantic import AliasChoices, Field, SecretStr
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Load canonical .env from morphio-io root
 # config.py is at backend/app/config.py, so go up 3 levels to reach morphio-io/
@@ -18,6 +18,7 @@ if local_env.exists():
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_ignore_empty=True)
     APP_ENV: str = Field(default="production", json_schema_extra={"env": "APP_ENV"})
     DEBUG: bool = Field(default=False, json_schema_extra={"env": "DEBUG"})
     LOG_LEVEL: str = Field(default="INFO", json_schema_extra={"env": "LOG_LEVEL"})
@@ -70,7 +71,9 @@ class Settings(BaseSettings):
     ANTHROPIC_API_KEY: SecretStr = Field(
         default=SecretStr(""), json_schema_extra={"env": "ANTHROPIC_API_KEY"}
     )
-    OPENAI_API_KEY: SecretStr = Field(..., json_schema_extra={"env": "OPENAI_API_KEY"})
+    OPENAI_API_KEY: SecretStr = Field(
+        default=SecretStr(""), json_schema_extra={"env": "OPENAI_API_KEY"}
+    )
     GEMINI_API_KEY: SecretStr = Field(
         default=SecretStr(""), json_schema_extra={"env": "GEMINI_API_KEY"}
     )
