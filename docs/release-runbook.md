@@ -3,7 +3,7 @@
 This runbook covers staging, deployment, rollback, and verification.
 
 ## Staging
-- Sync `stack.env`/secrets for staging.
+- Sync `.env`/secrets for staging.
 - Deploy with `docker-compose.prod.yml` (or the pinned release compose).
 - Run smoke tests: login, content generation, log upload, billing.
 - Validate `/health` and `/metrics` endpoints.
