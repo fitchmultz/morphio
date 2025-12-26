@@ -177,7 +177,8 @@ jobs:
               image: ${API_IMAGE}
               environment:
                 - APP_ENV=production
-              ports: ["8000:8000"]
+                - REDIS_URL=redis://redis:6384/0
+              ports: ["8005:8005"]
               depends_on:
                 redis: { condition: service_healthy }
                 worker-ml: { condition: service_healthy }
@@ -188,8 +189,10 @@ jobs:
               image: ${CRAWLER_IMAGE}
             redis:
               image: redis:alpine
+              command: ["redis-server", "--port", "6384"]
+              ports: ["6384:6384"]
               healthcheck:
-                test: ["CMD", "redis-cli", "ping"]
+                test: ["CMD", "redis-cli", "-p", "6384", "ping"]
                 interval: 10s
                 timeout: 5s
                 retries: 5
