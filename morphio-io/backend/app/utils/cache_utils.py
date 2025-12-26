@@ -1,4 +1,5 @@
 import datetime
+import inspect
 import hashlib
 import json
 import logging
@@ -44,7 +45,9 @@ async def test_redis_connection() -> bool:
         return False
     try:
         client = _get_redis_client()
-        result = await client.ping()
+        result = client.ping()
+        if inspect.isawaitable(result):
+            result = await result
         if result:
             logger.info("Redis connection test successful (cache_utils)")
             return True
