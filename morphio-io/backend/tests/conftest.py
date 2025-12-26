@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sess
 
 os.environ["APP_ENV"] = "development"  # Ensure relaxed settings during tests
 os.environ["JWT_SECRET_KEY"] = "test_secret_key"  # Set before imports
+os.environ["RATE_LIMITING_ENABLED"] = "False"  # Disable rate limiting for tests
 
 from app.database import get_db
 from app.main import app
