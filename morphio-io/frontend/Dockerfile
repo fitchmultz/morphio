@@ -1,5 +1,5 @@
 # Stage 1: Build the Next.js application
-FROM node:22-alpine AS builder
+FROM node:24-alpine AS builder
 
 # Set working directory
 WORKDIR /app
@@ -22,7 +22,7 @@ COPY frontend .
 RUN pnpm build
 
 # Stage 2: Serve the Next.js application
-FROM node:22-alpine
+FROM node:24-alpine
 
 WORKDIR /app
 
