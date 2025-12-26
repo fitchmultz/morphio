@@ -3,7 +3,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from dotenv import load_dotenv
+from dotenv import dotenv_values
 from pydantic import AliasChoices, Field, SecretStr
 from pydantic_settings import BaseSettings
 
@@ -11,10 +11,20 @@ from pydantic_settings import BaseSettings
 # config.py is at backend/app/config.py, so go up 3 levels to reach morphio-io/
 root_env = Path(__file__).parent.parent.parent / ".env"
 local_env = Path(__file__).parent.parent.parent / ".env.local"
-if root_env.exists():
-    load_dotenv(root_env, override=False)
-if local_env.exists():
-    load_dotenv(local_env, override=True)
+
+
+def _apply_env(path: Path, override: bool) -> None:
+    if not path.exists():
+        return
+    for key, value in dotenv_values(path).items():
+        if value in (None, ""):
+            continue
+        if override or key not in os.environ:
+            os.environ[key] = value
+
+
+_apply_env(root_env, override=False)
+_apply_env(local_env, override=True)
 
 
 class Settings(BaseSettings):
