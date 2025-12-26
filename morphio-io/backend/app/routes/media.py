@@ -255,7 +255,7 @@ async def process_media_route(
             if total_bytes > settings.MAX_UPLOAD_SIZE:
                 raise ApplicationException(
                     message="File size exceeds the maximum allowed limit.",
-                    status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                    status_code=status.HTTP_413_CONTENT_TOO_LARGE,
                 )
         await input_file.seek(0)
 
