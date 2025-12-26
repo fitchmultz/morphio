@@ -1,15 +1,16 @@
 # Morphio Project Status
 
-> **Last Updated:** 2025-12-23
+> **Last Updated:** 2025-12-25
 
 ## Overview
 
-Morphio is a monorepo containing two main projects:
+Morphio is a monorepo containing three main projects:
 
 | Project | Description | Status |
 |---------|-------------|--------|
 | **morphio-core** | Standalone library for audio/LLM/security utilities | Stable |
 | **morphio-io** | Full-stack web application (FastAPI + Next.js) | Active Development |
+| **morphio-native** | Native binaries and accelerators | Active Development |
 
 ## Current Versions & Ports
 
@@ -62,9 +63,20 @@ All core development phases have been completed as of 2025-12-23. See [phase-11-
 - Production security headers middleware (Phase 14)
 - Rate limiting with Redis backend (Phase 14)
 
-## Current Focus: Normalization ✅ Complete
+## Current Focus: Baseline Alignment ✅ Complete
 
-Repository normalization completed on 2025-12-23:
+Baseline alignment and wiring completed on 2025-12-25:
+
+### Configuration + Wiring ✅
+- [x] Align ports, versions, and env examples with backend config
+- [x] Add admin export bearer auth + unified API base URL
+- [x] Add API key management UI (create/revoke/list)
+- [x] Align log upload limits with backend config + config endpoint
+
+### Quality + Observability ✅
+- [x] Add Prometheus request metrics middleware
+- [x] Add backend tests for log config + upload size enforcement
+- [x] Add frontend tests for API key flows
 
 ### Configuration Parity ✅
 - [x] Align env examples across stack/backend/frontend

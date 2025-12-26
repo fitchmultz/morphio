@@ -1,6 +1,6 @@
 # Morphio Roadmap
 
-> **Last Updated:** 2025-12-23
+> **Last Updated:** 2025-12-25
 
 This document tracks future work items and enhancement ideas for the Morphio project.
 
@@ -8,6 +8,13 @@ This document tracks future work items and enhancement ideas for the Morphio pro
 
 These items were completed in the documentation normalization work:
 
+- [x] Align ports, versions, and env examples with backend config
+- [x] Add admin export bearer auth + unified API base URL
+- [x] Add API key management UI (create/revoke/list)
+- [x] Align log upload limits with backend config + config endpoint
+- [x] Add Prometheus request metrics middleware
+- [x] Add backend tests for log config + upload size enforcement
+- [x] Add frontend tests for API key flows
 - [x] Create canonical status page (`docs/status.md`)
 - [x] Create configuration guide (`docs/configuration.md`)
 - [x] Align env examples across stack/backend/frontend
@@ -50,7 +57,7 @@ These items were completed in the documentation normalization work:
 
 ### Infrastructure
 - [ ] Set up staging environment
-- [ ] Add Prometheus metrics endpoint
+- [x] Add Prometheus metrics endpoint
 - [ ] Configure log aggregation
 - [ ] Add health check dashboard
 
