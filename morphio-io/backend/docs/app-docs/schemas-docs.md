@@ -95,7 +95,7 @@ Standard response format via `app/utils/response_utils.py`:
 Types are generated from OpenAPI spec:
 ```bash
 cd morphio-io/frontend
-pnpm openapi:refresh  # Backend must be running on port 8000
+pnpm openapi:refresh  # Backend must be running on port 8005
 ```
 
 Generated files in `frontend/src/client/` - **do not edit manually**.

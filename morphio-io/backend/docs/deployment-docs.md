@@ -17,7 +17,7 @@ docker compose up -d --build
 ```
 
 Access:
-- Backend: http://localhost:8000
+- Backend: http://localhost:8005
 - Frontend: http://localhost:3500
 
 ### Production
@@ -58,9 +58,9 @@ The backend **refuses to start** if these aren't properly configured.
 
 | Service | Port | Description |
 |---------|------|-------------|
-| Backend | 8000 | FastAPI API |
-| Frontend | 3500 → 3000 | Next.js (Docker published → container) |
-| Redis | 6379 | Cache and job queue |
+| Backend | 8005 | FastAPI API |
+| Frontend | 3500 → 3005 | Next.js (Docker published → container) |
+| Redis | 6384 | Cache and job queue |
 | PostgreSQL | 5432 | Database |
 
 ## Health Checks

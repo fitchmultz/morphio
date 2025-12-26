@@ -207,7 +207,7 @@ if __name__ == "__main__":
     import uvicorn
 
     host = "0.0.0.0"
-    port = int(os.getenv("APP_PORT", 8000))
+    port = int(os.getenv("APP_PORT", 8005))
     reload = settings.APP_ENV == "development"
 
     logger.info(f"Starting server on {host}:{port}")

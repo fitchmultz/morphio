@@ -48,7 +48,7 @@ services:
     environment:
       - APP_ENV=development
       - APP_PORT=8005
-      - REDIS_URL=redis://redis:6379/0
+      - REDIS_URL=redis://redis:6384/0
       - WORKER_ML_URL=http://worker-ml:8001
       - CRAWLER_URL=http://crawler:8002
       - WATCHFILES_FORCE_POLLING=true
@@ -77,13 +77,13 @@ services:
   redis:
     image: redis:alpine
     container_name: morphio-dev-redis
-    command: redis-server
+    command: redis-server --port 6384
     ports:
-      - "6384:6379"
+      - "6384:6384"
     volumes:
       - redisdata:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "redis-cli", "-p", "6384", "ping"]
       interval: 5s
       timeout: 3s
       retries: 5

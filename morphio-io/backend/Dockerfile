@@ -57,7 +57,7 @@ FROM python:3.13-slim
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV APP_ENV=production
-ENV APP_PORT=8000
+ENV APP_PORT=8005
 ENV UVICORN_WORKERS=4
 
 # Admin user environment variables (set these at runtime)
@@ -114,10 +114,10 @@ RUN chown -R appuser:appuser /app /home/appuser/.cache
 USER appuser
 
 # Expose the port Flask is running on
-EXPOSE 8000
+EXPOSE 8005
 
 # Simple healthcheck probing the FastAPI health endpoint
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-  CMD curl -fsS http://localhost:8000/health/ || exit 1
+  CMD curl -fsS http://localhost:8005/health/ || exit 1
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]

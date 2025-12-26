@@ -15,7 +15,7 @@ Backend configuration is managed via Pydantic Settings, supporting environment v
 | `APP_ENV` | `production` | Environment mode |
 | `DEBUG` | `False` | Debug mode |
 | `LOG_LEVEL` | `INFO` | Logging level |
-| `APP_PORT` | `8000` | Server port |
+| `APP_PORT` | `8005` | Server port |
 
 ### Security
 

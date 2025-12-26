@@ -123,12 +123,12 @@ This project uses [@hey-api/openapi-ts](https://heyapi.dev/) to auto-generate Ty
 When the backend API changes (new routes, modified schemas, etc.), regenerate the types:
 
 ```bash
-# Backend must be running on port 8000
+# Backend must be running on port 8005
 pnpm openapi:refresh
 ```
 
 This command:
-1. Fetches the OpenAPI schema from `http://localhost:8000/openapi.json`
+1. Fetches the OpenAPI schema from `http://localhost:8005/openapi.json`
 2. Generates TypeScript types and SDK functions in `src/client/`
 
 ### Using Generated Types
@@ -173,7 +173,7 @@ A Dockerfile is provided to build and run the application in a container:
 docker build -t morphio-frontend .
 
 # Run the container
-docker run -p 3000:3000 morphio-frontend
+docker run -p 3005:3005 morphio-frontend
 ```
 
 ## Project Structure

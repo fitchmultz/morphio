@@ -12,4 +12,4 @@ echo "Running Alembic migrations..."
 alembic upgrade head
 
 echo "Starting server..."
-exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers "$UVICORN_WORKERS"
+exec uvicorn app.main:app --host 0.0.0.0 --port "${APP_PORT:-8005}" --workers "$UVICORN_WORKERS"
