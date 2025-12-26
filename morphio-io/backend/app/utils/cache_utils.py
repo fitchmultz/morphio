@@ -38,23 +38,18 @@ def is_redis_available() -> bool:
 
 
 async def test_redis_connection() -> bool:
-    """Test Redis connectivity with a set/get operation."""
+    """Test Redis connectivity with a ping."""
     if not is_redis_available():
         logger.warning("Redis client not available.")
         return False
     try:
-        test_key = "test_connection"
-        test_value = "test_value"
-        await set_redis_data(test_key, test_value, expire=10)
-        retrieved_value = await get_redis_data(test_key)
-        if retrieved_value == test_value:
+        client = _get_redis_client()
+        result = await client.ping()
+        if result:
             logger.info("Redis connection test successful (cache_utils)")
             return True
-        else:
-            logger.error(
-                f"Redis connection test failed: retrieved '{retrieved_value}' != '{test_value}'"
-            )
-            return False
+        logger.error("Redis connection test failed: ping returned falsy")
+        return False
     except Exception as e:
         logger.error(f"Redis connection test failed: {e}")
         return False
