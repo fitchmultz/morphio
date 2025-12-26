@@ -1,8 +1,8 @@
 services:
   frontend:
     build:
-      context: ..
-      dockerfile: morphio-io/frontend/Dockerfile.dev
+      context: .
+      dockerfile: frontend/Dockerfile.dev
     container_name: morphio-dev-frontend
     ports:
       - "3005:3005"
