@@ -15,7 +15,7 @@ make check      # Run all checks (required before commits)
 - `backend/` – FastAPI app (`app/{routes,services,models,schemas,utils}`), Alembic in `db/`.
 - `frontend/` – Next.js 16.1.1 app (`src/app`, `src/components`, `src/utils`).
 - `docs/` – project docs; `log_files/`, `uploads/` for local data.
-- Env examples: `backend/.env.example`, `frontend/.env.example`.
+- Env example: `.env.example` at the repo root.
 
 ## Makefile Commands (Preferred)
 

@@ -40,6 +40,11 @@ def main() -> int:
     if not TEMPLATE_PATH.exists():
         print(f"Template not found: {TEMPLATE_PATH}")
         return 1
+    frontend_env = ROOT / "frontend" / ".env.local"
+    if frontend_env.exists():
+        print(f"Unsupported nested env file found: {frontend_env}")
+        print("Use .env or .env.local at the repo root instead.")
+        return 1
 
     config_text = CONFIG_PATH.read_text(encoding="utf-8")
     template_text = TEMPLATE_PATH.read_text(encoding="utf-8")

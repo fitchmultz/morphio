@@ -29,11 +29,7 @@ pnpm install
 
 ### Environment Variables
 
-Copy the example environment file and modify as needed:
-
-```bash
-cp .env.example .env.local
-```
+Environment variables are loaded from the repo root (`../.env` and `../.env.local`).
 
 Key environment variables:
 
