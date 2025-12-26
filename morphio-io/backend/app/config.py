@@ -7,13 +7,14 @@ from dotenv import load_dotenv
 from pydantic import AliasChoices, Field, SecretStr
 from pydantic_settings import BaseSettings
 
-# Load .env from current directory (backend/.env) first
-load_dotenv()
-# Also try loading from project root .env (for shared config)
-# config.py is at backend/app/config.py, so go up 3 levels to reach project root
+# Load canonical .env from morphio-io root
+# config.py is at backend/app/config.py, so go up 3 levels to reach morphio-io/
 root_env = Path(__file__).parent.parent.parent / ".env"
+local_env = Path(__file__).parent.parent.parent / ".env.local"
 if root_env.exists():
-    load_dotenv(root_env, override=False)  # Don't override existing values
+    load_dotenv(root_env, override=False)
+if local_env.exists():
+    load_dotenv(local_env, override=True)
 
 
 class Settings(BaseSettings):
