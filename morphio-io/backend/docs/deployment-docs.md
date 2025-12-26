@@ -11,7 +11,7 @@ The backend can be deployed via Docker Compose (recommended) or directly.
 ```bash
 cd morphio-io
 cp .env.example .env
-# Edit stack.env with your API keys
+# Edit .env with your API keys
 
 docker compose up -d --build
 ```
