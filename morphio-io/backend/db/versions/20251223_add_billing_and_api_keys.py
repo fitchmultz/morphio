@@ -1,7 +1,7 @@
 """Add Stripe billing fields and API keys table.
 
 Revision ID: 20251223_add_billing_and_api_keys
-Revises: 20251223_add_llm_usage_records
+Revises: 20251223_llm_usage
 Create Date: 2025-12-23
 
 """
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = "20251223_add_billing_and_api_keys"
-down_revision = "20251223_add_llm_usage_records"
+down_revision = "20251223_llm_usage"
 branch_labels = None
 depends_on = None
 
