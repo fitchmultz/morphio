@@ -12,8 +12,8 @@ setup: ## Initial setup: install deps, copy env files
 	@echo "Setting up Morphio monorepo..."
 	@$(MAKE) install
 	@if [ ! -f .env ]; then \
-		echo "Copying stack.env.example to .env"; \
-		cp stack.env.example .env || true; \
+		echo "Copying .env.example to .env"; \
+		cp .env.example .env || true; \
 	fi
 	@echo "✅ Setup complete!"
 
