@@ -107,7 +107,7 @@ async def process_logs(
                 if total_size > max_upload_size:
                     raise ApplicationException(
                         "Log file exceeds maximum upload size.",
-                        status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                        status_code=status.HTTP_413_CONTENT_TOO_LARGE,
                     )
                 await buffer.write(chunk)
     except ApplicationException:
@@ -282,7 +282,7 @@ async def generate_splunk_config(
                 if total_size > max_upload_size:
                     raise ApplicationException(
                         "Log file exceeds maximum upload size.",
-                        status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                        status_code=status.HTTP_413_CONTENT_TOO_LARGE,
                     )
                 await buffer.write(chunk)
     except ApplicationException:
