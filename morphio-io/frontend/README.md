@@ -34,7 +34,6 @@ Environment variables are loaded from the repo root (`../.env` and `../.env.loca
 Key environment variables:
 
 - `NEXT_PUBLIC_API_BASE_URL`: URL for the backend API
-- `NEXT_PUBLIC_ALLOWED_AUDIO_EXTENSIONS`: Array of allowed audio file extensions
 
 ## Development
 

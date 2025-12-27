@@ -37,6 +37,9 @@ This document defines the canonical configuration contract for the Morphio monor
 | `REDIS_DB` | No | `0` | Redis database index |
 | `FRONTEND_URL` | No | `http://localhost:3005` | Frontend origin for redirects |
 | `PROMETHEUS_ENABLED` | No | `false` | Enable Prometheus metrics |
+| `OPENSEARCH_ENDPOINT` | No | - | Vector OpenSearch endpoint (prod logging) |
+| `OPENSEARCH_USER` | No | - | Vector OpenSearch username |
+| `OPENSEARCH_PASSWORD` | No | - | Vector OpenSearch password |
 | `USER_ROUTES_RATE_LIMIT` | No | `60` | Requests per window for user routes |
 | `USER_ROUTES_RATE_WINDOW` | No | `60` | Rate limit window in seconds |
 | `CSRF_COOKIE_EXPIRE_SECONDS` | No | `86400` | CSRF cookie lifetime in seconds |
@@ -68,7 +71,6 @@ This document defines the canonical configuration contract for the Morphio monor
 |----------|----------|---------|-------------|
 | `NEXT_PUBLIC_API_BASE_URL` | Yes | - | Backend API URL |
 | `NEXT_PUBLIC_MAX_UPLOAD_SIZE` | No | 3221225472 | Max upload size (3GB) |
-| `NEXT_PUBLIC_ALLOWED_AUDIO_EXTENSIONS` | No | - | Override allowed audio types |
 
 ### Redis
 
