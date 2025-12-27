@@ -40,7 +40,7 @@ Morphio is a modern, full-stack web application designed for creating, managing,
 
 - **Docker**: Containerization for consistent deployment
 - **NGINX**: Reverse proxy for routing frontend/backend traffic
-- **GitHub Actions**: CI/CD workflows for automated building and deployment
+- **Local CI**: Run `make ci` (GitHub Actions are disabled)
 
 ## Architecture
 
@@ -130,7 +130,18 @@ While the exact AI models aren't specified in the codebase, the structure sugges
    cd morphio-all
    ```
 
-3. **Backend Setup**:
+3. **Local dev (recommended)**:
+
+   From the repo root:
+
+   ```bash
+   cp .env.example .env
+   make install
+   make ci
+   make dev
+   ```
+
+4. **Manual backend setup (optional)**:
 
   ```bash
   cp .env.example .env  # Edit with your credentials
@@ -139,7 +150,7 @@ While the exact AI models aren't specified in the codebase, the structure sugges
   alembic upgrade head  # Run database migrations
   ```
 
-4. **Frontend Setup**:
+5. **Manual frontend setup (optional)**:
 
    ```bash
    cd morphio-io/frontend
@@ -147,7 +158,7 @@ While the exact AI models aren't specified in the codebase, the structure sugges
    pnpm dev  # Start development server
    ```
 
-5. **Docker Setup**:
+6. **Docker Setup**:
 
    ```bash
    cp .env.example .env  # Configure environment variables
@@ -232,14 +243,15 @@ See `.env.example` for more details.
 - A generated `docker-compose.release.yml` that pins digests (`image@sha256:...`).
 - SBOMs (SPDX JSON) for each image.
 
-### How to cut a release
+### How to cut a release (local)
 
 ```bash
 git tag v1.0.0
 git push origin v1.0.0
 ```
 
-GitHub Actions builds images, pushes to GHCR, generates the pinned compose + SBOMs, and attaches them to the GitHub Release.
+Build and push the release images locally, then generate `docker-compose.release.yml` pinned to the pushed image digests.
+Publish a GitHub Release and attach the pinned compose + SBOMs (see `docs/release-runbook.md`).
 
 ### Deploy (pinned)
 
