@@ -24,6 +24,6 @@ Each project also has its own README with project-specific documentation:
 
 ## Quick Links
 
-- **Start developing**: `make dev` from monorepo root
+- **Start developing**: `cp .env.example .env && make install && make ci && make dev` from monorepo root
 - **Run all tests**: `make test`
-- **Full CI check**: `make check`
+- **Full CI check**: `make ci`

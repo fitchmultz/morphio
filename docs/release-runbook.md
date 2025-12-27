@@ -9,8 +9,10 @@ This runbook covers staging, deployment, rollback, and verification.
 - Validate `/health` and `/metrics` endpoints.
 
 ## Deploy
-- Create and push a release tag (e.g. `v1.2.3`).
-- Pull the tagged images from GHCR.
+- Run `make ci` from the repo root (local CI is the release gate; Actions are disabled).
+- Build and push the release images locally (backend API, worker-ml, crawler, frontend) to GHCR.
+- Capture the pushed image digests and generate a pinned `docker-compose.release.yml`.
+- Create and push a release tag (e.g. `v1.2.3`), then publish a GitHub Release with the pinned compose + SBOMs attached.
 - Apply the pinned `docker-compose.release.yml` for deterministic deploys.
 - Record the tag + image digests for rollback.
 

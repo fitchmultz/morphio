@@ -19,14 +19,10 @@ This monorepo contains related Morphio projects for AI-powered content generatio
 ## Quick Start
 
 ```bash
-# Start the web app (backend + frontend)
+cp .env.example .env
+make install
+make ci
 make dev
-
-# Run all tests
-make test
-
-# Full CI check (required before commits)
-make check
 ```
 
 ## Project Relationship
@@ -62,7 +58,7 @@ morphio-core/
 | `make dev` | Start morphio-io dev servers |
 | `make test` | Run all tests (morphio-core + morphio-io) |
 | `make lint` | Lint everything |
-| `make check` | Full CI check (required before commits) |
+| `make ci` | Local CI runner (required before commits) |
 | `make clean` | Clean all build artifacts |
 
 ### morphio-io Commands (from `morphio-io/`)
@@ -91,9 +87,8 @@ See `morphio-core/README.md` for full documentation.
 ### Working on morphio-io
 
 ```bash
-cd morphio-io
-make dev          # Start dev servers
-make check        # Run before committing
+make dev          # Start dev servers (repo root)
+make ci           # Run local CI gate before committing
 ```
 
 ### Working on morphio-core
@@ -111,7 +106,7 @@ When modifying morphio-core APIs that morphio-io uses:
 1. Update morphio-core
 2. Run morphio-core tests: `cd morphio-core && uv run pytest`
 3. Update morphio-io adapters if needed
-4. Run morphio-io tests: `cd morphio-io && make check`
+4. Run local CI gate: `make ci`
 
 ## Architecture
 
@@ -136,7 +131,7 @@ morphio-io uses thin adapters (`app/adapters/`) that:
 - **Frontend**: Next.js 16.1.1, React 19, TypeScript, TailwindCSS 4
 - **Node.js**: ≥24.0.0
 - **Ports**: Backend 8005, Frontend 3005 (Docker 3500→3005), Redis 6384
-- **DevOps**: Docker, GitHub Actions
+- **DevOps**: Docker, local CI via `make ci`
 
 ### morphio-core
 - **Language**: Python 3.13+
