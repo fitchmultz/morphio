@@ -6,7 +6,7 @@ from typing import List, Optional, Tuple
 
 from ...schemas.audio_schema import AudioChunk
 from ...schemas.diarization_schema import TranscriptionSpeakerSegment, WordTiming
-from ...utils.enums import JobStatus
+from ...utils.enums import JobStatus, ProcessingStage
 from ..job import update_job_status
 from .diarization import is_diarization_available, run_diarization
 from .speaker_alignment import (
@@ -46,7 +46,13 @@ async def transcribe_with_diarization(
     chunk_offsets = [c.start_time for c in chunks]
 
     # Start diarization on full audio in background
-    await update_job_status(job_id, JobStatus.PROCESSING.value, 45, "Starting speaker diarization")
+    await update_job_status(
+        job_id,
+        JobStatus.PROCESSING.value,
+        45,
+        "Starting speaker diarization",
+        stage=ProcessingStage.DIARIZING,
+    )
     diarization_task = asyncio.create_task(run_diarization(audio_file, min_speakers, max_speakers))
 
     # Transcribe chunks with word timestamps
@@ -60,13 +66,20 @@ async def transcribe_with_diarization(
             JobStatus.PROCESSING.value,
             50 + int(10 * idx / max(total, 1)),
             f"Transcribing chunk {idx}/{total} with timestamps",
+            stage=ProcessingStage.TRANSCRIBING,
         )
         text, word_timings = await transcribe_chunk_with_timestamps(cp, offset)
         transcriptions.append(text)
         all_word_timings.extend(word_timings)
 
     # Wait for diarization to complete
-    await update_job_status(job_id, JobStatus.PROCESSING.value, 62, "Waiting for diarization")
+    await update_job_status(
+        job_id,
+        JobStatus.PROCESSING.value,
+        62,
+        "Waiting for diarization",
+        stage=ProcessingStage.DIARIZING,
+    )
 
     try:
         diarization_result = await diarization_task
@@ -78,7 +91,11 @@ async def transcribe_with_diarization(
 
     # Align speakers to words
     await update_job_status(
-        job_id, JobStatus.PROCESSING.value, 65, "Aligning speakers to transcript"
+        job_id,
+        JobStatus.PROCESSING.value,
+        65,
+        "Aligning speakers to transcript",
+        stage=ProcessingStage.DIARIZING,
     )
 
     utterances = align_speakers_to_words(diarization_result, all_word_timings)
@@ -118,6 +135,7 @@ async def transcribe_chunks_standard(
             JobStatus.PROCESSING.value,
             50 + int(15 * idx / max(total, 1)),
             f"Transcribing chunk {idx}/{total}",
+            stage=ProcessingStage.TRANSCRIBING,
         )
         transcriptions.append(await transcribe_audio_chunk(cp))
 

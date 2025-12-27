@@ -25,7 +25,7 @@ from ...utils.cache_utils import (
     compute_template_hash,
     get_cached_generated_content,
 )
-from ...utils.enums import JobStatus, UsageType
+from ...utils.enums import JobStatus, ProcessingStage, UsageType
 from ...utils.error_handlers import ApplicationException
 from ...utils.file_utils import compute_file_hash
 from ...utils.job_utils import enqueue_task
@@ -61,7 +61,13 @@ async def process_logs_file(
 
         logger.debug(f"Using model: {chosen_model} for job {job_id}")
 
-        await update_job_status(job_id, JobStatus.PROCESSING.value, 10, "Reading log file")
+        await update_job_status(
+            job_id,
+            JobStatus.PROCESSING.value,
+            10,
+            "Reading log file",
+            stage=ProcessingStage.DOWNLOADING,
+        )
 
         # Validate file existence
         if not file_path.exists():
@@ -80,7 +86,13 @@ async def process_logs_file(
         # Anonymize content if enabled
         processed_logs = anonymize_content(raw_logs, anonymize)
 
-        await update_job_status(job_id, JobStatus.PROCESSING.value, 30, "Loading template")
+        await update_job_status(
+            job_id,
+            JobStatus.PROCESSING.value,
+            30,
+            "Loading template",
+            stage=ProcessingStage.DOWNLOADING,
+        )
         template_content = await load_template("log-summary", db)
         if not template_content:
             raise ApplicationException("Template 'log-summary' not found", 404)
@@ -95,7 +107,13 @@ async def process_logs_file(
             generated_summary = json.loads(cached_content)
             logger.info(f"Cache hit for log summary: {file_hash}")
         else:
-            await update_job_status(job_id, JobStatus.PROCESSING.value, 50, "Generating summary")
+            await update_job_status(
+                job_id,
+                JobStatus.PROCESSING.value,
+                50,
+                "Generating summary",
+                stage=ProcessingStage.GENERATING,
+            )
             generated_summary = await generate_content_from_transcript(
                 transcript=processed_logs,
                 template_content=template_content,
@@ -113,7 +131,13 @@ async def process_logs_file(
         # De-anonymize the summary if anonymization was enabled
         final_summary = deanonymize_content(generated_summary, processed_logs, anonymize)
 
-        await update_job_status(job_id, JobStatus.PROCESSING.value, 70, "Saving generated content")
+        await update_job_status(
+            job_id,
+            JobStatus.PROCESSING.value,
+            70,
+            "Saving generated content",
+            stage=ProcessingStage.SAVING,
+        )
         saved_content = await save_generated_content(final_summary, user_id)
 
         result = {
@@ -130,6 +154,7 @@ async def process_logs_file(
             100,
             "Log summary generated and saved",
             result=result,
+            stage=ProcessingStage.COMPLETED,
         )
 
     except ApplicationException as e:
@@ -140,6 +165,7 @@ async def process_logs_file(
             100,
             f"Error: {e.message}",
             error=e.message,
+            stage=ProcessingStage.FAILED,
         )
     except Exception as e:
         logger.error(f"Unexpected error in log processing: {str(e)}", exc_info=True)
@@ -149,6 +175,7 @@ async def process_logs_file(
             100,
             f"Unexpected error: {str(e)}",
             error=str(e),
+            stage=ProcessingStage.FAILED,
         )
     finally:
         # Clean up the file
@@ -250,7 +277,13 @@ async def process_splunk_config(
 
         logger.debug(f"Using model: {chosen_model} for job {job_id}")
 
-        await update_job_status(job_id, JobStatus.PROCESSING.value, 10, "Reading log sample")
+        await update_job_status(
+            job_id,
+            JobStatus.PROCESSING.value,
+            10,
+            "Reading log sample",
+            stage=ProcessingStage.DOWNLOADING,
+        )
 
         if not file_path.exists():
             raise ApplicationException(f"Log file not found: {file_path}", 404)
@@ -267,7 +300,11 @@ async def process_splunk_config(
         processed_logs = anonymize_content(raw_logs, anonymize)
 
         await update_job_status(
-            job_id, JobStatus.PROCESSING.value, 30, "Loading Splunk config template"
+            job_id,
+            JobStatus.PROCESSING.value,
+            30,
+            "Loading Splunk config template",
+            stage=ProcessingStage.DOWNLOADING,
         )
         template_content = await load_template("splunk-config", db)
         if not template_content:
@@ -284,7 +321,11 @@ async def process_splunk_config(
             logger.info(f"Cache hit for Splunk config: {file_hash}")
         else:
             await update_job_status(
-                job_id, JobStatus.PROCESSING.value, 50, "Generating Splunk config"
+                job_id,
+                JobStatus.PROCESSING.value,
+                50,
+                "Generating Splunk config",
+                stage=ProcessingStage.GENERATING,
             )
             splunk_config = await generate_content_from_transcript(
                 transcript=processed_logs,
@@ -302,7 +343,13 @@ async def process_splunk_config(
 
         final_config = deanonymize_content(splunk_config, processed_logs, anonymize)
 
-        await update_job_status(job_id, JobStatus.PROCESSING.value, 70, "Saving Splunk config")
+        await update_job_status(
+            job_id,
+            JobStatus.PROCESSING.value,
+            70,
+            "Saving Splunk config",
+            stage=ProcessingStage.SAVING,
+        )
         saved_content = await save_generated_content(final_config, user_id)
 
         result = {
@@ -319,6 +366,7 @@ async def process_splunk_config(
             100,
             "Splunk configuration generated and saved",
             result=result,
+            stage=ProcessingStage.COMPLETED,
         )
 
     except ApplicationException as e:
@@ -329,6 +377,7 @@ async def process_splunk_config(
             100,
             f"Error: {e.message}",
             error=e.message,
+            stage=ProcessingStage.FAILED,
         )
     except Exception as e:
         logger.error(f"Unexpected error in Splunk config generation: {str(e)}", exc_info=True)
@@ -338,6 +387,7 @@ async def process_splunk_config(
             100,
             f"Unexpected error: {str(e)}",
             error=str(e),
+            stage=ProcessingStage.FAILED,
         )
     finally:
         if file_path.exists():

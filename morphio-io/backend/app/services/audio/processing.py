@@ -25,7 +25,7 @@ from ...utils.cache_utils import (
     get_cached_generated_content,
     get_cached_whisper_transcription,
 )
-from ...utils.enums import JobStatus, UsageType
+from ...utils.enums import JobStatus, ProcessingStage, UsageType
 from ...utils.error_handlers import ApplicationException
 from ...utils.file_utils import compute_file_hash, compute_hash
 from ...utils.job_utils import enqueue_task
@@ -69,14 +69,24 @@ async def transcribe_and_generate_audio(
         chosen_model = getattr(job_status, "chosen_model", None) or settings.CONTENT_MODEL
         logger.debug(f"Using model: {chosen_model} for job {job_id}")
 
-        await update_job_status(job_id, JobStatus.PROCESSING.value, 0, "Starting audio processing")
+        await update_job_status(
+            job_id,
+            JobStatus.PROCESSING.value,
+            0,
+            "Starting audio processing",
+            stage=ProcessingStage.QUEUED,
+        )
 
         input_path = str(input_data.url or input_data.file_path)
         if not input_path:
             raise ApplicationException("No audio input provided", status_code=400)
 
         await update_job_status(
-            job_id, JobStatus.PROCESSING.value, 20, "Input validated, template loaded"
+            job_id,
+            JobStatus.PROCESSING.value,
+            20,
+            "Input validated, template loaded",
+            stage=ProcessingStage.DOWNLOADING,
         )
 
         skip_generation = input_data.template_id == 0
@@ -89,7 +99,13 @@ async def transcribe_and_generate_audio(
         # Acquire audio file
         if input_data.source.value == "youtube":
             await increment_usage(db, input_data.user_id, UsageType.AUDIO_PROCESSING)
-            await update_job_status(job_id, JobStatus.PROCESSING.value, 30, "Downloading audio")
+            await update_job_status(
+                job_id,
+                JobStatus.PROCESSING.value,
+                30,
+                "Downloading audio",
+                stage=ProcessingStage.DOWNLOADING,
+            )
             audio_file = await download_video_via_ytdlp(
                 input_path, settings.UPLOAD_DIR, job_id=job_id
             )
@@ -129,7 +145,11 @@ async def transcribe_and_generate_audio(
             )
 
         await update_job_status(
-            job_id, JobStatus.PROCESSING.value, 70, "Transcription complete, preparing result"
+            job_id,
+            JobStatus.PROCESSING.value,
+            70,
+            "Transcription complete, preparing result",
+            stage=ProcessingStage.GENERATING,
         )
 
         if not transcription_text.strip():
@@ -147,6 +167,7 @@ async def transcribe_and_generate_audio(
                 100,
                 "Transcript-only processing complete",
                 result=result,
+                stage=ProcessingStage.COMPLETED,
             )
             return
 
@@ -168,11 +189,22 @@ async def transcribe_and_generate_audio(
 
     except ApplicationException as ae:
         logger.error(f"Application error: {ae.message}", exc_info=True)
-        await update_job_status(job_id, JobStatus.FAILED.value, 100, f"Error: {ae.message}")
+        await update_job_status(
+            job_id,
+            JobStatus.FAILED.value,
+            100,
+            f"Error: {ae.message}",
+            stage=ProcessingStage.FAILED,
+        )
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)}", exc_info=True)
         await update_job_status(
-            job_id, JobStatus.FAILED.value, 100, f"Unexpected error: {str(e)}", error=str(e)
+            job_id,
+            JobStatus.FAILED.value,
+            100,
+            f"Unexpected error: {str(e)}",
+            error=str(e),
+            stage=ProcessingStage.FAILED,
         )
 
 
@@ -201,7 +233,13 @@ async def _transcribe_audio(
     cache_suffix: str,
 ) -> tuple[str, List[TranscriptionSpeakerSegment], int]:
     """Chunk and transcribe audio, with optional diarization."""
-    await update_job_status(job_id, JobStatus.PROCESSING.value, 40, "Chunking audio")
+    await update_job_status(
+        job_id,
+        JobStatus.PROCESSING.value,
+        40,
+        "Chunking audio",
+        stage=ProcessingStage.CHUNKING,
+    )
 
     audio_input = AudioProcessingInput(
         file_path=audio_file,
@@ -291,7 +329,12 @@ async def _save_and_complete(content: str, input_data: MediaProcessingInput, job
             "template_id": input_data.template_id,
         }
         await update_job_status(
-            job_id, JobStatus.COMPLETED.value, 100, "Processing complete", result=result
+            job_id,
+            JobStatus.COMPLETED.value,
+            100,
+            "Processing complete",
+            result=result,
+            stage=ProcessingStage.COMPLETED,
         )
     except ApplicationException as ae:
         logger.error(f"Failed to save content: {ae.message}")
@@ -301,6 +344,7 @@ async def _save_and_complete(content: str, input_data: MediaProcessingInput, job
             100,
             "Processing complete (content not saved)",
             result={"content": content},
+            stage=ProcessingStage.FAILED,
         )
 
 

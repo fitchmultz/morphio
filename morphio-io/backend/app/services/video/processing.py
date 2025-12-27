@@ -30,7 +30,7 @@ from ...utils.cache_utils import (
     get_cached_whisper_transcription,
 )
 from ...utils.enums import JobStatus as JS
-from ...utils.enums import TranscriptionSource, UsageType
+from ...utils.enums import ProcessingStage, TranscriptionSource, UsageType
 from ...utils.error_handlers import ApplicationException
 from ...utils.file_utils import compute_file_hash, compute_hash, delete_file
 from ...utils.job_utils import enqueue_task
@@ -124,11 +124,23 @@ async def process_online_video(
 
         # fallback
         logger.info("Attempting fallback local approach via ffmpeg + whisper.")
-        await update_job_status(job_id, JS.PROCESSING.value, 30, "Downloading audio")
+        await update_job_status(
+            job_id,
+            JS.PROCESSING.value,
+            30,
+            "Downloading audio",
+            stage=ProcessingStage.DOWNLOADING,
+        )
         raw_path = await download_video_via_ytdlp(
             url, output_directory, job_id=job_id, video_id=video_id
         )
-        await update_job_status(job_id, JS.PROCESSING.value, 40, "Converting to mp3")
+        await update_job_status(
+            job_id,
+            JS.PROCESSING.value,
+            40,
+            "Converting to mp3",
+            stage=ProcessingStage.DOWNLOADING,
+        )
         result_text = await process_local_video(raw_path, output_directory, job_id)
         if result_text and result_text.strip():
             final_result = TranscriptionResult(
@@ -253,13 +265,25 @@ async def transcribe_and_generate_video(
 
         logger.debug(f"Using model: {chosen_model} for job {job_id}")
 
-        await update_job_status(job_id, JS.PROCESSING.value, 0, "Starting video processing")
+        await update_job_status(
+            job_id,
+            JS.PROCESSING.value,
+            0,
+            "Starting video processing",
+            stage=ProcessingStage.QUEUED,
+        )
 
         input_path = str(input_data.url or input_data.file_path)
         if not await validate_video_input(input_path):
             raise ApplicationException("Invalid video input", 400)
 
-        await update_job_status(job_id, JS.PROCESSING.value, 20, "Input validated, template loaded")
+        await update_job_status(
+            job_id,
+            JS.PROCESSING.value,
+            20,
+            "Input validated, template loaded",
+            stage=ProcessingStage.DOWNLOADING,
+        )
 
         skip_generation = input_data.template_id == 0
         template_content = ""
@@ -295,7 +319,11 @@ async def transcribe_and_generate_video(
                 transcription = raw_text
 
         await update_job_status(
-            job_id, JS.PROCESSING.value, 70, "Transcription complete, preparing result"
+            job_id,
+            JS.PROCESSING.value,
+            70,
+            "Transcription complete, preparing result",
+            stage=ProcessingStage.GENERATING,
         )
 
         if isinstance(transcription, str):
@@ -324,6 +352,7 @@ async def transcribe_and_generate_video(
                 100,
                 "Transcript-only processing complete",
                 result_data,
+                stage=ProcessingStage.COMPLETED,
             )
             return
 
@@ -371,7 +400,12 @@ async def transcribe_and_generate_video(
                 "template_id": input_data.template_id,
             }
             await update_job_status(
-                job_id, JS.COMPLETED.value, 100, "Processing complete", ret_data
+                job_id,
+                JS.COMPLETED.value,
+                100,
+                "Processing complete",
+                ret_data,
+                stage=ProcessingStage.COMPLETED,
             )
         except ApplicationException as ae:
             logger.error(f"Failed to save content: {ae.message}")
@@ -382,15 +416,27 @@ async def transcribe_and_generate_video(
                 100,
                 "Processing complete (content not saved)",
                 ret_data,
+                stage=ProcessingStage.FAILED,
             )
 
     except ApplicationException as ae:
         logger.error(f"Application error: {ae.message}", exc_info=True)
-        await update_job_status(job_id, JS.FAILED.value, 100, f"Error: {ae.message}")
+        await update_job_status(
+            job_id,
+            JS.FAILED.value,
+            100,
+            f"Error: {ae.message}",
+            stage=ProcessingStage.FAILED,
+        )
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)}", exc_info=True)
         await update_job_status(
-            job_id, JS.FAILED.value, 100, f"Unexpected error: {str(e)}", error=str(e)
+            job_id,
+            JS.FAILED.value,
+            100,
+            f"Unexpected error: {str(e)}",
+            error=str(e),
+            stage=ProcessingStage.FAILED,
         )
 
 
