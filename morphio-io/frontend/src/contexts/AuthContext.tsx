@@ -12,7 +12,7 @@ import {
 	useRef,
 	useState,
 } from "react";
-import type { AppSchemasAuthSchemaUserOut } from "@/client/types.gen";
+import type { UserOut } from "@/client/types.gen";
 import eventEmitter from "@/lib/eventEmitter";
 import { resetLogoutEventFlag } from "@/lib/hey-api";
 import logger from "@/lib/logger";
@@ -30,11 +30,11 @@ interface DecodedToken {
 // Enhanced interface with token management
 interface AuthContextType {
 	isAuthenticated: boolean;
-	login: (token: string, userData: AppSchemasAuthSchemaUserOut) => void;
+	login: (token: string, userData: UserOut) => void;
 	logout: (message?: string) => void;
 	loading: boolean;
-	userData: AppSchemasAuthSchemaUserOut | null;
-	updateUserData: (newData: Partial<AppSchemasAuthSchemaUserOut>) => void;
+	userData: UserOut | null;
+	updateUserData: (newData: Partial<UserOut>) => void;
 	getToken: () => string | null;
 	handleSessionExpired: () => void;
 	clearUserData: () => void;
@@ -48,9 +48,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
 	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 	const [loading, setLoading] = useState<boolean>(true);
-	const [userData, setUserData] = useState<AppSchemasAuthSchemaUserOut | null>(
-		null,
-	);
+	const [userData, setUserData] = useState<UserOut | null>(null);
 	const router = useRouter();
 	const pendingLogoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const csrfTokenRef = useRef<string | null>(null);
@@ -120,21 +118,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		logger.info("Session expired, user logged out");
 	}, [logout]);
 
-	const isValidUserData = useCallback(
-		(data: unknown): data is AppSchemasAuthSchemaUserOut => {
-			return (
-				typeof data === "object" &&
-				data !== null &&
-				"id" in data &&
-				"email" in data &&
-				"display_name" in data &&
-				typeof (data as AppSchemasAuthSchemaUserOut).id === "number" &&
-				typeof (data as AppSchemasAuthSchemaUserOut).email === "string" &&
-				typeof (data as AppSchemasAuthSchemaUserOut).display_name === "string"
-			);
-		},
-		[],
-	);
+	const isValidUserData = useCallback((data: unknown): data is UserOut => {
+		return (
+			typeof data === "object" &&
+			data !== null &&
+			"id" in data &&
+			"email" in data &&
+			"display_name" in data &&
+			typeof (data as UserOut).id === "number" &&
+			typeof (data as UserOut).email === "string" &&
+			typeof (data as UserOut).display_name === "string"
+		);
+	}, []);
 
 	// Check if token is valid
 	const checkTokenValidity = useCallback((): boolean => {
@@ -202,7 +197,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 	}, [checkTokenValidity, isValidUserData, clearUserData]);
 
 	const login = useCallback(
-		(token: string, newUserData: AppSchemasAuthSchemaUserOut) => {
+		(token: string, newUserData: UserOut) => {
 			// Cancel any pending logout (prevents race condition with session expired toast)
 			if (pendingLogoutRef.current !== null) {
 				clearTimeout(pendingLogoutRef.current);
@@ -219,20 +214,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		[router],
 	);
 
-	const updateUserData = useCallback(
-		(newData: Partial<AppSchemasAuthSchemaUserOut>) => {
-			setUserData((prevData) => {
-				if (prevData) {
-					const updatedData = { ...prevData, ...newData };
-					localStorage.setItem("userData", JSON.stringify(updatedData));
-					return updatedData;
-				}
-				return prevData;
-			});
-			logger.info("User data updated", { updatedFields: Object.keys(newData) });
-		},
-		[],
-	);
+	const updateUserData = useCallback((newData: Partial<UserOut>) => {
+		setUserData((prevData) => {
+			if (prevData) {
+				const updatedData = { ...prevData, ...newData };
+				localStorage.setItem("userData", JSON.stringify(updatedData));
+				return updatedData;
+			}
+			return prevData;
+		});
+		logger.info("User data updated", { updatedFields: Object.keys(newData) });
+	}, []);
 
 	const getToken = useCallback(() => localStorage.getItem("access_token"), []);
 

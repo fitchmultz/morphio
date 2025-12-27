@@ -9,6 +9,7 @@ from ..database import get_db
 from ..models.usage import Usage
 from ..models.user import User
 from ..models.subscription import Subscription
+from ..schemas.response_schema import ApiResponse
 from ..schemas.user_schema import UserCredits, UserOut, UserUpdate
 from ..utils.enums import UserRole
 from ..utils.response_utils import utc_now
@@ -35,7 +36,7 @@ router = APIRouter(tags=["User"], dependencies=[Depends(apply_rate_limit)])
 @router.get(
     "/profile",
     operation_id="get_user_profile",
-    response_model=UserOut,
+    response_model=ApiResponse[UserOut],
     responses={**common_responses},
 )
 @handle_route_errors
@@ -57,7 +58,7 @@ async def get_user_profile(current_user: User = Depends(get_current_user)):
 @router.post(
     "/change-display-name",
     operation_id="change_display_name",
-    response_model=UserOut,
+    response_model=ApiResponse[UserOut],
     responses={**common_responses},
 )
 @handle_route_errors
@@ -81,7 +82,7 @@ async def change_display_name(
 @router.post(
     "/change-email",
     operation_id="change_email",
-    response_model=UserOut,
+    response_model=ApiResponse[UserOut],
     responses={**common_responses},
 )
 @handle_route_errors
@@ -105,7 +106,7 @@ async def change_email(
 @router.get(
     "/credits",
     operation_id="get_user_credits",
-    response_model=UserCredits,
+    response_model=ApiResponse[UserCredits],
     responses={**common_responses},
 )
 @handle_route_errors
@@ -182,6 +183,7 @@ async def get_user_credits(
 @router.get(
     "/usage",
     operation_id="get_user_usage",
+    response_model=ApiResponse[list[dict]],
     responses={**common_responses},
 )
 @handle_route_errors

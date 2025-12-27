@@ -9,7 +9,7 @@ from ..config import settings
 from ..database import get_db
 from ..models.user import User
 from ..schemas.logs_schema import LogsProcessingResponse, LogsProcessingStatusResponse
-from ..schemas.response_schema import ResponseModel
+from ..schemas.response_schema import ApiResponse
 from ..services.logs import (
     enqueue_logs_processing,
     enqueue_splunk_config_processing,
@@ -32,7 +32,7 @@ ALLOWED_LOG_EXTENSIONS = {ext.lower() for ext in settings.ALLOWED_LOG_EXTENSIONS
 @router.post(
     "/process-logs",
     operation_id="process_logs",
-    response_model=ResponseModel[LogsProcessingResponse],
+    response_model=ApiResponse[LogsProcessingResponse],
     responses={
         200: {
             "description": "Log processing job enqueued successfully",
@@ -139,7 +139,7 @@ async def process_logs(
 @router.get(
     "/logs-processing-status/{job_id}",
     operation_id="get_logs_processing_status",
-    response_model=ResponseModel[LogsProcessingStatusResponse],
+    response_model=ApiResponse[LogsProcessingStatusResponse],
     responses={
         200: {
             "description": "Log processing status retrieved successfully",
@@ -204,7 +204,7 @@ async def get_logs_processing_status_route(
 @router.post(
     "/generate-splunk-config",
     operation_id="generate_splunk_config",
-    response_model=ResponseModel[LogsProcessingResponse],
+    response_model=ApiResponse[LogsProcessingResponse],
     responses={
         200: {
             "description": "Splunk config generation job enqueued successfully",
@@ -316,7 +316,7 @@ async def generate_splunk_config(
 @router.get(
     "/config",
     operation_id="get_log_config",
-    response_model=ResponseModel[dict],
+    response_model=ApiResponse[dict],
     responses={
         200: {
             "description": "Log file configuration",

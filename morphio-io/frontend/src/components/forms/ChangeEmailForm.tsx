@@ -22,15 +22,16 @@ export const ChangeEmailForm: FC<ChangeEmailFormProps> = ({
 		const response = await changeEmail({
 			body: { email: data.email },
 		});
-		if (response.data) {
-			onUpdate(response.data.email);
+		const updatedUser = response.data?.data;
+		if (updatedUser?.email) {
+			onUpdate(updatedUser.email);
 		} else {
 			const errorMessage =
 				response.error &&
 				typeof response.error === "object" &&
 				"message" in response.error
 					? String(response.error.message)
-					: "Failed to update email";
+					: response.data?.message || "Failed to update email";
 			throw new Error(errorMessage);
 		}
 	};

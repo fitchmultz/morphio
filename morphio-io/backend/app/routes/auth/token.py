@@ -7,7 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...database import get_db
 from ...models.user import User
-from ...schemas.auth_schema import AuthTokenResponse, CsrfTokenResponse, Token, UserOut
+from ...schemas.auth_schema import AuthTokenPayload, CsrfTokenPayload, Token, UserOut
+from ...schemas.response_schema import ApiResponse
 from ...services.redis import add_to_token_blacklist, is_token_blacklisted
 from ...services.security import (
     clear_refresh_cookie,
@@ -30,7 +31,7 @@ logger = logging.getLogger(__name__)
 @router.post(
     "/refresh-token",
     operation_id="refresh_token",
-    response_model=AuthTokenResponse,
+    response_model=ApiResponse[AuthTokenPayload],
     responses={**common_responses},
 )
 @rate_limit("30/minute")
@@ -128,7 +129,7 @@ async def refresh_token(
 @router.get(
     "/csrf-token",
     operation_id="get_csrf_token",
-    response_model=CsrfTokenResponse,
+    response_model=ApiResponse[CsrfTokenPayload],
     responses={
         200: {
             "description": "CSRF Token",

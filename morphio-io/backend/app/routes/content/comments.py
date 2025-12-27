@@ -10,7 +10,7 @@ from ...database import get_db
 from ...models.content import Content
 from ...models.user import User
 from ...schemas.comment_schema import CommentCreate, CommentOut, CommentUpdate
-from ...schemas.response_schema import ResponseModel
+from ...schemas.response_schema import ApiResponse
 from ...services.comment import (
     create_comment,
     delete_comment,
@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 @router.post(
     "/{content_id}/comments",
     operation_id="create_comment",
-    response_model=ResponseModel[CommentOut],
+    response_model=ApiResponse[CommentOut],
     responses={
         201: {
             "description": "Comment created successfully",
@@ -81,7 +81,7 @@ async def create_comment_route(
 @router.get(
     "/{content_id}/comments",
     operation_id="list_comments",
-    response_model=ResponseModel[List[CommentOut]],
+    response_model=ApiResponse[List[CommentOut]],
     responses={
         200: {
             "description": "Comments retrieved successfully",
@@ -132,7 +132,7 @@ async def get_comments(
 @router.put(
     "/comments/{comment_id}",
     operation_id="update_comment",
-    response_model=ResponseModel[CommentOut],
+    response_model=ApiResponse[CommentOut],
     responses={
         200: {
             "description": "Comment updated successfully",
@@ -181,7 +181,7 @@ async def update_comment_route(
 @router.delete(
     "/comments/{comment_id}",
     operation_id="delete_comment",
-    response_model=ResponseModel[None],
+    response_model=ApiResponse[None],
     responses={
         200: {
             "description": "Comment deleted successfully",

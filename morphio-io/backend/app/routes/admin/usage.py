@@ -17,6 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ...database import get_db
 from ...models.llm_usage import LLMUsageRecord
 from ...models.user import User
+from ...schemas.response_schema import ApiResponse
 from ...services.security import get_current_user
 from ...utils.decorators import require_auth
 from ...utils.enums import ResponseStatus
@@ -141,6 +142,7 @@ async def export_llm_usage(
 @router.get(
     "/summary",
     operation_id="get_llm_usage_summary",
+    response_model=ApiResponse[dict],
     responses={403: {"description": "Not authorized"}, **common_responses},
 )
 @require_auth

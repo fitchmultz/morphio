@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..database import get_db
 from ..models.user import User
-from ..schemas.response_schema import ResponseModel
+from ..schemas.response_schema import ApiResponse, ResponseModel
 from ..schemas.template_schema import TemplateCreate, TemplateOut, TemplateUpdate
 from ..services.security import get_current_user
 from ..services.template import (
@@ -51,7 +51,7 @@ async def get_templates(
 @router.post(
     "/save-template",
     operation_id="save_template",
-    response_model=ResponseModel[TemplateOut],
+    response_model=ApiResponse[TemplateOut],
     status_code=status.HTTP_201_CREATED,
     responses={
         201: {
@@ -85,7 +85,7 @@ async def save_template(
 @router.get(
     "/get-template/{template_id}",
     operation_id="get_template",
-    response_model=ResponseModel[TemplateOut],
+    response_model=ApiResponse[TemplateOut],
     responses={
         200: {
             "description": "Template retrieved successfully",
@@ -112,7 +112,7 @@ async def get_template(
 @router.put(
     "/update-template/{template_id}",
     operation_id="update_template",
-    response_model=ResponseModel[TemplateOut],
+    response_model=ApiResponse[TemplateOut],
     responses={
         200: {
             "description": "Template updated successfully",
@@ -149,7 +149,7 @@ async def update_template_route(
 @router.delete(
     "/delete-template/{template_id}",
     operation_id="delete_template",
-    response_model=ResponseModel[None],
+    response_model=ApiResponse[None],
     status_code=status.HTTP_200_OK,
     responses={
         200: {

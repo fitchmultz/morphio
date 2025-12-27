@@ -25,6 +25,456 @@ export type ApiKeyCreate = {
 };
 
 /**
+ * APIKeyCreatedOut
+ *
+ * API key response with the plaintext key (only returned on creation).
+ */
+export type ApiKeyCreatedOut = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Key Prefix
+     */
+    key_prefix: string;
+    /**
+     * Scopes
+     */
+    scopes: Array<string>;
+    /**
+     * Last Used At
+     */
+    last_used_at: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Key
+     *
+     * The API key. Store this securely - it won't be shown again!
+     */
+    key: string;
+};
+
+/**
+ * APIKeyOut
+ *
+ * API key response (without the actual key).
+ */
+export type ApiKeyOut = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Key Prefix
+     */
+    key_prefix: string;
+    /**
+     * Scopes
+     */
+    scopes: Array<string>;
+    /**
+     * Last Used At
+     */
+    last_used_at: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+};
+
+/**
+ * ApiResponse[APIKeyCreatedOut]
+ */
+export type ApiResponseApiKeyCreatedOut = {
+    status: ResponseStatus;
+    /**
+     * Message
+     */
+    message: string;
+    data?: ApiKeyCreatedOut | null;
+    /**
+     * Timestamp
+     */
+    timestamp?: string | null;
+};
+
+/**
+ * ApiResponse[AuthTokenPayload]
+ */
+export type ApiResponseAuthTokenPayload = {
+    status: ResponseStatus;
+    /**
+     * Message
+     */
+    message: string;
+    data?: AuthTokenPayload | null;
+    /**
+     * Timestamp
+     */
+    timestamp?: string | null;
+};
+
+/**
+ * ApiResponse[CheckoutSessionData]
+ */
+export type ApiResponseCheckoutSessionData = {
+    status: ResponseStatus;
+    /**
+     * Message
+     */
+    message: string;
+    data?: CheckoutSessionData | null;
+    /**
+     * Timestamp
+     */
+    timestamp?: string | null;
+};
+
+/**
+ * ApiResponse[CommentOut]
+ */
+export type ApiResponseCommentOut = {
+    status: ResponseStatus;
+    /**
+     * Message
+     */
+    message: string;
+    data?: CommentOut | null;
+    /**
+     * Timestamp
+     */
+    timestamp?: string | null;
+};
+
+/**
+ * ApiResponse[ContentOut]
+ */
+export type ApiResponseContentOut = {
+    status: ResponseStatus;
+    /**
+     * Message
+     */
+    message: string;
+    data?: ContentOut | null;
+    /**
+     * Timestamp
+     */
+    timestamp?: string | null;
+};
+
+/**
+ * ApiResponse[CsrfTokenPayload]
+ */
+export type ApiResponseCsrfTokenPayload = {
+    status: ResponseStatus;
+    /**
+     * Message
+     */
+    message: string;
+    data?: CsrfTokenPayload | null;
+    /**
+     * Timestamp
+     */
+    timestamp?: string | null;
+};
+
+/**
+ * ApiResponse[List[CommentOut]]
+ */
+export type ApiResponseListCommentOut = {
+    status: ResponseStatus;
+    /**
+     * Message
+     */
+    message: string;
+    /**
+     * Data
+     */
+    data?: Array<CommentOut> | null;
+    /**
+     * Timestamp
+     */
+    timestamp?: string | null;
+};
+
+/**
+ * ApiResponse[List[ContentOut]]
+ */
+export type ApiResponseListContentOut = {
+    status: ResponseStatus;
+    /**
+     * Message
+     */
+    message: string;
+    /**
+     * Data
+     */
+    data?: Array<ContentOut> | null;
+    /**
+     * Timestamp
+     */
+    timestamp?: string | null;
+};
+
+/**
+ * ApiResponse[LogsProcessingResponse]
+ */
+export type ApiResponseLogsProcessingResponse = {
+    status: ResponseStatus;
+    /**
+     * Message
+     */
+    message: string;
+    data?: LogsProcessingResponse | null;
+    /**
+     * Timestamp
+     */
+    timestamp?: string | null;
+};
+
+/**
+ * ApiResponse[LogsProcessingStatusResponse]
+ */
+export type ApiResponseLogsProcessingStatusResponse = {
+    status: ResponseStatus;
+    /**
+     * Message
+     */
+    message: string;
+    data?: LogsProcessingStatusResponse | null;
+    /**
+     * Timestamp
+     */
+    timestamp?: string | null;
+};
+
+/**
+ * ApiResponse[MediaProcessingResponse]
+ */
+export type ApiResponseMediaProcessingResponse = {
+    status: ResponseStatus;
+    /**
+     * Message
+     */
+    message: string;
+    data?: MediaProcessingResponse | null;
+    /**
+     * Timestamp
+     */
+    timestamp?: string | null;
+};
+
+/**
+ * ApiResponse[MediaProcessingStatusResponse]
+ */
+export type ApiResponseMediaProcessingStatusResponse = {
+    status: ResponseStatus;
+    /**
+     * Message
+     */
+    message: string;
+    data?: MediaProcessingStatusResponse | null;
+    /**
+     * Timestamp
+     */
+    timestamp?: string | null;
+};
+
+/**
+ * ApiResponse[NoneType]
+ */
+export type ApiResponseNoneType = {
+    status: ResponseStatus;
+    /**
+     * Message
+     */
+    message: string;
+    /**
+     * Data
+     */
+    data?: null;
+    /**
+     * Timestamp
+     */
+    timestamp?: string | null;
+};
+
+/**
+ * ApiResponse[PortalSessionData]
+ */
+export type ApiResponsePortalSessionData = {
+    status: ResponseStatus;
+    /**
+     * Message
+     */
+    message: string;
+    data?: PortalSessionData | null;
+    /**
+     * Timestamp
+     */
+    timestamp?: string | null;
+};
+
+/**
+ * ApiResponse[TemplateOut]
+ */
+export type ApiResponseTemplateOut = {
+    status: ResponseStatus;
+    /**
+     * Message
+     */
+    message: string;
+    data?: TemplateOut | null;
+    /**
+     * Timestamp
+     */
+    timestamp?: string | null;
+};
+
+/**
+ * ApiResponse[UserCredits]
+ */
+export type ApiResponseUserCredits = {
+    status: ResponseStatus;
+    /**
+     * Message
+     */
+    message: string;
+    data?: UserCredits | null;
+    /**
+     * Timestamp
+     */
+    timestamp?: string | null;
+};
+
+/**
+ * ApiResponse[UserOut]
+ */
+export type ApiResponseUserOut = {
+    status: ResponseStatus;
+    /**
+     * Message
+     */
+    message: string;
+    data?: UserOut | null;
+    /**
+     * Timestamp
+     */
+    timestamp?: string | null;
+};
+
+/**
+ * ApiResponse[dict]
+ */
+export type ApiResponseDict = {
+    status: ResponseStatus;
+    /**
+     * Message
+     */
+    message: string;
+    /**
+     * Data
+     */
+    data?: {
+        [key: string]: unknown;
+    } | null;
+    /**
+     * Timestamp
+     */
+    timestamp?: string | null;
+};
+
+/**
+ * ApiResponse[list]
+ */
+export type ApiResponseList = {
+    status: ResponseStatus;
+    /**
+     * Message
+     */
+    message: string;
+    /**
+     * Data
+     */
+    data?: Array<unknown> | null;
+    /**
+     * Timestamp
+     */
+    timestamp?: string | null;
+};
+
+/**
+ * ApiResponse[list[APIKeyOut]]
+ */
+export type ApiResponseListApiKeyOut = {
+    status: ResponseStatus;
+    /**
+     * Message
+     */
+    message: string;
+    /**
+     * Data
+     */
+    data?: Array<ApiKeyOut> | null;
+    /**
+     * Timestamp
+     */
+    timestamp?: string | null;
+};
+
+/**
+ * ApiResponse[list[SubscriptionOut]]
+ */
+export type ApiResponseListSubscriptionOut = {
+    status: ResponseStatus;
+    /**
+     * Message
+     */
+    message: string;
+    /**
+     * Data
+     */
+    data?: Array<SubscriptionOut> | null;
+    /**
+     * Timestamp
+     */
+    timestamp?: string | null;
+};
+
+/**
+ * ApiResponse[list[dict]]
+ */
+export type ApiResponseListDict = {
+    status: ResponseStatus;
+    /**
+     * Message
+     */
+    message: string;
+    /**
+     * Data
+     */
+    data?: Array<{
+        [key: string]: unknown;
+    }> | null;
+    /**
+     * Timestamp
+     */
+    timestamp?: string | null;
+};
+
+/**
  * AuthTokenPayload
  *
  * Payload for auth token responses (login, register, refresh).
@@ -38,25 +488,7 @@ export type AuthTokenPayload = {
      * Refresh Token
      */
     refresh_token?: string;
-    user: AppSchemasAuthSchemaUserOut;
-};
-
-/**
- * AuthTokenResponse
- *
- * Wrapped response for auth token endpoints.
- */
-export type AuthTokenResponse = {
-    status: ResponseStatus;
-    /**
-     * Message
-     */
-    message: string;
-    data?: AuthTokenPayload | null;
-    /**
-     * Timestamp
-     */
-    timestamp?: string | null;
+    user: UserOut;
 };
 
 /**
@@ -147,6 +579,26 @@ export type ChangePasswordRequest = {
      * New Password
      */
     new_password: string;
+};
+
+/**
+ * CheckoutSessionData
+ *
+ * Data returned from checkout session creation.
+ */
+export type CheckoutSessionData = {
+    /**
+     * Checkout Url
+     *
+     * URL to redirect user to Stripe checkout
+     */
+    checkout_url: string;
+    /**
+     * Session Id
+     *
+     * Stripe session ID
+     */
+    session_id: string;
 };
 
 /**
@@ -281,7 +733,7 @@ export type ContentOut = {
      * Tags
      */
     tags: Array<string>;
-    user: AppSchemasAuthSchemaUserOut;
+    user: UserOut;
     template?: TemplateOut | null;
 };
 
@@ -532,24 +984,6 @@ export type CsrfTokenPayload = {
 };
 
 /**
- * CsrfTokenResponse
- *
- * Wrapped response for CSRF token endpoint.
- */
-export type CsrfTokenResponse = {
-    status: ResponseStatus;
-    /**
-     * Message
-     */
-    message: string;
-    data?: CsrfTokenPayload | null;
-    /**
-     * Timestamp
-     */
-    timestamp?: string | null;
-};
-
-/**
  * HTTPValidationError
  */
 export type HttpValidationError = {
@@ -699,6 +1133,20 @@ export type PaginatedResponseContentOut = {
 };
 
 /**
+ * PortalSessionData
+ *
+ * Data returned from portal session creation.
+ */
+export type PortalSessionData = {
+    /**
+     * Portal Url
+     *
+     * URL to redirect user to Stripe billing portal
+     */
+    portal_url: string;
+};
+
+/**
  * ProcessingStage
  *
  * Detailed processing stages for progress reporting.
@@ -713,21 +1161,6 @@ export type PaginatedResponseContentOut = {
  * - SAVING: 90-100%
  */
 export type ProcessingStage = 'queued' | 'downloading' | 'chunking' | 'transcribing' | 'diarizing' | 'generating' | 'saving' | 'completed' | 'failed';
-
-/**
- * ResponseModel[CommentOut]
- */
-export type ResponseModelCommentOut = {
-    /**
-     * Status
-     */
-    status: string;
-    /**
-     * Message
-     */
-    message: string;
-    data?: CommentOut | null;
-};
 
 /**
  * ResponseModel[ContentOut]
@@ -775,24 +1208,6 @@ export type ResponseModelConversationThreadOut = {
 };
 
 /**
- * ResponseModel[List[CommentOut]]
- */
-export type ResponseModelListCommentOut = {
-    /**
-     * Status
-     */
-    status: string;
-    /**
-     * Message
-     */
-    message: string;
-    /**
-     * Data
-     */
-    data?: Array<CommentOut> | null;
-};
-
-/**
  * ResponseModel[List[ConversationSummary]]
  */
 export type ResponseModelListConversationSummary = {
@@ -829,54 +1244,6 @@ export type ResponseModelListTemplateOut = {
 };
 
 /**
- * ResponseModel[LogsProcessingResponse]
- */
-export type ResponseModelLogsProcessingResponse = {
-    /**
-     * Status
-     */
-    status: string;
-    /**
-     * Message
-     */
-    message: string;
-    data?: LogsProcessingResponse | null;
-};
-
-/**
- * ResponseModel[LogsProcessingStatusResponse]
- */
-export type ResponseModelLogsProcessingStatusResponse = {
-    /**
-     * Status
-     */
-    status: string;
-    /**
-     * Message
-     */
-    message: string;
-    data?: LogsProcessingStatusResponse | null;
-};
-
-/**
- * ResponseModel[NoneType]
- */
-export type ResponseModelNoneType = {
-    /**
-     * Status
-     */
-    status: string;
-    /**
-     * Message
-     */
-    message: string;
-    /**
-     * Data
-     */
-    data?: null;
-};
-
-/**
  * ResponseModel[PaginatedResponse[ContentOut]]
  */
 export type ResponseModelPaginatedResponseContentOut = {
@@ -889,97 +1256,6 @@ export type ResponseModelPaginatedResponseContentOut = {
      */
     message: string;
     data?: PaginatedResponseContentOut | null;
-};
-
-/**
- * ResponseModel[TemplateOut]
- */
-export type ResponseModelTemplateOut = {
-    /**
-     * Status
-     */
-    status: string;
-    /**
-     * Message
-     */
-    message: string;
-    data?: TemplateOut | null;
-};
-
-/**
- * ResponseModel[dict]
- */
-export type ResponseModelDict = {
-    /**
-     * Status
-     */
-    status: string;
-    /**
-     * Message
-     */
-    message: string;
-    /**
-     * Data
-     */
-    data?: {
-        [key: string]: unknown;
-    } | null;
-};
-
-/**
- * ResponseModel[list]
- */
-export type ResponseModelList = {
-    /**
-     * Status
-     */
-    status: string;
-    /**
-     * Message
-     */
-    message: string;
-    /**
-     * Data
-     */
-    data?: Array<unknown> | null;
-};
-
-/**
- * ResponseModel[list[SubscriptionOut]]
- */
-export type ResponseModelListSubscriptionOut = {
-    /**
-     * Status
-     */
-    status: string;
-    /**
-     * Message
-     */
-    message: string;
-    /**
-     * Data
-     */
-    data?: Array<SubscriptionOut> | null;
-};
-
-/**
- * ResponseModel[list[dict]]
- */
-export type ResponseModelListDict = {
-    /**
-     * Status
-     */
-    status: string;
-    /**
-     * Message
-     */
-    message: string;
-    /**
-     * Data
-     */
-    data?: Array<{
-        [key: string]: unknown;
-    }> | null;
 };
 
 /**
@@ -1084,7 +1360,7 @@ export type TemplateOut = {
      * Usage Count
      */
     usage_count?: number;
-    user?: AppSchemasAuthSchemaUserOut | null;
+    user?: UserOut | null;
 };
 
 /**
@@ -1211,6 +1487,41 @@ export type UserLogin = {
 };
 
 /**
+ * UserOut
+ */
+export type UserOut = {
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Display Name
+     */
+    display_name: string;
+    role?: UserRole;
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Last Login
+     */
+    last_login?: string | null;
+    /**
+     * Is Active
+     */
+    is_active: boolean;
+    /**
+     * Content Count
+     */
+    content_count?: number;
+};
+
+/**
  * UserRole
  */
 export type UserRole = 'USER' | 'ADMIN' | 'POWER' | 'MODERATOR' | 'GUEST';
@@ -1248,41 +1559,6 @@ export type ValidationError = {
     type: string;
 };
 
-/**
- * UserOut
- */
-export type AppSchemasAuthSchemaUserOut = {
-    /**
-     * Email
-     */
-    email: string;
-    /**
-     * Display Name
-     */
-    display_name: string;
-    role?: UserRole;
-    /**
-     * Id
-     */
-    id: number;
-    /**
-     * Created At
-     */
-    created_at: string;
-    /**
-     * Last Login
-     */
-    last_login?: string | null;
-    /**
-     * Is Active
-     */
-    is_active: boolean;
-    /**
-     * Content Count
-     */
-    content_count?: number;
-};
-
 export type LoginData = {
     body: UserLogin;
     path?: never;
@@ -1315,7 +1591,7 @@ export type LoginResponses = {
     /**
      * Successful Login
      */
-    200: AuthTokenResponse;
+    200: ApiResponseAuthTokenPayload;
 };
 
 export type LoginResponse = LoginResponses[keyof LoginResponses];
@@ -1346,8 +1622,10 @@ export type LogoutResponses = {
     /**
      * Successfully Logged Out
      */
-    200: unknown;
+    200: ApiResponseNoneType;
 };
+
+export type LogoutResponse = LogoutResponses[keyof LogoutResponses];
 
 export type RegisterData = {
     body: UserCreate;
@@ -1389,7 +1667,7 @@ export type RegisterResponses = {
     /**
      * User registered successfully
      */
-    201: AuthTokenResponse;
+    201: ApiResponseAuthTokenPayload;
 };
 
 export type RegisterResponse = RegisterResponses[keyof RegisterResponses];
@@ -1430,8 +1708,10 @@ export type ChangePasswordResponses = {
     /**
      * Password Changed Successfully
      */
-    200: unknown;
+    200: ApiResponseNoneType;
 };
+
+export type ChangePasswordResponse = ChangePasswordResponses[keyof ChangePasswordResponses];
 
 export type RefreshTokenData = {
     body?: never;
@@ -1459,7 +1739,7 @@ export type RefreshTokenResponses = {
     /**
      * Successful Response
      */
-    200: AuthTokenResponse;
+    200: ApiResponseAuthTokenPayload;
 };
 
 export type RefreshTokenResponse = RefreshTokenResponses[keyof RefreshTokenResponses];
@@ -1490,7 +1770,7 @@ export type GetCsrfTokenResponses = {
     /**
      * CSRF Token
      */
-    200: CsrfTokenResponse;
+    200: ApiResponseCsrfTokenPayload;
 };
 
 export type GetCsrfTokenResponse = GetCsrfTokenResponses[keyof GetCsrfTokenResponses];
@@ -1633,7 +1913,7 @@ export type GetContentResponses = {
     /**
      * Content retrieved successfully
      */
-    200: ContentOut;
+    200: ApiResponseContentOut;
 };
 
 export type GetContentResponse = GetContentResponses[keyof GetContentResponses];
@@ -1683,7 +1963,7 @@ export type UpdateContentResponses = {
     /**
      * Content updated successfully
      */
-    200: ContentOut;
+    200: ApiResponseContentOut;
 };
 
 export type UpdateContentResponse = UpdateContentResponses[keyof UpdateContentResponses];
@@ -1725,11 +2005,9 @@ export type UpdateMultipleContentsError = UpdateMultipleContentsErrors[keyof Upd
 
 export type UpdateMultipleContentsResponses = {
     /**
-     * Response Update Multiple Contents
-     *
      * Contents updated successfully
      */
-    200: Array<ContentOut>;
+    200: ApiResponseListContentOut;
 };
 
 export type UpdateMultipleContentsResponse = UpdateMultipleContentsResponses[keyof UpdateMultipleContentsResponses];
@@ -1779,7 +2057,7 @@ export type UpdateContentTitleResponses = {
     /**
      * Content title updated successfully
      */
-    200: ResponseModelContentOut;
+    200: ApiResponseContentOut;
 };
 
 export type UpdateContentTitleResponse = UpdateContentTitleResponses[keyof UpdateContentTitleResponses];
@@ -1825,8 +2103,10 @@ export type DeleteContentResponses = {
     /**
      * Content deleted successfully
      */
-    200: unknown;
+    200: ApiResponseNoneType;
 };
+
+export type DeleteContentResponse = DeleteContentResponses[keyof DeleteContentResponses];
 
 export type ListCommentsData = {
     body?: never;
@@ -1878,7 +2158,7 @@ export type ListCommentsResponses = {
     /**
      * Comments retrieved successfully
      */
-    200: ResponseModelListCommentOut;
+    200: ApiResponseListCommentOut;
 };
 
 export type ListCommentsResponse = ListCommentsResponses[keyof ListCommentsResponses];
@@ -1928,7 +2208,7 @@ export type CreateCommentResponses = {
     /**
      * Successful Response
      */
-    200: ResponseModelCommentOut;
+    200: ApiResponseCommentOut;
     /**
      * Comment created successfully
      */
@@ -1978,7 +2258,7 @@ export type DeleteCommentResponses = {
     /**
      * Comment deleted successfully
      */
-    200: ResponseModelNoneType;
+    200: ApiResponseNoneType;
 };
 
 export type DeleteCommentResponse = DeleteCommentResponses[keyof DeleteCommentResponses];
@@ -2028,7 +2308,7 @@ export type UpdateCommentResponses = {
     /**
      * Comment updated successfully
      */
-    200: ResponseModelCommentOut;
+    200: ApiResponseCommentOut;
 };
 
 export type UpdateCommentResponse = UpdateCommentResponses[keyof UpdateCommentResponses];
@@ -2124,7 +2404,7 @@ export type DeleteConversationResponses = {
     /**
      * Conversation deleted successfully
      */
-    200: ResponseModelNoneType;
+    200: ApiResponseNoneType;
 };
 
 export type DeleteConversationResponse = DeleteConversationResponses[keyof DeleteConversationResponses];
@@ -2269,7 +2549,7 @@ export type SaveTemplateResponses = {
     /**
      * Template saved successfully
      */
-    201: ResponseModelTemplateOut;
+    201: ApiResponseTemplateOut;
 };
 
 export type SaveTemplateResponse = SaveTemplateResponses[keyof SaveTemplateResponses];
@@ -2303,7 +2583,7 @@ export type GetTemplateResponses = {
     /**
      * Template retrieved successfully
      */
-    200: ResponseModelTemplateOut;
+    200: ApiResponseTemplateOut;
 };
 
 export type GetTemplateResponse = GetTemplateResponses[keyof GetTemplateResponses];
@@ -2341,7 +2621,7 @@ export type UpdateTemplateResponses = {
     /**
      * Template updated successfully
      */
-    200: ResponseModelTemplateOut;
+    200: ApiResponseTemplateOut;
 };
 
 export type UpdateTemplateResponse = UpdateTemplateResponses[keyof UpdateTemplateResponses];
@@ -2375,7 +2655,7 @@ export type DeleteTemplateResponses = {
     /**
      * Template deleted successfully
      */
-    200: ResponseModelNoneType;
+    200: ApiResponseNoneType;
 };
 
 export type DeleteTemplateResponse = DeleteTemplateResponses[keyof DeleteTemplateResponses];
@@ -2406,7 +2686,7 @@ export type GetUserProfileResponses = {
     /**
      * Successful Response
      */
-    200: AppSchemasAuthSchemaUserOut;
+    200: ApiResponseUserOut;
 };
 
 export type GetUserProfileResponse = GetUserProfileResponses[keyof GetUserProfileResponses];
@@ -2443,7 +2723,7 @@ export type ChangeDisplayNameResponses = {
     /**
      * Successful Response
      */
-    200: AppSchemasAuthSchemaUserOut;
+    200: ApiResponseUserOut;
 };
 
 export type ChangeDisplayNameResponse = ChangeDisplayNameResponses[keyof ChangeDisplayNameResponses];
@@ -2480,7 +2760,7 @@ export type ChangeEmailResponses = {
     /**
      * Successful Response
      */
-    200: AppSchemasAuthSchemaUserOut;
+    200: ApiResponseUserOut;
 };
 
 export type ChangeEmailResponse = ChangeEmailResponses[keyof ChangeEmailResponses];
@@ -2511,7 +2791,7 @@ export type GetUserCreditsResponses = {
     /**
      * Successful Response
      */
-    200: UserCredits;
+    200: ApiResponseUserCredits;
 };
 
 export type GetUserCreditsResponse = GetUserCreditsResponses[keyof GetUserCreditsResponses];
@@ -2542,8 +2822,10 @@ export type GetUserUsageResponses = {
     /**
      * Successful Response
      */
-    200: unknown;
+    200: ApiResponseListDict;
 };
+
+export type GetUserUsageResponse = GetUserUsageResponses[keyof GetUserUsageResponses];
 
 export type GetMediaConfigData = {
     body?: never;
@@ -2571,7 +2853,7 @@ export type GetMediaConfigResponses = {
     /**
      * Media file configuration
      */
-    200: ResponseModelDict;
+    200: ApiResponseDict;
 };
 
 export type GetMediaConfigResponse = GetMediaConfigResponses[keyof GetMediaConfigResponses];
@@ -2602,7 +2884,7 @@ export type GetAvailableModelsResponses = {
     /**
      * Available AI models for content generation
      */
-    200: ResponseModelList;
+    200: ApiResponseList;
 };
 
 export type GetAvailableModelsResponse = GetAvailableModelsResponses[keyof GetAvailableModelsResponses];
@@ -2651,7 +2933,7 @@ export type ProcessMediaResponses = {
     /**
      * Media processing job enqueued successfully
      */
-    200: MediaProcessingResponse;
+    200: ApiResponseMediaProcessingResponse;
 };
 
 export type ProcessMediaResponse = ProcessMediaResponses[keyof ProcessMediaResponses];
@@ -2697,7 +2979,7 @@ export type GetMediaProcessingStatusResponses = {
     /**
      * Media processing status retrieved successfully
      */
-    200: MediaProcessingStatusResponse;
+    200: ApiResponseMediaProcessingStatusResponse;
 };
 
 export type GetMediaProcessingStatusResponse = GetMediaProcessingStatusResponses[keyof GetMediaProcessingStatusResponses];
@@ -2802,7 +3084,7 @@ export type ProcessWebResponses = {
     /**
      * Enqueued web scraping successfully
      */
-    200: MediaProcessingStatusResponse;
+    200: ApiResponseMediaProcessingResponse;
 };
 
 export type ProcessWebResponse = ProcessWebResponses[keyof ProcessWebResponses];
@@ -2840,7 +3122,7 @@ export type GetWebProcessingStatusResponses = {
     /**
      * Successful Response
      */
-    200: MediaProcessingStatusResponse;
+    200: ApiResponseMediaProcessingStatusResponse;
 };
 
 export type GetWebProcessingStatusResponse = GetWebProcessingStatusResponses[keyof GetWebProcessingStatusResponses];
@@ -2875,7 +3157,7 @@ export type GetAdminUsageResponses = {
     /**
      * Successful Response
      */
-    200: ResponseModelListDict;
+    200: ApiResponseListDict;
 };
 
 export type GetAdminUsageResponse = GetAdminUsageResponses[keyof GetAdminUsageResponses];
@@ -2910,7 +3192,7 @@ export type GetSubscriptionsResponses = {
     /**
      * Successful Response
      */
-    200: ResponseModelListSubscriptionOut;
+    200: ApiResponseListSubscriptionOut;
 };
 
 export type GetSubscriptionsResponse = GetSubscriptionsResponses[keyof GetSubscriptionsResponses];
@@ -3022,8 +3304,10 @@ export type GetLlmUsageSummaryResponses = {
     /**
      * Successful Response
      */
-    200: unknown;
+    200: ApiResponseDict;
 };
+
+export type GetLlmUsageSummaryResponse = GetLlmUsageSummaryResponses[keyof GetLlmUsageSummaryResponses];
 
 export type CreateCheckoutSessionData = {
     body?: never;
@@ -3070,8 +3354,10 @@ export type CreateCheckoutSessionResponses = {
     /**
      * Checkout session created
      */
-    200: unknown;
+    200: ApiResponseCheckoutSessionData;
 };
+
+export type CreateCheckoutSessionResponse = CreateCheckoutSessionResponses[keyof CreateCheckoutSessionResponses];
 
 export type CreatePortalSessionData = {
     body?: never;
@@ -3107,8 +3393,10 @@ export type CreatePortalSessionResponses = {
     /**
      * Portal session created
      */
-    200: unknown;
+    200: ApiResponsePortalSessionData;
 };
+
+export type CreatePortalSessionResponse = CreatePortalSessionResponses[keyof CreatePortalSessionResponses];
 
 export type ListApiKeysData = {
     body?: never;
@@ -3136,8 +3424,10 @@ export type ListApiKeysResponses = {
     /**
      * List of API keys
      */
-    200: unknown;
+    200: ApiResponseListApiKeyOut;
 };
+
+export type ListApiKeysResponse = ListApiKeysResponses[keyof ListApiKeysResponses];
 
 export type CreateApiKeyData = {
     body: ApiKeyCreate;
@@ -3175,8 +3465,10 @@ export type CreateApiKeyResponses = {
     /**
      * API key created successfully
      */
-    200: unknown;
+    200: ApiResponseApiKeyCreatedOut;
 };
+
+export type CreateApiKeyResponse = CreateApiKeyResponses[keyof CreateApiKeyResponses];
 
 export type RevokeApiKeyData = {
     body?: never;
@@ -3219,8 +3511,10 @@ export type RevokeApiKeyResponses = {
     /**
      * API key revoked
      */
-    200: unknown;
+    200: ApiResponseDict;
 };
+
+export type RevokeApiKeyResponse = RevokeApiKeyResponses[keyof RevokeApiKeyResponses];
 
 export type HealthCheckData = {
     body?: never;
@@ -3233,8 +3527,42 @@ export type HealthCheckResponses = {
     /**
      * Successful Response
      */
-    200: unknown;
+    200: ApiResponseNoneType;
 };
+
+export type HealthCheckResponse = HealthCheckResponses[keyof HealthCheckResponses];
+
+export type HealthDbData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/health/db';
+};
+
+export type HealthDbResponses = {
+    /**
+     * Successful Response
+     */
+    200: ApiResponseNoneType;
+};
+
+export type HealthDbResponse = HealthDbResponses[keyof HealthDbResponses];
+
+export type HealthRedisData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/health/redis';
+};
+
+export type HealthRedisResponses = {
+    /**
+     * Successful Response
+     */
+    200: ApiResponseNoneType;
+};
+
+export type HealthRedisResponse = HealthRedisResponses[keyof HealthRedisResponses];
 
 export type ProcessLogsData = {
     body: BodyProcessLogs;
@@ -3279,7 +3607,7 @@ export type ProcessLogsResponses = {
     /**
      * Log processing job enqueued successfully
      */
-    200: ResponseModelLogsProcessingResponse;
+    200: ApiResponseLogsProcessingResponse;
 };
 
 export type ProcessLogsResponse = ProcessLogsResponses[keyof ProcessLogsResponses];
@@ -3325,7 +3653,7 @@ export type GetLogsProcessingStatusResponses = {
     /**
      * Log processing status retrieved successfully
      */
-    200: ResponseModelLogsProcessingStatusResponse;
+    200: ApiResponseLogsProcessingStatusResponse;
 };
 
 export type GetLogsProcessingStatusResponse = GetLogsProcessingStatusResponses[keyof GetLogsProcessingStatusResponses];
@@ -3373,7 +3701,7 @@ export type GenerateSplunkConfigResponses = {
     /**
      * Splunk config generation job enqueued successfully
      */
-    200: ResponseModelLogsProcessingResponse;
+    200: ApiResponseLogsProcessingResponse;
 };
 
 export type GenerateSplunkConfigResponse = GenerateSplunkConfigResponses[keyof GenerateSplunkConfigResponses];
@@ -3404,7 +3732,7 @@ export type GetLogConfigResponses = {
     /**
      * Log file configuration
      */
-    200: ResponseModelDict;
+    200: ApiResponseDict;
 };
 
 export type GetLogConfigResponse = GetLogConfigResponses[keyof GetLogConfigResponses];

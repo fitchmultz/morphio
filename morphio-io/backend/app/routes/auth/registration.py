@@ -8,12 +8,13 @@ from ...config import settings
 from ...database import get_db
 from ...models.user import User
 from ...schemas.auth_schema import (
-    AuthTokenResponse,
+    AuthTokenPayload,
     ChangePasswordRequest,
     Token,
     UserCreate,
     UserOut,
 )
+from ...schemas.response_schema import ApiResponse
 from ...services.security import (
     create_access_token,
     create_refresh_token,
@@ -35,7 +36,7 @@ logger = logging.getLogger(__name__)
 @router.post(
     "/register",
     operation_id="register",
-    response_model=AuthTokenResponse,
+    response_model=ApiResponse[AuthTokenPayload],
     status_code=status.HTTP_201_CREATED,
     responses={
         201: {
@@ -130,6 +131,7 @@ async def register(
 @router.post(
     "/change-password",
     operation_id="change_password",
+    response_model=ApiResponse[None],
     responses={
         200: {
             "description": "Password Changed Successfully",

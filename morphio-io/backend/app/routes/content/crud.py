@@ -17,7 +17,7 @@ from ...schemas.content_schema import (
     ContentTitleUpdate,
     ContentUpdate,
 )
-from ...schemas.response_schema import PaginatedResponse, ResponseModel
+from ...schemas.response_schema import ApiResponse, PaginatedResponse, ResponseModel
 from ...services.content import sanitize_content, validate_content
 from ...services.generation import update_content_title
 from ...services.security import get_current_user
@@ -152,7 +152,7 @@ async def get_contents(
 @router.get(
     "/get-content/{content_id}",
     operation_id="get_content",
-    response_model=ContentOut,
+    response_model=ApiResponse[ContentOut],
     responses={
         200: {
             "description": "Content retrieved successfully",
@@ -184,7 +184,7 @@ async def get_content(
 @router.put(
     "/update-content/{content_id}",
     operation_id="update_content",
-    response_model=ContentOut,
+    response_model=ApiResponse[ContentOut],
     responses={
         200: {
             "description": "Content updated successfully",
@@ -236,7 +236,7 @@ async def update_content(
 @router.put(
     "/update-multiple-contents",
     operation_id="update_multiple_contents",
-    response_model=List[ContentOut],
+    response_model=ApiResponse[List[ContentOut]],
     responses={
         200: {
             "description": "Contents updated successfully",
@@ -287,7 +287,7 @@ async def update_multiple_contents(
 @router.put(
     "/update-title/{content_id}",
     operation_id="update_content_title",
-    response_model=ResponseModel[ContentOut],
+    response_model=ApiResponse[ContentOut],
     responses={
         200: {
             "description": "Content title updated successfully",
@@ -323,6 +323,7 @@ async def update_content_title_route(
     "/delete-content/{content_id}",
     operation_id="delete_content",
     status_code=status.HTTP_200_OK,
+    response_model=ApiResponse[None],
     responses={
         200: {
             "description": "Content deleted successfully",

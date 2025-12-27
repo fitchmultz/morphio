@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..database import get_db
 from ..models.api_key import APIKey
 from ..models.user import User
+from ..schemas.response_schema import ApiResponse
 from ..services.security import get_current_user
 from ..utils.decorators import require_auth
 from ..utils.enums import ResponseStatus
@@ -52,6 +53,7 @@ class APIKeyCreatedOut(APIKeyOut):
 @router.post(
     "",
     operation_id="create_api_key",
+    response_model=ApiResponse[APIKeyCreatedOut],
     responses={
         200: {"description": "API key created successfully"},
         400: {"description": "Invalid request"},
@@ -116,6 +118,7 @@ async def create_api_key(
 @router.get(
     "",
     operation_id="list_api_keys",
+    response_model=ApiResponse[list[APIKeyOut]],
     responses={
         200: {"description": "List of API keys"},
         **common_responses,
@@ -164,6 +167,7 @@ async def list_api_keys(
 @router.delete(
     "/{key_id}",
     operation_id="revoke_api_key",
+    response_model=ApiResponse[dict],
     responses={
         200: {"description": "API key revoked"},
         404: {"description": "API key not found"},

@@ -9,7 +9,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...database import get_db
 from ...models.user import User
-from ...schemas.auth_schema import AuthTokenResponse, Token, UserLogin, UserOut
+from ...schemas.auth_schema import AuthTokenPayload, Token, UserLogin, UserOut
+from ...schemas.response_schema import ApiResponse
 from ...services.redis import add_to_token_blacklist
 from ...services.security import (
     clear_auth_cookies,
@@ -39,7 +40,7 @@ logger = logging.getLogger(__name__)
 @router.post(
     "/login",
     operation_id="login",
-    response_model=AuthTokenResponse,
+    response_model=ApiResponse[AuthTokenPayload],
     responses={
         200: {
             "description": "Successful Login",
@@ -160,6 +161,7 @@ async def login(
 @router.post(
     "/logout",
     operation_id="logout",
+    response_model=ApiResponse[None],
     responses={
         200: {
             "description": "Successfully Logged Out",
