@@ -31,7 +31,7 @@ This document defines the canonical configuration contract for the Morphio monor
 | `APP_ENV` | Yes | `production` | Environment: `development`, `production` |
 | `SECRET_KEY` | **Prod** | `dev_secret_key` | Strong secret for sessions |
 | `JWT_SECRET_KEY` | **Prod** | `dev_jwt_secret_key` | JWT signing key |
-| `OPENAI_API_KEY` | Yes | - | OpenAI API key |
+| `OPENAI_API_KEY` | Optional | - | Required if using OpenAI models |
 | `DATABASE_URL` | **Prod** | SQLite | PostgreSQL connection string |
 | `REDIS_URL` | Yes | `redis://localhost:6384/0` | Redis connection URL |
 | `REDIS_DB` | No | `0` | Redis database index |
@@ -50,9 +50,10 @@ This document defines the canonical configuration contract for the Morphio monor
 | `SERVICE_TIMEOUT` | No | `60` | Upstream service timeout in seconds |
 
 **AI/LLM Keys:**
-- `OPENAI_API_KEY` - Required
-- `ANTHROPIC_API_KEY` - Optional
-- `GEMINI_API_KEY` - Optional
+- Provide at least one provider key that matches the model you configure.
+- `OPENAI_API_KEY` - Required if using OpenAI models
+- `ANTHROPIC_API_KEY` - Required if using Anthropic models
+- `GEMINI_API_KEY` - Required if using Gemini models
 - `HUGGING_FACE_TOKEN` - Required for diarization
 
 **Model Configuration:**
