@@ -10,6 +10,9 @@ ROOT = Path(__file__).resolve().parent.parent
 CONFIG_PATH = ROOT / "backend" / "app" / "config.py"
 TEMPLATE_PATH = ROOT / ".env.example"
 FRONTEND_PATH = ROOT / "frontend"
+FRONTEND_FILES = [
+    FRONTEND_PATH / "next.config.ts",
+]
 COMPOSE_FILES = [
     ROOT / "docker-compose.yml",
     ROOT / "docker-compose.watch.yml",
@@ -41,12 +44,20 @@ def extract_template_keys(template_text: str) -> set[str]:
 
 def extract_frontend_env_keys() -> set[str]:
     keys: set[str] = set()
-    if not FRONTEND_PATH.exists():
-        return keys
-    for path in FRONTEND_PATH.rglob("*"):
-        if not path.is_file():
-            continue
-        if path.suffix not in {".ts", ".tsx", ".js", ".jsx", ".mjs"}:
+    src_path = FRONTEND_PATH / "src"
+    if src_path.exists():
+        for path in src_path.rglob("*"):
+            if not path.is_file():
+                continue
+            if path.suffix not in {".ts", ".tsx", ".js", ".jsx", ".mjs"}:
+                continue
+            try:
+                text = path.read_text(encoding="utf-8")
+            except Exception:
+                continue
+            keys.update(re.findall(r"NEXT_PUBLIC_[A-Z0-9_]+", text))
+    for path in FRONTEND_FILES:
+        if not path.exists():
             continue
         try:
             text = path.read_text(encoding="utf-8")
