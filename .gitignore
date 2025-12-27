@@ -25,6 +25,8 @@ build/
 .env
 .env.local
 .env.*.local
+.venv/
+.venv-ci/
 
 # Node
 node_modules/
