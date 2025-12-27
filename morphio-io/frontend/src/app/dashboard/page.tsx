@@ -123,8 +123,8 @@ function Dashboard() {
 			if (error) {
 				throw new Error(error instanceof Error ? error.message : String(error));
 			}
-			if (data?.job_id) {
-				setJobId(data.job_id);
+			if (data?.data?.job_id) {
+				setJobId(data.data.job_id);
 			} else {
 				throw new Error("No job ID received from the server");
 			}

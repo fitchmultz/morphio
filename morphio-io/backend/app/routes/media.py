@@ -18,7 +18,7 @@ from ..schemas.media_schema import (
     MediaSource,
     MediaType,
 )
-from ..schemas.response_schema import ResponseModel
+from ..schemas.response_schema import ApiResponse
 from ..services.audio import enqueue_audio_processing, get_audio_processing_status
 from ..services.generation.core import MODEL_DISPLAY_INFO, VALID_GENERATION_MODELS
 from ..services.security import get_current_user
@@ -40,7 +40,7 @@ router = APIRouter()
 @router.get(
     "/config",
     operation_id="get_media_config",
-    response_model=ResponseModel[dict],
+    response_model=ApiResponse[dict],
     responses={
         200: {
             "description": "Media file configuration",
@@ -84,7 +84,7 @@ async def get_media_file_configuration():
 @router.get(
     "/models",
     operation_id="get_available_models",
-    response_model=ResponseModel[list],
+    response_model=ApiResponse[list],
     responses={
         200: {
             "description": "Available AI models for content generation",
@@ -121,7 +121,7 @@ async def get_available_models():
 @router.post(
     "/process-media",
     operation_id="process_media",
-    response_model=MediaProcessingResponse,
+    response_model=ApiResponse[MediaProcessingResponse],
     responses={
         200: {"description": "Media processing job enqueued successfully"},
         400: {"description": "Bad Request"},
@@ -308,7 +308,7 @@ async def process_media_route(
 @router.get(
     "/media-processing-status/{job_id}",
     operation_id="get_media_processing_status",
-    response_model=MediaProcessingStatusResponse,
+    response_model=ApiResponse[MediaProcessingStatusResponse],
     responses={
         200: {"description": "Media processing status retrieved successfully"},
         404: {"description": "Not Found"},

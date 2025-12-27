@@ -22,15 +22,16 @@ export const ChangeDisplayNameForm: FC<ChangeDisplayNameFormProps> = ({
 		const response = await changeDisplayName({
 			body: { display_name: data.display_name },
 		});
-		if (response.data) {
-			onUpdate(response.data.display_name);
+		const updatedUser = response.data?.data;
+		if (updatedUser?.display_name) {
+			onUpdate(updatedUser.display_name);
 		} else {
 			const errorMessage =
 				response.error &&
 				typeof response.error === "object" &&
 				"message" in response.error
 					? String(response.error.message)
-					: "Failed to update display name";
+					: response.data?.message || "Failed to update display name";
 			throw new Error(errorMessage);
 		}
 	};

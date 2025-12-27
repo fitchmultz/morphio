@@ -11,10 +11,7 @@ import {
 	listApiKeys,
 	revokeApiKey,
 } from "@/client/sdk.gen";
-import type {
-	AppSchemasAuthSchemaUserOut,
-	UserCredits,
-} from "@/client/types.gen";
+import type { UserCredits, UserOut } from "@/client/types.gen";
 import { Skeleton } from "@/components/common/Skeleton";
 import { ChangeDisplayNameForm } from "@/components/forms/ChangeDisplayNameForm";
 import { ChangeEmailForm } from "@/components/forms/ChangeEmailForm";
@@ -38,8 +35,7 @@ type ApiKeyCreated = ApiKey & {
 
 export const ProfileManagement: FC = () => {
 	const { updateUserData } = useAuth();
-	const [userProfile, setUserProfile] =
-		useState<AppSchemasAuthSchemaUserOut | null>(null);
+	const [userProfile, setUserProfile] = useState<UserOut | null>(null);
 	const [credits, setCredits] = useState<UserCredits | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [fetchError, setFetchError] = useState<string | null>(null);
@@ -57,25 +53,28 @@ export const ProfileManagement: FC = () => {
 			setLoading(true);
 			setFetchError(null);
 			const response = await getUserProfile();
+			const responseData = response.data;
+			const profileData = responseData?.data;
 
-			if (response.data) {
-				setUserProfile(response.data);
-				updateUserData(response.data);
+			if (profileData) {
+				setUserProfile(profileData);
+				updateUserData(profileData);
 			} else {
 				const errorMessage =
 					response.error &&
 					typeof response.error === "object" &&
 					"message" in response.error
 						? String(response.error.message)
-						: "Failed to fetch user profile";
+						: responseData?.message || "Failed to fetch user profile";
 				throw new Error(errorMessage);
 			}
 
 			// Fetch credits
 			try {
 				const creditsResponse = await getUserCredits();
-				if (creditsResponse.data) {
-					setCredits(creditsResponse.data);
+				const creditsData = creditsResponse.data?.data;
+				if (creditsData) {
+					setCredits(creditsData);
 				}
 			} catch (creditsError) {
 				logger.warn("Failed to fetch credits", { error: creditsError });
@@ -108,15 +107,10 @@ export const ProfileManagement: FC = () => {
 						: "Failed to load API keys",
 				);
 			}
-			const responseData = data as {
-				status?: string;
-				data?: ApiKey[];
-				message?: string;
-			} | null;
-			if (responseData?.status === "success" && responseData.data) {
-				setApiKeys(responseData.data);
+			if (data?.status === "success" && data.data) {
+				setApiKeys(data.data as ApiKey[]);
 			} else {
-				throw new Error(responseData?.message || "Failed to load API keys");
+				throw new Error(data?.message || "Failed to load API keys");
 			}
 		} catch (error) {
 			const message =
@@ -132,10 +126,7 @@ export const ProfileManagement: FC = () => {
 		fetchApiKeys();
 	}, [fetchApiKeys]);
 
-	const handleProfileUpdate = (
-		updateKey: keyof AppSchemasAuthSchemaUserOut,
-		newValue: string,
-	) => {
+	const handleProfileUpdate = (updateKey: keyof UserOut, newValue: string) => {
 		if (userProfile) {
 			const updatedProfile = { ...userProfile, [updateKey]: newValue };
 			setUserProfile(updatedProfile);
@@ -152,11 +143,9 @@ export const ProfileManagement: FC = () => {
 			const response = await createCheckoutSession({
 				query: { plan },
 			});
-			const responseData = response.data as {
-				data?: { checkout_url?: string };
-			} | null;
-			if (responseData?.data?.checkout_url) {
-				window.location.href = responseData.data.checkout_url;
+			const checkoutUrl = response.data?.data?.checkout_url;
+			if (checkoutUrl) {
+				window.location.href = checkoutUrl;
 			} else {
 				notifyError("Failed to create checkout session");
 			}
@@ -187,18 +176,13 @@ export const ProfileManagement: FC = () => {
 						: "Failed to create API key",
 				);
 			}
-			const responseData = data as {
-				status?: string;
-				data?: ApiKeyCreated;
-				message?: string;
-			} | null;
-			if (responseData?.status === "success" && responseData.data) {
-				setNewApiKey(responseData.data);
+			if (data?.status === "success" && data.data) {
+				setNewApiKey(data.data as ApiKeyCreated);
 				setApiKeyName("");
 				await fetchApiKeys();
 				notifySuccess("API key created. Store it securely.");
 			} else {
-				throw new Error(responseData?.message || "Failed to create API key");
+				throw new Error(data?.message || "Failed to create API key");
 			}
 		} catch (error) {
 			logger.error("Failed to create API key", { error });
@@ -243,15 +227,11 @@ export const ProfileManagement: FC = () => {
 						: "Failed to revoke API key",
 				);
 			}
-			const responseData = data as {
-				status?: string;
-				message?: string;
-			} | null;
-			if (responseData?.status === "success") {
+			if (data?.status === "success") {
 				await fetchApiKeys();
 				notifySuccess("API key revoked.");
 			} else {
-				throw new Error(responseData?.message || "Failed to revoke API key");
+				throw new Error(data?.message || "Failed to revoke API key");
 			}
 		} catch (error) {
 			logger.error("Failed to revoke API key", { error });
@@ -265,11 +245,9 @@ export const ProfileManagement: FC = () => {
 		try {
 			setIsUpgrading(true);
 			const response = await createPortalSession();
-			const responseData = response.data as {
-				data?: { portal_url?: string };
-			} | null;
-			if (responseData?.data?.portal_url) {
-				window.location.href = responseData.data.portal_url;
+			const portalUrl = response.data?.data?.portal_url;
+			if (portalUrl) {
+				window.location.href = portalUrl;
 			} else {
 				notifyError("Failed to create portal session");
 			}

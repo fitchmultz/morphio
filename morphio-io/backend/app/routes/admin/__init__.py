@@ -12,7 +12,7 @@ from ...database import get_db
 from ...models.subscription import Subscription
 from ...models.usage import Usage
 from ...models.user import User
-from ...schemas.response_schema import ResponseModel
+from ...schemas.response_schema import ApiResponse
 from ...schemas.subscription_schema import SubscriptionOut
 from ...services.security import get_current_user
 from ...utils.decorators import require_auth
@@ -29,7 +29,7 @@ router = APIRouter(tags=["Admin"])
 @router.get(
     "/get-usage",
     operation_id="get_admin_usage",
-    response_model=ResponseModel[list[dict]],
+    response_model=ApiResponse[list[dict]],
     responses={403: {"description": "Not authorized"}, **common_responses},
 )
 @require_auth
@@ -90,7 +90,7 @@ async def get_usage(
 @router.get(
     "/get-subscriptions",
     operation_id="get_subscriptions",
-    response_model=ResponseModel[list[SubscriptionOut]],
+    response_model=ApiResponse[list[SubscriptionOut]],
     responses={403: {"description": "Not authorized"}, **common_responses},
 )
 @require_auth

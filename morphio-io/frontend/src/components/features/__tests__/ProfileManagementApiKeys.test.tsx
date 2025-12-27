@@ -44,9 +44,11 @@ describe("ProfileManagement API keys", () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
 		(sdk.getUserProfile as jest.Mock).mockResolvedValue({
-			data: mockUserProfile,
+			data: { status: "success", data: mockUserProfile },
 		});
-		(sdk.getUserCredits as jest.Mock).mockResolvedValue({ data: null });
+		(sdk.getUserCredits as jest.Mock).mockResolvedValue({
+			data: { status: "success", data: null },
+		});
 	});
 
 	test("creates an API key and surfaces the plaintext key", async () => {
@@ -110,7 +112,7 @@ describe("ProfileManagement API keys", () => {
 				data: { status: "success", data: [] },
 			});
 		(sdk.revokeApiKey as jest.Mock).mockResolvedValue({
-			data: { status: "success" },
+			data: { status: "success", data: { id: 7 } },
 		});
 
 		render(<ProfileManagement />);

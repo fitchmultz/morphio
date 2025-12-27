@@ -3,8 +3,8 @@
 import { type DefaultError, type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { changeDisplayName, changeEmail, changePassword, continueConversation, createApiKey, createCheckoutSession, createComment, createItem, createPortalSession, deleteComment, deleteContent, deleteConversation, deleteTemplate, exportLlmUsage, generateSplunkConfig, getAdminUsage, getAvailableModels, getContent, getConversationThread, getCsrfToken, getLlmUsageSummary, getLogConfig, getLogsProcessingStatus, getMediaConfig, getMediaProcessingStatus, getSubscriptions, getTemplate, getUserCredits, getUserProfile, getUserUsage, getWebProcessingStatus, healthCheck, listApiKeys, listComments, listContentConversations, listContents, listTemplates, login, logout, type Options, processLogs, processMedia, processWeb, readItem, readUsersMe, refreshToken, register, revokeApiKey, saveContent, saveTemplate, updateComment, updateContent, updateContentTitle, updateMultipleContents, updateTemplate } from '../sdk.gen';
-import type { ChangeDisplayNameData, ChangeDisplayNameError, ChangeDisplayNameResponse, ChangeEmailData, ChangeEmailError, ChangeEmailResponse, ChangePasswordData, ChangePasswordError, ContinueConversationData, ContinueConversationError, ContinueConversationResponse, CreateApiKeyData, CreateApiKeyError, CreateCheckoutSessionData, CreateCheckoutSessionError, CreateCommentData, CreateCommentError, CreateCommentResponse, CreateItemData, CreateItemError, CreateItemResponse, CreatePortalSessionData, DeleteCommentData, DeleteCommentError, DeleteCommentResponse, DeleteContentData, DeleteContentError, DeleteConversationData, DeleteConversationError, DeleteConversationResponse, DeleteTemplateData, DeleteTemplateError, DeleteTemplateResponse, ExportLlmUsageData, ExportLlmUsageError, GenerateSplunkConfigData, GenerateSplunkConfigError, GenerateSplunkConfigResponse, GetAdminUsageData, GetAdminUsageResponse, GetAvailableModelsData, GetAvailableModelsResponse, GetContentData, GetContentError, GetContentResponse, GetConversationThreadData, GetConversationThreadError, GetConversationThreadResponse, GetCsrfTokenData, GetCsrfTokenResponse, GetLlmUsageSummaryData, GetLlmUsageSummaryError, GetLogConfigData, GetLogConfigResponse, GetLogsProcessingStatusData, GetLogsProcessingStatusError, GetLogsProcessingStatusResponse, GetMediaConfigData, GetMediaConfigResponse, GetMediaProcessingStatusData, GetMediaProcessingStatusError, GetMediaProcessingStatusResponse, GetSubscriptionsData, GetSubscriptionsResponse, GetTemplateData, GetTemplateError, GetTemplateResponse, GetUserCreditsData, GetUserCreditsResponse, GetUserProfileData, GetUserProfileResponse, GetUserUsageData, GetWebProcessingStatusData, GetWebProcessingStatusError, GetWebProcessingStatusResponse, HealthCheckData, ListApiKeysData, ListCommentsData, ListCommentsError, ListCommentsResponse, ListContentConversationsData, ListContentConversationsError, ListContentConversationsResponse, ListContentsData, ListContentsError, ListContentsResponse, ListTemplatesData, ListTemplatesResponse, LoginData, LoginError, LoginResponse, LogoutData, ProcessLogsData, ProcessLogsError, ProcessLogsResponse, ProcessMediaData, ProcessMediaError, ProcessMediaResponse, ProcessWebData, ProcessWebError, ProcessWebResponse, ReadItemData, ReadItemError, ReadUsersMeData, RefreshTokenData, RefreshTokenResponse, RegisterData, RegisterError, RegisterResponse, RevokeApiKeyData, RevokeApiKeyError, SaveContentData, SaveContentError, SaveContentResponse, SaveTemplateData, SaveTemplateError, SaveTemplateResponse, UpdateCommentData, UpdateCommentError, UpdateCommentResponse, UpdateContentData, UpdateContentError, UpdateContentResponse, UpdateContentTitleData, UpdateContentTitleError, UpdateContentTitleResponse, UpdateMultipleContentsData, UpdateMultipleContentsError, UpdateMultipleContentsResponse, UpdateTemplateData, UpdateTemplateError, UpdateTemplateResponse } from '../types.gen';
+import { changeDisplayName, changeEmail, changePassword, continueConversation, createApiKey, createCheckoutSession, createComment, createItem, createPortalSession, deleteComment, deleteContent, deleteConversation, deleteTemplate, exportLlmUsage, generateSplunkConfig, getAdminUsage, getAvailableModels, getContent, getConversationThread, getCsrfToken, getLlmUsageSummary, getLogConfig, getLogsProcessingStatus, getMediaConfig, getMediaProcessingStatus, getSubscriptions, getTemplate, getUserCredits, getUserProfile, getUserUsage, getWebProcessingStatus, healthCheck, healthDb, healthRedis, listApiKeys, listComments, listContentConversations, listContents, listTemplates, login, logout, type Options, processLogs, processMedia, processWeb, readItem, readUsersMe, refreshToken, register, revokeApiKey, saveContent, saveTemplate, updateComment, updateContent, updateContentTitle, updateMultipleContents, updateTemplate } from '../sdk.gen';
+import type { ChangeDisplayNameData, ChangeDisplayNameError, ChangeDisplayNameResponse, ChangeEmailData, ChangeEmailError, ChangeEmailResponse, ChangePasswordData, ChangePasswordError, ChangePasswordResponse, ContinueConversationData, ContinueConversationError, ContinueConversationResponse, CreateApiKeyData, CreateApiKeyError, CreateApiKeyResponse, CreateCheckoutSessionData, CreateCheckoutSessionError, CreateCheckoutSessionResponse, CreateCommentData, CreateCommentError, CreateCommentResponse, CreateItemData, CreateItemError, CreateItemResponse, CreatePortalSessionData, CreatePortalSessionResponse, DeleteCommentData, DeleteCommentError, DeleteCommentResponse, DeleteContentData, DeleteContentError, DeleteContentResponse, DeleteConversationData, DeleteConversationError, DeleteConversationResponse, DeleteTemplateData, DeleteTemplateError, DeleteTemplateResponse, ExportLlmUsageData, ExportLlmUsageError, GenerateSplunkConfigData, GenerateSplunkConfigError, GenerateSplunkConfigResponse, GetAdminUsageData, GetAdminUsageResponse, GetAvailableModelsData, GetAvailableModelsResponse, GetContentData, GetContentError, GetContentResponse, GetConversationThreadData, GetConversationThreadError, GetConversationThreadResponse, GetCsrfTokenData, GetCsrfTokenResponse, GetLlmUsageSummaryData, GetLlmUsageSummaryError, GetLlmUsageSummaryResponse, GetLogConfigData, GetLogConfigResponse, GetLogsProcessingStatusData, GetLogsProcessingStatusError, GetLogsProcessingStatusResponse, GetMediaConfigData, GetMediaConfigResponse, GetMediaProcessingStatusData, GetMediaProcessingStatusError, GetMediaProcessingStatusResponse, GetSubscriptionsData, GetSubscriptionsResponse, GetTemplateData, GetTemplateError, GetTemplateResponse, GetUserCreditsData, GetUserCreditsResponse, GetUserProfileData, GetUserProfileResponse, GetUserUsageData, GetUserUsageResponse, GetWebProcessingStatusData, GetWebProcessingStatusError, GetWebProcessingStatusResponse, HealthCheckData, HealthCheckResponse, HealthDbData, HealthDbResponse, HealthRedisData, HealthRedisResponse, ListApiKeysData, ListApiKeysResponse, ListCommentsData, ListCommentsError, ListCommentsResponse, ListContentConversationsData, ListContentConversationsError, ListContentConversationsResponse, ListContentsData, ListContentsError, ListContentsResponse, ListTemplatesData, ListTemplatesResponse, LoginData, LoginError, LoginResponse, LogoutData, LogoutResponse, ProcessLogsData, ProcessLogsError, ProcessLogsResponse, ProcessMediaData, ProcessMediaError, ProcessMediaResponse, ProcessWebData, ProcessWebError, ProcessWebResponse, ReadItemData, ReadItemError, ReadUsersMeData, RefreshTokenData, RefreshTokenResponse, RegisterData, RegisterError, RegisterResponse, RevokeApiKeyData, RevokeApiKeyError, RevokeApiKeyResponse, SaveContentData, SaveContentError, SaveContentResponse, SaveTemplateData, SaveTemplateError, SaveTemplateResponse, UpdateCommentData, UpdateCommentError, UpdateCommentResponse, UpdateContentData, UpdateContentError, UpdateContentResponse, UpdateContentTitleData, UpdateContentTitleError, UpdateContentTitleResponse, UpdateMultipleContentsData, UpdateMultipleContentsError, UpdateMultipleContentsResponse, UpdateTemplateData, UpdateTemplateError, UpdateTemplateResponse } from '../types.gen';
 
 /**
  * Login
@@ -26,8 +26,8 @@ export const loginMutation = (options?: Partial<Options<LoginData>>): UseMutatio
 /**
  * Logout
  */
-export const logoutMutation = (options?: Partial<Options<LogoutData>>): UseMutationOptions<unknown, DefaultError, Options<LogoutData>> => {
-    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<LogoutData>> = {
+export const logoutMutation = (options?: Partial<Options<LogoutData>>): UseMutationOptions<LogoutResponse, DefaultError, Options<LogoutData>> => {
+    const mutationOptions: UseMutationOptions<LogoutResponse, DefaultError, Options<LogoutData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await logout({
                 ...options,
@@ -60,8 +60,8 @@ export const registerMutation = (options?: Partial<Options<RegisterData>>): UseM
 /**
  * Change Password
  */
-export const changePasswordMutation = (options?: Partial<Options<ChangePasswordData>>): UseMutationOptions<unknown, ChangePasswordError, Options<ChangePasswordData>> => {
-    const mutationOptions: UseMutationOptions<unknown, ChangePasswordError, Options<ChangePasswordData>> = {
+export const changePasswordMutation = (options?: Partial<Options<ChangePasswordData>>): UseMutationOptions<ChangePasswordResponse, ChangePasswordError, Options<ChangePasswordData>> => {
+    const mutationOptions: UseMutationOptions<ChangePasswordResponse, ChangePasswordError, Options<ChangePasswordData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await changePassword({
                 ...options,
@@ -308,8 +308,8 @@ export const updateContentTitleMutation = (options?: Partial<Options<UpdateConte
 /**
  * Delete Content
  */
-export const deleteContentMutation = (options?: Partial<Options<DeleteContentData>>): UseMutationOptions<unknown, DeleteContentError, Options<DeleteContentData>> => {
-    const mutationOptions: UseMutationOptions<unknown, DeleteContentError, Options<DeleteContentData>> = {
+export const deleteContentMutation = (options?: Partial<Options<DeleteContentData>>): UseMutationOptions<DeleteContentResponse, DeleteContentError, Options<DeleteContentData>> => {
+    const mutationOptions: UseMutationOptions<DeleteContentResponse, DeleteContentError, Options<DeleteContentData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await deleteContent({
                 ...options,
@@ -652,7 +652,7 @@ export const getUserUsageQueryKey = (options?: Options<GetUserUsageData>) => cre
 /**
  * Get Current User Usage
  */
-export const getUserUsageOptions = (options?: Options<GetUserUsageData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof getUserUsageQueryKey>>({
+export const getUserUsageOptions = (options?: Options<GetUserUsageData>) => queryOptions<GetUserUsageResponse, DefaultError, GetUserUsageResponse, ReturnType<typeof getUserUsageQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
         const { data } = await getUserUsage({
             ...options,
@@ -946,7 +946,7 @@ export const getLlmUsageSummaryQueryKey = (options?: Options<GetLlmUsageSummaryD
  *
  * Get summary statistics of LLM usage for display in admin dashboard.
  */
-export const getLlmUsageSummaryOptions = (options?: Options<GetLlmUsageSummaryData>) => queryOptions<unknown, GetLlmUsageSummaryError, unknown, ReturnType<typeof getLlmUsageSummaryQueryKey>>({
+export const getLlmUsageSummaryOptions = (options?: Options<GetLlmUsageSummaryData>) => queryOptions<GetLlmUsageSummaryResponse, GetLlmUsageSummaryError, GetLlmUsageSummaryResponse, ReturnType<typeof getLlmUsageSummaryQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
         const { data } = await getLlmUsageSummary({
             ...options,
@@ -966,7 +966,7 @@ export const getLlmUsageSummaryInfiniteQueryKey = (options?: Options<GetLlmUsage
  *
  * Get summary statistics of LLM usage for display in admin dashboard.
  */
-export const getLlmUsageSummaryInfiniteOptions = (options?: Options<GetLlmUsageSummaryData>) => infiniteQueryOptions<unknown, GetLlmUsageSummaryError, InfiniteData<unknown>, QueryKey<Options<GetLlmUsageSummaryData>>, string | null | Pick<QueryKey<Options<GetLlmUsageSummaryData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+export const getLlmUsageSummaryInfiniteOptions = (options?: Options<GetLlmUsageSummaryData>) => infiniteQueryOptions<GetLlmUsageSummaryResponse, GetLlmUsageSummaryError, InfiniteData<GetLlmUsageSummaryResponse>, QueryKey<Options<GetLlmUsageSummaryData>>, string | null | Pick<QueryKey<Options<GetLlmUsageSummaryData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
 // @ts-ignore
 {
     queryFn: async ({ pageParam, queryKey, signal }) => {
@@ -995,8 +995,8 @@ export const getLlmUsageSummaryInfiniteOptions = (options?: Options<GetLlmUsageS
  *
  * Returns a URL to redirect the user to Stripe's hosted checkout page.
  */
-export const createCheckoutSessionMutation = (options?: Partial<Options<CreateCheckoutSessionData>>): UseMutationOptions<unknown, CreateCheckoutSessionError, Options<CreateCheckoutSessionData>> => {
-    const mutationOptions: UseMutationOptions<unknown, CreateCheckoutSessionError, Options<CreateCheckoutSessionData>> = {
+export const createCheckoutSessionMutation = (options?: Partial<Options<CreateCheckoutSessionData>>): UseMutationOptions<CreateCheckoutSessionResponse, CreateCheckoutSessionError, Options<CreateCheckoutSessionData>> => {
+    const mutationOptions: UseMutationOptions<CreateCheckoutSessionResponse, CreateCheckoutSessionError, Options<CreateCheckoutSessionData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await createCheckoutSession({
                 ...options,
@@ -1016,8 +1016,8 @@ export const createCheckoutSessionMutation = (options?: Partial<Options<CreateCh
  *
  * Returns a URL to redirect the user to Stripe's billing portal.
  */
-export const createPortalSessionMutation = (options?: Partial<Options<CreatePortalSessionData>>): UseMutationOptions<unknown, DefaultError, Options<CreatePortalSessionData>> => {
-    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<CreatePortalSessionData>> = {
+export const createPortalSessionMutation = (options?: Partial<Options<CreatePortalSessionData>>): UseMutationOptions<CreatePortalSessionResponse, DefaultError, Options<CreatePortalSessionData>> => {
+    const mutationOptions: UseMutationOptions<CreatePortalSessionResponse, DefaultError, Options<CreatePortalSessionData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await createPortalSession({
                 ...options,
@@ -1039,7 +1039,7 @@ export const listApiKeysQueryKey = (options?: Options<ListApiKeysData>) => creat
  *
  * The plaintext key is not returned - only the prefix for identification.
  */
-export const listApiKeysOptions = (options?: Options<ListApiKeysData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof listApiKeysQueryKey>>({
+export const listApiKeysOptions = (options?: Options<ListApiKeysData>) => queryOptions<ListApiKeysResponse, DefaultError, ListApiKeysResponse, ReturnType<typeof listApiKeysQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
         const { data } = await listApiKeys({
             ...options,
@@ -1060,8 +1060,8 @@ export const listApiKeysOptions = (options?: Options<ListApiKeysData>) => queryO
  * The plaintext key is only returned once at creation time.
  * Store it securely - it cannot be retrieved later.
  */
-export const createApiKeyMutation = (options?: Partial<Options<CreateApiKeyData>>): UseMutationOptions<unknown, CreateApiKeyError, Options<CreateApiKeyData>> => {
-    const mutationOptions: UseMutationOptions<unknown, CreateApiKeyError, Options<CreateApiKeyData>> = {
+export const createApiKeyMutation = (options?: Partial<Options<CreateApiKeyData>>): UseMutationOptions<CreateApiKeyResponse, CreateApiKeyError, Options<CreateApiKeyData>> => {
+    const mutationOptions: UseMutationOptions<CreateApiKeyResponse, CreateApiKeyError, Options<CreateApiKeyData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await createApiKey({
                 ...options,
@@ -1081,8 +1081,8 @@ export const createApiKeyMutation = (options?: Partial<Options<CreateApiKeyData>
  *
  * The key will immediately stop working for authentication.
  */
-export const revokeApiKeyMutation = (options?: Partial<Options<RevokeApiKeyData>>): UseMutationOptions<unknown, RevokeApiKeyError, Options<RevokeApiKeyData>> => {
-    const mutationOptions: UseMutationOptions<unknown, RevokeApiKeyError, Options<RevokeApiKeyData>> = {
+export const revokeApiKeyMutation = (options?: Partial<Options<RevokeApiKeyData>>): UseMutationOptions<RevokeApiKeyResponse, RevokeApiKeyError, Options<RevokeApiKeyData>> => {
+    const mutationOptions: UseMutationOptions<RevokeApiKeyResponse, RevokeApiKeyError, Options<RevokeApiKeyData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await revokeApiKey({
                 ...options,
@@ -1100,7 +1100,7 @@ export const healthCheckQueryKey = (options?: Options<HealthCheckData>) => creat
 /**
  * Health Check
  */
-export const healthCheckOptions = (options?: Options<HealthCheckData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof healthCheckQueryKey>>({
+export const healthCheckOptions = (options?: Options<HealthCheckData>) => queryOptions<HealthCheckResponse, DefaultError, HealthCheckResponse, ReturnType<typeof healthCheckQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
         const { data } = await healthCheck({
             ...options,
@@ -1111,6 +1111,42 @@ export const healthCheckOptions = (options?: Options<HealthCheckData>) => queryO
         return data;
     },
     queryKey: healthCheckQueryKey(options)
+});
+
+export const healthDbQueryKey = (options?: Options<HealthDbData>) => createQueryKey('healthDb', options);
+
+/**
+ * Health Db
+ */
+export const healthDbOptions = (options?: Options<HealthDbData>) => queryOptions<HealthDbResponse, DefaultError, HealthDbResponse, ReturnType<typeof healthDbQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await healthDb({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: healthDbQueryKey(options)
+});
+
+export const healthRedisQueryKey = (options?: Options<HealthRedisData>) => createQueryKey('healthRedis', options);
+
+/**
+ * Health Redis
+ */
+export const healthRedisOptions = (options?: Options<HealthRedisData>) => queryOptions<HealthRedisResponse, DefaultError, HealthRedisResponse, ReturnType<typeof healthRedisQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await healthRedis({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: healthRedisQueryKey(options)
 });
 
 /**

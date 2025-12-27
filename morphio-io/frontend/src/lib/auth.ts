@@ -10,14 +10,14 @@ import {
 	logout as logoutSdk,
 	register as registerSdk,
 } from "@/client/sdk.gen";
-import type { AppSchemasAuthSchemaUserOut } from "@/client/types.gen";
+import type { UserOut } from "@/client/types.gen";
 import { clearAuthToken } from "@/lib/hey-api";
 import eventEmitter from "./eventEmitter";
 import logger from "./logger";
 
 export type AuthResult = {
 	access_token: string;
-	user: AppSchemasAuthSchemaUserOut;
+	user: UserOut;
 };
 
 export const login = async (
@@ -28,22 +28,12 @@ export const login = async (
 		body: { email, password },
 	});
 
-	if (response.data) {
-		// Backend returns ApiResponse wrapper: { status, message, data: { access_token, user } }
-		// Cast to any to handle both old SDK types (Token) and new (AuthTokenResponse)
-		const data = response.data as unknown as {
-			data?: { access_token: string; user: AppSchemasAuthSchemaUserOut };
-			access_token?: string;
-			user?: AppSchemasAuthSchemaUserOut;
+	const payload = response.data?.data;
+	if (payload?.access_token && payload?.user) {
+		return {
+			access_token: payload.access_token,
+			user: payload.user,
 		};
-		// Try wrapped format first, fall back to unwrapped for SDK transition
-		const payload = data.data ?? data;
-		if (payload?.access_token && payload?.user) {
-			return {
-				access_token: payload.access_token,
-				user: payload.user,
-			};
-		}
 	}
 
 	// Handle error response
@@ -52,7 +42,7 @@ export const login = async (
 		typeof response.error === "object" &&
 		"message" in response.error
 			? String(response.error.message)
-			: "Login failed";
+			: response.data?.message || "Login failed";
 	throw new Error(errorMessage);
 };
 
@@ -65,22 +55,12 @@ export const register = async (
 		body: { email, password, display_name: displayName },
 	});
 
-	if (response.data) {
-		// Backend returns ApiResponse wrapper: { status, message, data: { access_token, user } }
-		// Cast to any to handle both old SDK types (Token) and new (AuthTokenResponse)
-		const data = response.data as unknown as {
-			data?: { access_token: string; user: AppSchemasAuthSchemaUserOut };
-			access_token?: string;
-			user?: AppSchemasAuthSchemaUserOut;
+	const payload = response.data?.data;
+	if (payload?.access_token && payload?.user) {
+		return {
+			access_token: payload.access_token,
+			user: payload.user,
 		};
-		// Try wrapped format first, fall back to unwrapped for SDK transition
-		const payload = data.data ?? data;
-		if (payload?.access_token && payload?.user) {
-			return {
-				access_token: payload.access_token,
-				user: payload.user,
-			};
-		}
 	}
 
 	// Handle error response
@@ -89,7 +69,7 @@ export const register = async (
 		typeof response.error === "object" &&
 		"message" in response.error
 			? String(response.error.message)
-			: "Registration failed";
+			: response.data?.message || "Registration failed";
 	throw new Error(errorMessage);
 };
 

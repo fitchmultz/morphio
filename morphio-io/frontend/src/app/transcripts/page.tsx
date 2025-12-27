@@ -63,7 +63,7 @@ const TranscriptPage: React.FC = () => {
 		if (!authLoading && isAuthenticated) {
 			getUserProfile()
 				.then((resp) => {
-					if (resp.data) {
+					if (resp.data?.data) {
 						logger.info("Prefetched user profile on transcripts page");
 					} else {
 						logger.warn("Could not prefetch user profile", resp);
@@ -141,8 +141,8 @@ const TranscriptPage: React.FC = () => {
 			if (error) {
 				throw new Error(error instanceof Error ? error.message : String(error));
 			}
-			if (data?.job_id) {
-				setJobId(data.job_id);
+			if (data?.data?.job_id) {
+				setJobId(data.data.job_id);
 			} else {
 				throw new Error("Failed to initiate transcript job");
 			}
@@ -178,12 +178,13 @@ const TranscriptPage: React.FC = () => {
 							: String(fetchError),
 					);
 				}
-				if (data) {
-					setCurrentStatus(data);
-					setProgress(data.progress ?? 0);
-					setStatusMessage(data.message || "");
-					if (data.status === "completed") {
-						const result = data.result;
+				const statusData = data?.data;
+				if (statusData) {
+					setCurrentStatus(statusData);
+					setProgress(statusData.progress ?? 0);
+					setStatusMessage(statusData.message || "");
+					if (statusData.status === "completed") {
+						const result = statusData.result;
 						if (result && typeof result === "object" && "content" in result) {
 							setTranscriptResult(
 								(result as Record<string, unknown>).content as string,
@@ -194,8 +195,8 @@ const TranscriptPage: React.FC = () => {
 						}
 						setIsLoading(false);
 						setJobId(null);
-					} else if (data.status === "failed") {
-						setError(data.error || "Transcript job failed");
+					} else if (statusData.status === "failed") {
+						setError(statusData.error || "Transcript job failed");
 						setIsLoading(false);
 						setJobId(null);
 					} else {

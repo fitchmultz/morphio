@@ -14,7 +14,7 @@ from ...schemas.conversation_schema import (
     ConversationSummary,
     ConversationThreadOut,
 )
-from ...schemas.response_schema import ResponseModel
+from ...schemas.response_schema import ApiResponse, ResponseModel
 from ...services.conversation import (
     continue_content_conversation,
     delete_conversation,
@@ -94,7 +94,7 @@ async def get_conversation_thread(
 @router.delete(
     "/{content_id}/conversations/{conversation_id}",
     operation_id="delete_conversation",
-    response_model=ResponseModel[None],
+    response_model=ApiResponse[None],
     status_code=status.HTTP_200_OK,
     responses={
         200: {

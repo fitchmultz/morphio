@@ -16,6 +16,7 @@ from ..config import settings
 from ..database import get_db
 from ..models.subscription import Subscription
 from ..models.user import User
+from ..schemas.response_schema import ApiResponse
 from ..services.security import get_current_user
 from ..utils.decorators import require_auth
 from ..utils.enums import ResponseStatus
@@ -52,6 +53,7 @@ def get_stripe_client() -> stripe.StripeClient | None:
 @router.post(
     "/checkout-session",
     operation_id="create_checkout_session",
+    response_model=ApiResponse[CheckoutSessionData],
     responses={
         200: {"description": "Checkout session created"},
         400: {"description": "Invalid plan"},
@@ -131,6 +133,7 @@ async def create_checkout_session(
 @router.post(
     "/portal-session",
     operation_id="create_portal_session",
+    response_model=ApiResponse[PortalSessionData],
     responses={
         200: {"description": "Portal session created"},
         400: {"description": "No Stripe customer found"},

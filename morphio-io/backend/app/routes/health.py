@@ -8,11 +8,12 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..database import engine
+from ..schemas.response_schema import ApiResponse
 
 router = APIRouter()
 
 
-@router.get("/", tags=["Health"])
+@router.get("/", tags=["Health"], response_model=ApiResponse[None])
 async def health_check():
     logger = logging.getLogger(__name__)
     logger.info("Health check endpoint called")
@@ -24,7 +25,7 @@ async def health_check():
     )
 
 
-@router.get("/db", tags=["Health"])
+@router.get("/db", tags=["Health"], response_model=ApiResponse[None])
 async def health_db():
     logger = logging.getLogger(__name__)
     try:
@@ -46,7 +47,7 @@ async def health_db():
         )
 
 
-@router.get("/redis", tags=["Health"])
+@router.get("/redis", tags=["Health"], response_model=ApiResponse[None])
 async def health_redis():
     logger = logging.getLogger(__name__)
     try:

@@ -41,14 +41,14 @@ export function useJobStatusQuery(
 				const response = await getWebProcessingStatus({
 					path: { job_id: jobId },
 				});
-				if (response.data) return response.data;
+				if (response.data?.data) return response.data.data;
 				throw new Error("Failed to fetch job status");
 			}
 
 			const response = await getMediaProcessingStatus({
 				path: { job_id: jobId },
 			});
-			if (response.data) return response.data;
+			if (response.data?.data) return response.data.data;
 			throw new Error("Failed to fetch job status");
 		},
 		enabled: !!jobId,

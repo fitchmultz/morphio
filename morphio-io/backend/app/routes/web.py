@@ -6,13 +6,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..database import get_db
 from ..models.user import User
-from ..schemas.media_schema import MediaProcessingStatusResponse
+from ..schemas.media_schema import MediaProcessingResponse, MediaProcessingStatusResponse
+from ..schemas.response_schema import ApiResponse
 from ..services.generation.core import VALID_GENERATION_MODELS
 from ..services.security import get_current_user
 from ..services.template import get_template_by_name
 from ..services.web import enqueue_web_scraping, get_web_processing_status
 from ..utils.decorators import rate_limit, require_auth
-from ..utils.enums import JobStatus, ResponseStatus
+from ..utils.enums import JobStatus, MediaProcessingStatus, ResponseStatus
 from ..utils.error_handlers import ApplicationException
 from ..utils.response_utils import create_response
 from ..utils.route_helpers import handle_route_errors
@@ -24,7 +25,7 @@ router = APIRouter()
 @router.post(
     "/process-web",
     operation_id="process_web",
-    response_model=MediaProcessingStatusResponse,
+    response_model=ApiResponse[MediaProcessingResponse],
     responses={
         200: {"description": "Enqueued web scraping successfully"},
         400: {"description": "Invalid URL or missing parameters"},
@@ -75,11 +76,11 @@ async def enqueue_web_scraping_route(
         return create_response(
             status=ResponseStatus.SUCCESS,
             message="Web scraping job enqueued",
-            data={
-                "job_id": job_id,
-                "status": "pending",
-                "message": "Scraping webpage and generating content...",
-            },
+            data=MediaProcessingResponse(
+                job_id=job_id,
+                status=MediaProcessingStatus.PENDING,
+                message="Scraping webpage and generating content...",
+            ).model_dump(),
             status_code=status.HTTP_200_OK,
         )
     except ApplicationException as ae:
@@ -95,7 +96,7 @@ async def enqueue_web_scraping_route(
 @router.get(
     "/web-processing-status/{job_id}",
     operation_id="get_web_processing_status",
-    response_model=MediaProcessingStatusResponse,
+    response_model=ApiResponse[MediaProcessingStatusResponse],
     responses={
         404: {"description": "Job not found"},
         401: {"description": "Unauthorized"},
