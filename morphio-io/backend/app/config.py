@@ -7,10 +7,18 @@ from dotenv import dotenv_values
 from pydantic import AliasChoices, Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# Load canonical .env from morphio-io root
-# config.py is at backend/app/config.py, so go up 3 levels to reach morphio-io/
-root_env = Path(__file__).parent.parent.parent / ".env"
-local_env = Path(__file__).parent.parent.parent / ".env.local"
+
+# Load canonical .env from monorepo root.
+# Resolve by walking up to the nearest .env.example to avoid brittle path depth assumptions.
+def _find_monorepo_root(start_dir: Path) -> Path:
+    for candidate in [start_dir] + list(start_dir.parents):
+        if (candidate / ".env.example").exists():
+            return candidate
+    return start_dir
+
+
+config_dir = Path(__file__).resolve().parent
+root_env = _find_monorepo_root(config_dir) / ".env"
 
 
 def _apply_env(path: Path, override: bool) -> None:
@@ -24,7 +32,6 @@ def _apply_env(path: Path, override: bool) -> None:
 
 
 _apply_env(root_env, override=False)
-_apply_env(local_env, override=True)
 
 
 class Settings(BaseSettings):

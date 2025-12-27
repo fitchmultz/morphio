@@ -127,14 +127,14 @@ While the exact AI models aren't specified in the codebase, the structure sugges
 
    ```bash
    git clone <repository-url>
-   cd morphio-io
+   cd morphio-all
    ```
 
 3. **Backend Setup**:
 
   ```bash
-  cp .env.example .env  # Edit with your credentials (optional overrides in .env.local)
-  cd backend
+  cp .env.example .env  # Edit with your credentials
+  cd morphio-io/backend
   uv sync --dev         # Install project deps + dev tools (ruff, pytest, etc.)
   alembic upgrade head  # Run database migrations
   ```
@@ -142,7 +142,7 @@ While the exact AI models aren't specified in the codebase, the structure sugges
 4. **Frontend Setup**:
 
    ```bash
-   cd frontend
+   cd morphio-io/frontend
    pnpm install
    pnpm dev  # Start development server
    ```
@@ -151,7 +151,7 @@ While the exact AI models aren't specified in the codebase, the structure sugges
 
    ```bash
    cp .env.example .env  # Configure environment variables
-   make dev-docker
+   make -C morphio-io dev-docker
    ```
 
    **Platform Note**: The `worker-ml` service is amd64-only due to `torchcodec` (a `pyannote-audio` dependency) lacking Linux ARM64 wheels. Docker Compose files include `platform: linux/amd64` for this service. For manual builds on ARM64:

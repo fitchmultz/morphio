@@ -7,8 +7,9 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parent.parent
+MONOREPO_ROOT = ROOT.parent
 CONFIG_PATH = ROOT / "backend" / "app" / "config.py"
-TEMPLATE_PATH = ROOT / ".env.example"
+TEMPLATE_PATH = MONOREPO_ROOT / ".env.example"
 FRONTEND_PATH = ROOT / "frontend"
 FRONTEND_FILES = [
     FRONTEND_PATH / "next.config.ts",
@@ -87,10 +88,21 @@ def main() -> int:
     if not TEMPLATE_PATH.exists():
         print(f"Template not found: {TEMPLATE_PATH}")
         return 1
-    frontend_env = ROOT / "frontend" / ".env.local"
-    if frontend_env.exists():
-        print(f"Unsupported nested env file found: {frontend_env}")
-        print("Use .env or .env.local at the repo root instead.")
+
+    nested_env_files = sorted(
+        path for path in ROOT.rglob(".env*") if path.is_file()
+    )
+    if nested_env_files:
+        print("Only /.env and /.env.example are allowed.")
+        print("Found nested env file(s):")
+        for path in nested_env_files:
+            print(f"- {path}")
+        return 1
+
+    root_env_local = MONOREPO_ROOT / ".env.local"
+    if root_env_local.exists():
+        print("Only /.env and /.env.example are allowed.")
+        print(f"Found forbidden env file: {root_env_local}")
         return 1
 
     config_text = CONFIG_PATH.read_text(encoding="utf-8")

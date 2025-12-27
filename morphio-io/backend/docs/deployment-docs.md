@@ -9,11 +9,11 @@ The backend can be deployed via Docker Compose (recommended) or directly.
 ### Development
 
 ```bash
-cd morphio-io
+# From repo root
 cp .env.example .env
 # Edit .env with your API keys
 
-docker compose up -d --build
+docker compose -f morphio-io/docker-compose.yml up -d --build
 ```
 
 Access:
@@ -30,7 +30,7 @@ openssl rand -base64 48 > secrets/JWT_SECRET_KEY
 echo "postgresql+asyncpg://user:pass@postgres:5432/morphio" > secrets/DATABASE_URL
 
 # Start stack
-docker compose -f docker-compose.prod.yml up -d --build
+docker compose -f morphio-io/docker-compose.prod.yml up -d --build
 ```
 
 Production compose uses Docker secrets for sensitive values.

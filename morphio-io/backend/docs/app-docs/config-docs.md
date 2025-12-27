@@ -68,4 +68,4 @@ The app **refuses to start** if these aren't met.
 
 - `app/config.py` - Settings class definition
 - `.env.example` - Local development template (repo root)
-- `.env.local` - Local overrides (repo root, not committed)
+- `.env` - Local development env file (repo root, copy from `.env.example`)

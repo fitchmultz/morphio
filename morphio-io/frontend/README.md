@@ -29,7 +29,7 @@ pnpm install
 
 ### Environment Variables
 
-Environment variables are loaded from the repo root (`../.env` and `../.env.local`).
+Environment variables are loaded from the repo root (`../.env`) only.
 
 Key environment variables:
 

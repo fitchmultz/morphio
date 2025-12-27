@@ -11,9 +11,9 @@ help: ## Show this help message
 setup: ## Initial setup: install deps, copy env files
 	@echo "Setting up Morphio monorepo..."
 	@$(MAKE) install
-	@if [ ! -f .env ]; then \
-		echo "Copying .env.example to .env"; \
-		cp .env.example .env || true; \
+	@if [ ! -f ../.env ]; then \
+		echo "Copying ../.env.example to ../.env"; \
+		cp ../.env.example ../.env || true; \
 	fi
 	@echo "✅ Setup complete!"
 
@@ -39,15 +39,15 @@ dev: ## Start native dev servers (backend + frontend + Redis via Docker)
 	cleanup() { \
 		echo ""; \
 		echo "🛑 Stopping Redis..."; \
-		docker compose -f docker-compose.watch.yml stop redis || true; \
+		docker compose --env-file ../.env -f docker-compose.watch.yml stop redis || true; \
 		if [ -n "$$BACKEND_PID" ]; then kill $$BACKEND_PID 2>/dev/null || true; fi; \
 		if [ -n "$$FRONTEND_PID" ]; then kill $$FRONTEND_PID 2>/dev/null || true; fi; \
 		exit; \
 	}; \
 	trap cleanup INT TERM; \
 	echo "🚀 Starting native dev servers..."; \
-	docker compose -f docker-compose.watch.yml up -d redis; \
-	PORT=$$(grep -E "^APP_PORT=" .env 2>/dev/null | cut -d "=" -f2 || echo "8005"); \
+	docker compose --env-file ../.env -f docker-compose.watch.yml up -d redis; \
+	PORT=$$(grep -E "^APP_PORT=" ../.env 2>/dev/null | cut -d "=" -f2 || echo "8005"); \
 	echo "🚀 Starting backend on http://localhost:$$PORT..."; \
 	cd backend && uv run uvicorn app.main:app --reload --port $$PORT & \
 	BACKEND_PID=$$!; \
@@ -62,41 +62,41 @@ dev-full: ## Start ALL services natively (Apple Silicon optimized)
 
 dev-docker: ## Start all services in Docker with hot reload
 	@echo "🐳 Starting Docker development environment..."
-	@docker compose -f docker-compose.watch.yml up --build --watch
+	@docker compose --env-file ../.env -f docker-compose.watch.yml up --build --watch
 
 dev-docker-build: ## Rebuild and start all Docker services
 	@echo "🔨 Rebuilding Docker images..."
-	@docker compose -f docker-compose.watch.yml build --no-cache
-	@docker compose -f docker-compose.watch.yml up --watch
+	@docker compose --env-file ../.env -f docker-compose.watch.yml build --no-cache
+	@docker compose --env-file ../.env -f docker-compose.watch.yml up --watch
 
 dev-docker-down: ## Stop all Docker services
 	@echo "🛑 Stopping Docker services..."
-	@docker compose -f docker-compose.watch.yml down
+	@docker compose --env-file ../.env -f docker-compose.watch.yml down
 
 dev-docker-clean: ## Stop Docker services and remove volumes
 	@echo "🧹 Cleaning Docker environment..."
-	@docker compose -f docker-compose.watch.yml down -v --remove-orphans
+	@docker compose --env-file ../.env -f docker-compose.watch.yml down -v --remove-orphans
 
 dev-docker-logs: ## View all Docker service logs
-	@docker compose -f docker-compose.watch.yml logs -f
+	@docker compose --env-file ../.env -f docker-compose.watch.yml logs -f
 
 dev-docker-logs-backend: ## View Docker backend logs only
-	@docker compose -f docker-compose.watch.yml logs -f backend
+	@docker compose --env-file ../.env -f docker-compose.watch.yml logs -f backend
 
 dev-docker-logs-frontend: ## View Docker frontend logs only
-	@docker compose -f docker-compose.watch.yml logs -f frontend
+	@docker compose --env-file ../.env -f docker-compose.watch.yml logs -f frontend
 
 dev-docker-shell-backend: ## Open shell in Docker backend container
-	@docker compose -f docker-compose.watch.yml exec backend bash
+	@docker compose --env-file ../.env -f docker-compose.watch.yml exec backend bash
 
 dev-docker-shell-frontend: ## Open shell in Docker frontend container
-	@docker compose -f docker-compose.watch.yml exec frontend sh
+	@docker compose --env-file ../.env -f docker-compose.watch.yml exec frontend sh
 
 dev-docker-restart-backend: ## Restart Docker backend only
-	@docker compose -f docker-compose.watch.yml restart backend
+	@docker compose --env-file ../.env -f docker-compose.watch.yml restart backend
 
 dev-docker-restart-frontend: ## Restart Docker frontend only
-	@docker compose -f docker-compose.watch.yml restart frontend
+	@docker compose --env-file ../.env -f docker-compose.watch.yml restart frontend
 
 dev-worker-ml: ## Start worker-ml natively (MLX on Apple Silicon)
 	@echo "🧠 Starting ML worker on http://localhost:8001..."
@@ -107,7 +107,7 @@ dev-crawler: ## Start crawler natively
 	@cd backend && uv run uvicorn crawler.main:app --reload --port 8002
 
 dev-backend: ## Start backend dev server (native)
-	@PORT=$$(grep -E '^APP_PORT=' .env 2>/dev/null | cut -d '=' -f2 || echo "8005"); \
+	@PORT=$$(grep -E '^APP_PORT=' ../.env 2>/dev/null | cut -d '=' -f2 || echo "8005"); \
 	echo "🚀 Starting backend on http://localhost:$$PORT..."; \
 	cd backend && uv run uvicorn app.main:app --reload --port $$PORT
 

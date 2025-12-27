@@ -53,7 +53,7 @@ services:
       - CRAWLER_URL=http://crawler:8002
       - WATCHFILES_FORCE_POLLING=true
     env_file:
-      - path: .env
+      - path: ../.env
         required: false
     depends_on:
       redis:
