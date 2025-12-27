@@ -9,6 +9,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 CONFIG_PATH = ROOT / "backend" / "app" / "config.py"
 TEMPLATE_PATH = ROOT / ".env.example"
+FRONTEND_PATH = ROOT / "frontend"
+COMPOSE_FILES = [
+    ROOT / "docker-compose.yml",
+    ROOT / "docker-compose.watch.yml",
+    ROOT / "docker-compose.prod.yml",
+]
 
 
 def extract_env_keys(config_text: str) -> set[str]:
@@ -31,6 +37,36 @@ def extract_template_keys(template_text: str) -> set[str]:
         if key:
             keys.add(key)
     return keys
+
+
+def extract_frontend_env_keys() -> set[str]:
+    keys: set[str] = set()
+    if not FRONTEND_PATH.exists():
+        return keys
+    for path in FRONTEND_PATH.rglob("*"):
+        if not path.is_file():
+            continue
+        if path.suffix not in {".ts", ".tsx", ".js", ".jsx", ".mjs"}:
+            continue
+        try:
+            text = path.read_text(encoding="utf-8")
+        except Exception:
+            continue
+        keys.update(re.findall(r"NEXT_PUBLIC_[A-Z0-9_]+", text))
+    return keys
+
+
+def extract_compose_vars(compose_text: str) -> tuple[set[str], set[str]]:
+    with_defaults: set[str] = set()
+    without_defaults: set[str] = set()
+    for match in re.finditer(r"\$\{([A-Z0-9_]+)([^}]*)\}", compose_text):
+        name = match.group(1)
+        suffix = match.group(2) or ""
+        if suffix.startswith(":-") or suffix.startswith("-") or suffix.startswith(":?"):
+            with_defaults.add(name)
+        else:
+            without_defaults.add(name)
+    return with_defaults, without_defaults
 
 
 def main() -> int:
@@ -56,6 +92,27 @@ def main() -> int:
     if missing:
         print("Missing env keys in template:")
         for key in missing:
+            print(f"- {key}")
+        return 1
+
+    frontend_keys = extract_frontend_env_keys()
+    frontend_missing = sorted(frontend_keys - template_keys)
+    if frontend_missing:
+        print("Missing NEXT_PUBLIC_* keys in template:")
+        for key in frontend_missing:
+            print(f"- {key}")
+        return 1
+
+    compose_missing: set[str] = set()
+    for compose_file in COMPOSE_FILES:
+        if not compose_file.exists():
+            continue
+        compose_text = compose_file.read_text(encoding="utf-8")
+        _, without_defaults = extract_compose_vars(compose_text)
+        compose_missing.update(without_defaults - template_keys)
+    if compose_missing:
+        print("Missing compose vars without defaults in template:")
+        for key in sorted(compose_missing):
             print(f"- {key}")
         return 1
 

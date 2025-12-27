@@ -95,6 +95,9 @@ jobs:
           uv venv .venv
           UV_PROJECT_ENVIRONMENT=.venv uv sync --project morphio-io/backend --dev --frozen
 
+      - name: Env template audit
+        run: python3 morphio-io/scripts/audit_env_template.py
+
       - name: Ruff (lint)
         run: UV_PROJECT_ENVIRONMENT=.venv uv run --project morphio-io/backend ruff check morphio-io/backend
 
