@@ -11,7 +11,7 @@
 	test test-native test-core test-io \
 	lint lint-native lint-core lint-io \
 	format format-native format-core format-io \
-	check check-native check-core check-io audit-imports \
+	check check-native check-core check-io audit-imports ci \
 	clean check-rust rmds
 
 # Default target
@@ -149,6 +149,9 @@ check: rmds check-native check-core check-io audit-imports ## Full CI check for 
 	@echo "============================================"
 	@echo "✅ All checks passed for entire monorepo!"
 	@echo "============================================"
+
+ci: ## Run local CI runner (scripts/ci/run.sh)
+	@bash scripts/ci/run.sh
 
 check-native: check-rust ## Full check for morphio-native (fmt + clippy + build + verify)
 	@echo "🔎 Checking morphio-native..."

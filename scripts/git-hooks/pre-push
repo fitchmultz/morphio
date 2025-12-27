@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! bash scripts/ci/run.sh; then
+  echo "Push blocked: local CI failed"
+  exit 1
+fi
