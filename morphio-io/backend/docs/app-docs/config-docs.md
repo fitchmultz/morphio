@@ -29,11 +29,13 @@ Backend configuration is managed via Pydantic Settings, supporting environment v
 
 ### AI/LLM
 
+Provide at least one provider key matching the configured model(s).
+
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `OPENAI_API_KEY` | - | Required |
-| `ANTHROPIC_API_KEY` | - | Optional |
-| `GEMINI_API_KEY` | - | Optional |
+| `OPENAI_API_KEY` | - | Required if using OpenAI models |
+| `ANTHROPIC_API_KEY` | - | Required if using Anthropic models |
+| `GEMINI_API_KEY` | - | Required if using Gemini models |
 | `HUGGING_FACE_TOKEN` | - | Required for diarization |
 
 ### Database
