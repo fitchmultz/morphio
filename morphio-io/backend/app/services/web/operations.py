@@ -20,7 +20,7 @@ from ...utils.cache_utils import (
     compute_template_hash,
     get_cached_generated_content,
 )
-from ...utils.enums import JobStatus, UsageType
+from ...utils.enums import JobStatus, ProcessingStage, UsageType
 from ...utils.error_handlers import ApplicationException
 from ...utils.file_utils import compute_hash
 from ..generation import generate_content_from_transcript, save_generated_content
@@ -103,7 +103,13 @@ async def scrape_and_generate_web(
 
         logger.debug(f"Using model: {chosen_model} for job {job_id}")
 
-        await update_job_status(job_id, JobStatus.PROCESSING.value, 10, "Scraping webpage")
+        await update_job_status(
+            job_id,
+            JobStatus.PROCESSING.value,
+            10,
+            "Scraping webpage",
+            stage=ProcessingStage.DOWNLOADING,
+        )
         await increment_usage(db, user_id, UsageType.WEB_SCRAPING)
         scraped_text = await scrape_webpage(url)
 
@@ -120,7 +126,13 @@ async def scrape_and_generate_web(
         template_content = await load_template(template_id_val, db)
         template_hash = compute_template_hash(template_content)
 
-        await update_job_status(job_id, JobStatus.PROCESSING.value, 40, "Template loaded")
+        await update_job_status(
+            job_id,
+            JobStatus.PROCESSING.value,
+            40,
+            "Template loaded",
+            stage=ProcessingStage.DOWNLOADING,
+        )
 
         transcript_hash = compute_hash(scraped_text)
         cached_content = await get_cached_generated_content(
@@ -135,7 +147,13 @@ async def scrape_and_generate_web(
             generated_content = json.loads(cached_content)
             logger.info("Cache hit for web content generation.")
         else:
-            await update_job_status(job_id, JobStatus.PROCESSING.value, 60, "Generating content")
+            await update_job_status(
+                job_id,
+                JobStatus.PROCESSING.value,
+                60,
+                "Generating content",
+                stage=ProcessingStage.GENERATING,
+            )
             generated_content = await generate_content_from_transcript(
                 transcript=scraped_text,
                 template_content=template_content,
@@ -151,7 +169,13 @@ async def scrape_and_generate_web(
                 chosen_model,
             )
 
-        await update_job_status(job_id, JobStatus.PROCESSING.value, 80, "Saving content")
+        await update_job_status(
+            job_id,
+            JobStatus.PROCESSING.value,
+            80,
+            "Saving content",
+            stage=ProcessingStage.SAVING,
+        )
         saved = await save_generated_content(generated_content, user_id)
         if not saved or not saved.id:
             raise ApplicationException("Could not save content", 500)
@@ -169,6 +193,7 @@ async def scrape_and_generate_web(
             100,
             "Web scraping + generation complete",
             result=result,
+            stage=ProcessingStage.COMPLETED,
         )
 
     except ApplicationException as ae:
@@ -179,6 +204,7 @@ async def scrape_and_generate_web(
             100,
             f"Error: {ae.message}",
             error=ae.message,
+            stage=ProcessingStage.FAILED,
         )
     except Exception as e:
         logger.error(f"Unexpected error in scrape_and_generate_web: {str(e)}", exc_info=True)
@@ -188,4 +214,5 @@ async def scrape_and_generate_web(
             100,
             f"Unexpected error: {str(e)}",
             error=str(e),
+            stage=ProcessingStage.FAILED,
         )

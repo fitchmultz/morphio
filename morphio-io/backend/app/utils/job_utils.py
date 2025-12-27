@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..schemas.job_schema import JobStatusInfo
 from ..services.job import store_job_info, update_job_status
-from ..utils.enums import JobStatus
+from ..utils.enums import JobStatus, ProcessingStage
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +48,7 @@ async def enqueue_task(
                 100,
                 f"Unexpected error: {str(e)}",
                 error=str(e),
+                stage=ProcessingStage.FAILED,
             )
 
     task = asyncio.create_task(run_job(), name=f"processing_{job_id}")

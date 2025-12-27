@@ -16,6 +16,7 @@ from ..utils.cache_utils import (
     get_cached_whisper_transcription,
     get_cached_youtube_transcript,
 )
+from ..utils.enums import ProcessingStage
 from ..utils.error_handlers import ApplicationException
 from ..utils.file_utils import compute_file_hash, compute_hash
 from ..adapters.video import get_yt_video_id
@@ -107,6 +108,12 @@ async def process_video(input_data: MediaProcessingInput, job_id: str, db: Async
 
     # Save content (patched in tests if needed)
     await save_generated_content(content, int(input_data.user_id), int(input_data.template_id))
-    await update_job_status(job_id, "completed", 100, "Done")
+    await update_job_status(
+        job_id,
+        "completed",
+        100,
+        "Done",
+        stage=ProcessingStage.COMPLETED,
+    )
 
     return {"status": "success", "content": content}
