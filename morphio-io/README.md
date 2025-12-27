@@ -151,8 +151,7 @@ While the exact AI models aren't specified in the codebase, the structure sugges
 
    ```bash
    cp .env.example .env  # Configure environment variables
-   ./build-docker.sh
-   ./start-docker-dev.sh  # Start all services
+   make dev-docker
    ```
 
    **Platform Note**: The `worker-ml` service is amd64-only due to `torchcodec` (a `pyannote-audio` dependency) lacking Linux ARM64 wheels. Docker Compose files include `platform: linux/amd64` for this service. For manual builds on ARM64:
