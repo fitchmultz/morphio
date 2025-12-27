@@ -2,7 +2,8 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-COMPOSE=(docker compose -f "$ROOT/docker-compose.watch.yml")
+REPO_ROOT="$(cd "$ROOT/.." && pwd)"
+COMPOSE=(docker compose --env-file "$REPO_ROOT/.env" -f "$ROOT/docker-compose.watch.yml")
 
 cleanup() {
   "${COMPOSE[@]}" down -v --remove-orphans

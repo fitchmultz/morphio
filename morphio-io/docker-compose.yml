@@ -7,7 +7,7 @@ services:
     ports:
       - '8005:8005'
     env_file:
-      - path: .env
+      - path: ../.env
         required: false
     environment:
       - APP_ENV=${APP_ENV:-development}
@@ -38,7 +38,7 @@ services:
     ports:
       - '3500:3005'
     env_file:
-      - path: .env
+      - path: ../.env
         required: false
     environment:
       - NODE_ENV=${NODE_ENV:-development}

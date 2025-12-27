@@ -6,9 +6,9 @@ REPO_ROOT="$(cd "$ROOT/.." && pwd)"
 
 python3 "$ROOT/scripts/audit_env_template.py"
 
-docker compose -f "$ROOT/docker-compose.yml" config >/dev/null
-docker compose -f "$ROOT/docker-compose.watch.yml" config >/dev/null
-docker compose -f "$ROOT/docker-compose.prod.yml" config >/dev/null
+docker compose --env-file "$REPO_ROOT/.env" -f "$ROOT/docker-compose.yml" config >/dev/null
+docker compose --env-file "$REPO_ROOT/.env" -f "$ROOT/docker-compose.watch.yml" config >/dev/null
+docker compose --env-file "$REPO_ROOT/.env" -f "$ROOT/docker-compose.prod.yml" config >/dev/null
 
 forbidden_url_regex='https?://[^[:space:]]+:(3000|8000|6379)\b|redis://[^[:space:]]+:(6379)\b'
 if rg -n --hidden -e "$forbidden_url_regex" "$REPO_ROOT" \

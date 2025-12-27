@@ -11,6 +11,10 @@ require_cmd() {
   command -v "$1" >/dev/null 2>&1 || fail "$1 not found" "$2"
 }
 
+[[ -f ".env.example" ]] || fail ".env.example missing" "Restore .env.example at repo root"
+[[ -f ".env" ]] || fail ".env missing" "cp .env.example .env"
+[[ ! -f "morphio-io/.env" ]] || fail "Nested morphio-io/.env found" "Remove morphio-io/.env"
+
 require_cmd uv "curl -LsSf https://astral.sh/uv/install.sh | sh"
 PYTHON="$(uv python find 3.13 2>/dev/null || true)"
 if [[ -z "${PYTHON}" ]]; then

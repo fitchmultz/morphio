@@ -3,8 +3,8 @@ import type { NextConfig } from "next";
 import fs from "node:fs";
 import path from "node:path";
 
-const envRoot = path.resolve(__dirname, "..");
-const envFiles = [".env", ".env.local"].map((name) => path.join(envRoot, name));
+const envRoot = path.resolve(__dirname, "..", "..");
+const envFiles = [".env"].map((name) => path.join(envRoot, name));
 
 const loadEnvFile = (filePath: string, override = false) => {
 	if (!fs.existsSync(filePath)) return;
@@ -27,7 +27,6 @@ const loadEnvFile = (filePath: string, override = false) => {
 };
 
 loadEnvFile(envFiles[0]);
-loadEnvFile(envFiles[1], true);
 
 const nextConfig: NextConfig = {
 	productionBrowserSourceMaps: false,
