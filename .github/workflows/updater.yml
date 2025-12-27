@@ -1,10 +1,7 @@
 name: GitHub Actions Version Updater
 
 on:
-  push:
-    branches:
-      - main
-      - dev
+  workflow_dispatch:
 
 jobs:
   update-versions:

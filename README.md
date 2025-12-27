@@ -149,7 +149,8 @@ morphio-io uses thin adapters (`app/adapters/`) that:
 
 1. Create a feature branch
 2. Make changes
-3. Run `make check` from monorepo root
-4. Create a Pull Request
+3. Run `bash scripts/install-git-hooks.sh` once
+4. Run `make ci` from monorepo root
+5. Create a Pull Request
 
 For bugs or feature requests, open an issue.
