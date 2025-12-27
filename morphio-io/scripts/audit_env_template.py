@@ -114,6 +114,14 @@ def main() -> int:
             print(f"- {key}")
         return 1
 
+    template_next_public = {k for k in template_keys if k.startswith("NEXT_PUBLIC_")}
+    unused_next_public = sorted(template_next_public - frontend_keys)
+    if unused_next_public:
+        print("Unused NEXT_PUBLIC_* keys in template (remove from .env.example):")
+        for key in unused_next_public:
+            print(f"- {key}")
+        return 1
+
     compose_missing: set[str] = set()
     for compose_file in COMPOSE_FILES:
         if not compose_file.exists():

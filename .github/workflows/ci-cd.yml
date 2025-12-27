@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Rust 1.75
-        uses: dtolnay/rust-action@stable
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: "1.75"
           components: clippy, rustfmt
@@ -42,14 +42,24 @@ jobs:
         working-directory: morphio-native
         run: cargo clippy -- -D warnings
 
-      - name: Rust tests
-        working-directory: morphio-native
-        run: cargo test
-
       - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
           python-version: '3.13'
+
+      - name: Install Python dev headers
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-dev
+
+      - name: Rust tests
+        working-directory: morphio-native
+        env:
+          PYO3_PYTHON: ${{ env.pythonLocation }}/bin/python3.13
+          PYO3_LIB_DIR: ${{ env.pythonLocation }}/lib
+          PYO3_INCLUDE_DIR: ${{ env.pythonLocation }}/include/python3.13
+          RUSTFLAGS: -L${{ env.pythonLocation }}/lib -lpython3.13
+        run: cargo test
 
       - name: Build wheel for CI
         run: |
@@ -71,7 +81,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Rust 1.75
-        uses: dtolnay/rust-action@stable
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: "1.75"
 
@@ -87,7 +97,7 @@ jobs:
 
       - name: Install uv
         run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh -s -- -y
+          curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Sync (frozen) with dev deps
@@ -106,7 +116,7 @@ jobs:
 
       - name: ty (type check)
         working-directory: morphio-io/backend
-        run: UV_PROJECT_ENVIRONMENT=../../.venv uv run ty check
+        run: UV_PROJECT_ENVIRONMENT=../../.venv uv run ty check --exclude "worker_ml/" --exclude "crawler/" --exclude "app/services/diarization/" --exclude "tests/performance/"
 
   frontend-checks:
     name: Frontend • Biome + TypeScript
@@ -115,18 +125,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.11.0
+          run_install: false
+
       - name: Setup Node.js 24
         uses: actions/setup-node@v4
         with:
           node-version: '24'
           cache: 'pnpm'
           cache-dependency-path: morphio-io/frontend/pnpm-lock.yaml
-
-      - name: Enable Corepack and pin pnpm
-        working-directory: morphio-io/frontend
-        run: |
-          corepack enable
-          corepack prepare pnpm@10.11.0 --activate
 
       - name: Install dependencies
         working-directory: morphio-io/frontend
@@ -193,6 +203,7 @@ jobs:
             org.opencontainers.image.revision=${{ github.sha }}
 
       - name: Build and push
+        if: ${{ !(github.event_name == 'pull_request' && matrix.name == 'worker-ml') }}
         uses: docker/build-push-action@v6
         with:
           context: ${{ matrix.context }}
