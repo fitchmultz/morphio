@@ -14,7 +14,7 @@ from ...schemas.conversation_schema import (
     ConversationSummary,
     ConversationThreadOut,
 )
-from ...schemas.response_schema import ApiResponse, ResponseModel
+from ...schemas.response_schema import ApiResponse
 from ...services.conversation import (
     continue_content_conversation,
     delete_conversation,
@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 @router.get(
     "/{content_id}/conversations",
     operation_id="list_content_conversations",
-    response_model=ResponseModel[List[ConversationSummary]],
+    response_model=ApiResponse[List[ConversationSummary]],
     responses={
         200: {"description": "Conversations retrieved successfully"},
         401: {"description": "Unauthorized"},
@@ -52,17 +52,18 @@ async def list_content_conversations(
     conversations = await fetch_conversations_for_content(
         db, content_id=content_id, user_id=current_user.id
     )
-    return ResponseModel(
-        status="success",
+    return create_response(
+        status=ResponseStatus.SUCCESS,
         message="Conversations retrieved successfully",
-        data=conversations,
+        data=[summary.model_dump() for summary in conversations],
+        status_code=status.HTTP_200_OK,
     )
 
 
 @router.get(
     "/{content_id}/conversations/{conversation_id}",
     operation_id="get_conversation_thread",
-    response_model=ResponseModel[ConversationThreadOut],
+    response_model=ApiResponse[ConversationThreadOut],
     responses={
         200: {"description": "Conversation retrieved successfully"},
         401: {"description": "Unauthorized"},
@@ -84,10 +85,11 @@ async def get_conversation_thread(
         user_id=current_user.id,
         conversation_id=conversation_id,
     )
-    return ResponseModel(
-        status="success",
+    return create_response(
+        status=ResponseStatus.SUCCESS,
         message="Conversation retrieved successfully",
-        data=thread,
+        data=thread.model_dump(),
+        status_code=status.HTTP_200_OK,
     )
 
 
@@ -143,7 +145,7 @@ async def delete_conversation_route(
 @router.post(
     "/{content_id}/conversation",
     operation_id="continue_conversation",
-    response_model=ResponseModel[ConversationResponse],
+    response_model=ApiResponse[ConversationResponse],
     responses={
         200: {"description": "Conversation updated successfully"},
         400: {"description": "Bad request"},
@@ -166,8 +168,9 @@ async def continue_content_conversation_route(
         user_id=current_user.id,
         request=payload,
     )
-    return ResponseModel(
-        status="success",
+    return create_response(
+        status=ResponseStatus.SUCCESS,
         message="Conversation updated successfully",
-        data=result,
+        data=result.model_dump(),
+        status_code=status.HTTP_200_OK,
     )
