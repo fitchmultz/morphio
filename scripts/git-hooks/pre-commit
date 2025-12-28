@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+
+python3 "$REPO_ROOT/morphio-io/scripts/audit_env_template.py"
+"$REPO_ROOT/scripts/audit_imports.sh"
+
+if command -v pnpm >/dev/null 2>&1; then
+  staged_files=()
+  while IFS= read -r -d '' file; do
+    staged_files+=("$file")
+  done < <(git -C "$REPO_ROOT" diff --cached --name-only --diff-filter=ACMR -z)
+
+  frontend_files=()
+  for file in "${staged_files[@]}"; do
+    if [[ "$file" == morphio-io/frontend/* ]]; then
+      rel="${file#morphio-io/frontend/}"
+      case "$rel" in
+        *.ts|*.tsx|*.js|*.jsx|*.json|*.jsonc|*.css|*.scss)
+          frontend_files+=("$rel")
+          ;;
+      esac
+    fi
+  done
+
+  if [[ ${#frontend_files[@]} -gt 0 ]]; then
+    (cd "$REPO_ROOT/morphio-io/frontend" && pnpm biome check "${frontend_files[@]}")
+  fi
+fi
