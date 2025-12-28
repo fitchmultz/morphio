@@ -5,22 +5,12 @@
 import asyncio
 import json
 import logging
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional
 
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import HTTPException, RequestValidationError
 from fastapi.responses import JSONResponse
 from jwt.exceptions import PyJWTError
-from openai import (
-    APIConnectionError,
-    APIError,
-    APITimeoutError,
-    AuthenticationError,
-    BadRequestError,
-    InternalServerError,
-    PermissionDeniedError,
-    RateLimitError,
-)
 from slowapi.errors import RateLimitExceeded
 from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
 
@@ -31,25 +21,6 @@ from ..utils.enums import ResponseStatus
 from ..utils.response_utils import CustomJSONEncoder, utc_now
 
 logger = logging.getLogger(__name__)
-
-OPENAI_ERROR_MAPPING: Dict[type, tuple[int, str]] = {
-    AuthenticationError: (
-        status.HTTP_401_UNAUTHORIZED,
-        "Authentication failed with OpenAI API.",
-    ),
-    RateLimitError: (
-        status.HTTP_429_TOO_MANY_REQUESTS,
-        "OpenAI API rate limit exceeded.",
-    ),
-    APIConnectionError: (
-        status.HTTP_503_SERVICE_UNAVAILABLE,
-        "Failed to connect to OpenAI API.",
-    ),
-    APITimeoutError: (
-        status.HTTP_504_GATEWAY_TIMEOUT,
-        "Request to OpenAI API timed out.",
-    ),
-}
 
 
 class ApplicationException(Exception):
@@ -67,18 +38,6 @@ class RateLimitException(ApplicationException):
     ):
         super().__init__(message, status_code=status.HTTP_429_TOO_MANY_REQUESTS)
         self.retry_after = retry_after
-
-
-def handle_openai_exception(exc: Exception) -> ApplicationException:
-    logger.error(f"OpenAI API error: {str(exc)}", exc_info=True)
-    error_info = OPENAI_ERROR_MAPPING.get(
-        type(exc),
-        (
-            status.HTTP_500_INTERNAL_SERVER_ERROR,
-            "An unexpected error occurred with the OpenAI API.",
-        ),
-    )
-    return ApplicationException(message=error_info[1], status_code=error_info[0])
 
 
 def create_error_response(
@@ -212,33 +171,10 @@ def register_exception_handlers(app: FastAPI) -> None:
             request=request,
         )
 
-    @app.exception_handler(AuthenticationError)
-    async def authentication_exception_handler(
-        request: Request, exc: AuthenticationError
-    ) -> JSONResponse:
-        logger.error("Authentication failed with OpenAI API")
-        return create_error_response(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            message="Authentication failed. Check your OpenAI API key.",
-            error_type="AuthenticationError",
-        )
-
-    @app.exception_handler(APIConnectionError)
-    async def api_connection_exception_handler(
-        request: Request, exc: APIConnectionError
-    ) -> JSONResponse:
-        logger.error("Failed to connect to OpenAI API")
-        return create_error_response(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            message="Failed to connect to OpenAI's API. Please try again later.",
-            error_type="APIConnectionError",
-        )
-
     @app.exception_handler(RateLimitExceeded)
-    @app.exception_handler(RateLimitError)
     @app.exception_handler(RateLimitException)
     async def rate_limit_exception_handler(
-        request: Request, exc: Union[RateLimitExceeded, RateLimitError, RateLimitException]
+        request: Request, exc: RateLimitExceeded | RateLimitException
     ) -> JSONResponse:
         retry_after = getattr(exc, "retry_after", None)
         logger.warning(f"Rate limit exceeded. Retry after: {retry_after}")
@@ -254,15 +190,6 @@ def register_exception_handlers(app: FastAPI) -> None:
         if retry_after:
             response.headers["Retry-After"] = str(retry_after)
         return response
-
-    @app.exception_handler(BadRequestError)
-    async def bad_request_exception_handler(request: Request, exc: BadRequestError) -> JSONResponse:
-        logger.error(f"Bad request sent to the API: {str(exc)}")
-        return create_error_response(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            message="Invalid request. Please check your input and try again.",
-            error_type="BadRequestError",
-        )
 
     @app.exception_handler(ValueError)
     async def value_error_exception_handler(request: Request, exc: ValueError) -> JSONResponse:
@@ -281,46 +208,6 @@ def register_exception_handlers(app: FastAPI) -> None:
             status_code=exc.status_code,
             message=exc.message,
             error_type=exc.__class__.__name__,
-        )
-
-    @app.exception_handler(APIError)
-    async def api_error_handler(request: Request, exc: APIError) -> JSONResponse:
-        logger.error(f"OpenAI API error: {str(exc)}")
-        return create_error_response(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            message="An error occurred with the OpenAI API. Please try again later.",
-            error_type="APIError",
-        )
-
-    @app.exception_handler(InternalServerError)
-    async def internal_server_error_handler(
-        request: Request, exc: InternalServerError
-    ) -> JSONResponse:
-        logger.error(f"OpenAI Internal Server Error: {str(exc)}")
-        return create_error_response(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            message="An internal server error occurred. Please try again later.",
-            error_type="InternalServerError",
-        )
-
-    @app.exception_handler(APITimeoutError)
-    async def api_timeout_error_handler(request: Request, exc: APITimeoutError) -> JSONResponse:
-        logger.error(f"OpenAI API Timeout Error: {str(exc)}")
-        return create_error_response(
-            status_code=status.HTTP_504_GATEWAY_TIMEOUT,
-            message="The request to OpenAI API timed out. Please try again later.",
-            error_type="APITimeoutError",
-        )
-
-    @app.exception_handler(PermissionDeniedError)
-    async def permission_denied_error_handler(
-        request: Request, exc: PermissionDeniedError
-    ) -> JSONResponse:
-        logger.error(f"Permission Denied Error: {str(exc)}")
-        return create_error_response(
-            status_code=status.HTTP_403_FORBIDDEN,
-            message="You don't have permission to perform this action.",
-            error_type="PermissionDeniedError",
         )
 
     # Correlation ID middleware registered in app.main

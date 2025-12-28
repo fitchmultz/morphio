@@ -42,7 +42,6 @@ BANNED_PATTERNS=(
 # Files to skip (exceptions with documentation)
 SKIP_FILES=(
     "app/config.py"  # Contains deprecated client properties with RuntimeError
-    "app/utils/error_handlers.py"  # Catches SDK exceptions from morphio-core adapter calls
 )
 
 # Colors for output
