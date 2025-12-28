@@ -21,4 +21,3 @@ mkdir -p "$(dirname "$OUT")"
 echo "Creating compressed backup to $OUT"
 pg_dump --no-owner --format=custom "$DATABASE_URL" -f "$OUT"
 echo "Backup completed: $OUT"
-

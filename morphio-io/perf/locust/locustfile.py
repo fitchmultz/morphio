@@ -39,4 +39,3 @@ class ApiUser(HttpUser):
             return
         headers = {"Authorization": f"Bearer {self.token}"}
         self.client.get("/user/profile", headers=headers)
-

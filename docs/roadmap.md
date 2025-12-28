@@ -1,6 +1,6 @@
 # Morphio Roadmap
 
-> **Last Updated:** 2025-12-25
+> **Last Updated:** 2025-12-28
 
 This document tracks future work items and enhancement ideas for the Morphio project.
 
@@ -28,9 +28,9 @@ These items were completed in the documentation normalization work:
 ## Short-Term (Next Sprint)
 
 ### Developer Experience
-- [ ] Add pre-commit hooks for SDK boundary enforcement
-- [ ] Create contributor onboarding guide
-- [ ] Add development troubleshooting FAQ
+- [x] Add pre-commit hooks for SDK boundary enforcement
+- [x] Create contributor onboarding guide
+- [x] Add development troubleshooting FAQ
 
 ### Testing
 - [ ] Add E2E tests for credits display flow

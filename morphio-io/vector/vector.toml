@@ -31,4 +31,3 @@
   index = "morphio-%Y-%m-%d"
   request.retry_max_attempts = 5
   request.rate_limit_duration_secs = 1
-

@@ -1,41 +1,63 @@
 # Pre-commit configuration for Morphio monorepo
-# Install: pre-commit install
-# Run manually: pre-commit run --all-files
+# Install: bash scripts/install-git-hooks.sh
+# Run manually: uv run pre-commit run --all-files
 
 repos:
   - repo: local
     hooks:
+      # Env template audit - ensures .env.example has all config keys
+      - id: audit-env-template
+        name: Audit env template
+        entry: python3 morphio-io/scripts/audit_env_template.py
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-commit]
+
+      # Provider SDK boundary - no direct SDK imports in morphio-io
       - id: audit-imports
         name: Audit provider SDK imports
         entry: ./scripts/audit_imports.sh
         language: script
         pass_filenames: false
         always_run: true
-        stages: [commit]
+        stages: [pre-commit]
 
+      # morphio-core boundary - imports only via adapters
+      - id: audit-morphio-core-boundary
+        name: Audit morphio_core boundary
+        entry: ./scripts/audit_morphio_core_boundary.sh
+        language: script
+        pass_filenames: false
+        always_run: true
+        stages: [pre-commit]
+
+      # Ruff lint check
       - id: ruff-check
         name: Ruff lint (Python)
         entry: bash -c 'cd morphio-io/backend && uv run ruff check .'
         language: system
         pass_filenames: false
         types: [python]
-        stages: [commit]
+        stages: [pre-commit]
 
+      # Ruff format check
       - id: ruff-format
         name: Ruff format check (Python)
         entry: bash -c 'cd morphio-io/backend && uv run ruff format --check .'
         language: system
         pass_filenames: false
         types: [python]
-        stages: [commit]
+        stages: [pre-commit]
 
+      # Biome check for frontend
       - id: biome-check
         name: Biome check (TypeScript/JS)
         entry: bash -c 'cd morphio-io/frontend && pnpm biome check .'
         language: system
         pass_filenames: false
-        types_or: [javascript, typescript, tsx, jsx]
-        stages: [commit]
+        files: '\.(js|jsx|ts|tsx)$'
+        stages: [pre-commit]
 
   # Standard pre-commit hooks for general hygiene
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -48,7 +70,7 @@ repos:
       - id: check-yaml
         args: [--allow-multiple-documents]
       - id: check-json
-        exclude: 'tsconfig\.json$'  # tsconfig may have comments
+        exclude: '(tsconfig\.json|\.vscode/.*\.json)$'  # VS Code and tsconfig use JSONC
       - id: check-added-large-files
         args: ['--maxkb=1000']
       - id: check-merge-conflict

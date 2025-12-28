@@ -2,12 +2,18 @@
 
 Shared documentation for the Morphio monorepo.
 
+## Getting Started
+
+**New to the project?** Start here:
+
+- **[Onboarding Guide](./onboarding.md)** - First hour setup: install deps, configure env, verify CI passes
+
 ## Quick Links
 
 - **[Project Status](./status.md)** - Current state, completed work, and what's next
 - **[Configuration Guide](./configuration.md)** - Environment variables and setup
-- **[Contributing](../CONTRIBUTING.md)** - Onboarding, workflow, and PR protocol
-- **[Troubleshooting](./troubleshooting.md)** - Common setup and CI fixes
+- **[Contributing](../CONTRIBUTING.md)** - Workflow, PR protocol, and non-negotiables
+- **[Troubleshooting FAQ](./troubleshooting.md)** - Common setup and CI fixes
 - **[Roadmap](./roadmap.md)** - Upcoming features and priorities
 
 ## Guides
@@ -24,8 +30,14 @@ Each project also has its own README with project-specific documentation:
 - [morphio-io README](../morphio-io/README.md) - Web application setup and development
 - [morphio-core README](../morphio-core/README.md) - Library API reference and examples
 
-## Quick Links
+## Quick Commands
 
-- **Start developing**: `cp .env.example .env && make install && make ci && make dev` from monorepo root
-- **Run all tests**: `make test`
-- **Full CI check**: `make ci`
+```bash
+# Full setup from scratch
+cp .env.example .env && make install && bash scripts/install-git-hooks.sh && make ci
+
+# Daily development
+make dev          # Start backend + frontend
+make ci           # Run all checks before commit
+make test         # Run all tests
+```
