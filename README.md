@@ -12,9 +12,11 @@ This monorepo contains related Morphio projects for AI-powered content generatio
 
 ## Documentation
 
+- **[Contributing](./CONTRIBUTING.md)** - Onboarding, workflow, and PR protocol
 - **[Shared Docs](./docs/)** - Cross-cutting guides
 - **[Using morphio-core](./docs/using-morphio-core.md)** - How to use morphio-core in your own projects
 - **[Architecture](./docs/architecture.md)** - How morphio-io uses morphio-core via adapters
+- **[Troubleshooting](./docs/troubleshooting.md)** - Common setup and CI fixes
 
 ## Quick Start
 

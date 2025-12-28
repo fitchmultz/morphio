@@ -6,6 +6,8 @@ Shared documentation for the Morphio monorepo.
 
 - **[Project Status](./status.md)** - Current state, completed work, and what's next
 - **[Configuration Guide](./configuration.md)** - Environment variables and setup
+- **[Contributing](../CONTRIBUTING.md)** - Onboarding, workflow, and PR protocol
+- **[Troubleshooting](./troubleshooting.md)** - Common setup and CI fixes
 - **[Roadmap](./roadmap.md)** - Upcoming features and priorities
 
 ## Guides
