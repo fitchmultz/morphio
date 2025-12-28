@@ -19,4 +19,3 @@ fi
 echo "Restoring from $IN to target database"
 pg_restore --clean --if-exists --no-owner --no-privileges -d "$DATABASE_URL" "$IN"
 echo "Restore completed"
-

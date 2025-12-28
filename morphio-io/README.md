@@ -342,5 +342,5 @@ For bugs or feature requests, open an issue with detailed information.
   uv run ruff check .
   uv run basedpyright
   ```
-  
+
 - Project dependencies are declared in `backend/pyproject.toml`.
