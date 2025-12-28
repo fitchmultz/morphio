@@ -13,16 +13,18 @@ if command -v pnpm >/dev/null 2>&1; then
   done < <(git -C "$REPO_ROOT" diff --cached --name-only --diff-filter=ACMR -z)
 
   frontend_files=()
-  for file in "${staged_files[@]}"; do
-    if [[ "$file" == morphio-io/frontend/* ]]; then
-      rel="${file#morphio-io/frontend/}"
-      case "$rel" in
-        *.ts|*.tsx|*.js|*.jsx|*.json|*.jsonc|*.css|*.scss)
-          frontend_files+=("$rel")
-          ;;
-      esac
-    fi
-  done
+  if (( ${#staged_files[@]} )); then
+    for file in "${staged_files[@]}"; do
+      if [[ "$file" == morphio-io/frontend/* ]]; then
+        rel="${file#morphio-io/frontend/}"
+        case "$rel" in
+          *.ts|*.tsx|*.js|*.jsx|*.json|*.jsonc|*.css|*.scss)
+            frontend_files+=("$rel")
+            ;;
+        esac
+      fi
+    done
+  fi
 
   if [[ ${#frontend_files[@]} -gt 0 ]]; then
     (cd "$REPO_ROOT/morphio-io/frontend" && pnpm biome check "${frontend_files[@]}")
