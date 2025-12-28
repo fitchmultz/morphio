@@ -9,8 +9,12 @@ if ! command -v rg >/dev/null 2>&1; then
   exit 1
 fi
 
-cd "$APP_DIR"
-matches="$(rg -n "^(from morphio_core|import morphio_core)\\b" . --glob '!adapters/**' || true)"
+if [[ ! -d "$APP_DIR" ]]; then
+  echo "ERROR: backend app directory not found at $APP_DIR" >&2
+  exit 1
+fi
+
+matches="$(rg -n "^(from morphio_core|import morphio_core)\\b" "$APP_DIR" --glob '!**/adapters/**' || true)"
 if [[ -n "$matches" ]]; then
   echo "ERROR: morphio_core imports found outside adapters:" >&2
   echo "$matches" >&2
