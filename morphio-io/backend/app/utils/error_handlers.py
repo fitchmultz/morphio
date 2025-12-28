@@ -1,4 +1,4 @@
-# This file handles application exceptions, including custom and OpenAI-based errors.
+# This file handles application exceptions, including custom runtime errors.
 # Refactored to remove the local DateTimeEncoder in favor of CustomJSONEncoder from helpers.py.
 
 
