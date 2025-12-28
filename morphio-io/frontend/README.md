@@ -115,15 +115,14 @@ This project uses [@hey-api/openapi-ts](https://heyapi.dev/) to auto-generate Ty
 
 ### Regenerating Types
 
-When the backend API changes (new routes, modified schemas, etc.), regenerate the types:
+When the backend API changes (new routes, modified schemas, etc.), regenerate the types from the repo root:
 
 ```bash
-# Backend must be running on port 8005
-pnpm openapi:refresh
+make -C morphio-io openapi
 ```
 
 This command:
-1. Fetches the OpenAPI schema from `http://localhost:8005/openapi.json`
+1. Exports the OpenAPI schema from the backend app (no running server required)
 2. Generates TypeScript types and SDK functions in `src/client/`
 
 ### Using Generated Types
