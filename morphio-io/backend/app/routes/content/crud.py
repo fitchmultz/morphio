@@ -17,7 +17,7 @@ from ...schemas.content_schema import (
     ContentTitleUpdate,
     ContentUpdate,
 )
-from ...schemas.response_schema import ApiResponse, PaginatedResponse, ResponseModel
+from ...schemas.response_schema import ApiResponse, PaginatedResponse
 from ...services.content import sanitize_content, validate_content
 from ...services.generation import update_content_title
 from ...services.security import get_current_user
@@ -36,7 +36,8 @@ logger = logging.getLogger(__name__)
 @router.post(
     "/save-content",
     operation_id="save_content",
-    response_model=ResponseModel[ContentOut],
+    response_model=ApiResponse[ContentOut],
+    status_code=status.HTTP_201_CREATED,
     responses={
         201: {
             "description": "Content saved successfully",
@@ -76,17 +77,18 @@ async def save_content(
     await db.commit()
     await db.refresh(db_content)
 
-    return ResponseModel(
-        status="success",
+    return create_response(
+        status=ResponseStatus.SUCCESS,
         message="Content saved successfully",
-        data=ContentOut.model_validate(db_content),
+        data=ContentOut.model_validate(db_content).model_dump(),
+        status_code=status.HTTP_201_CREATED,
     )
 
 
 @router.get(
     "/get-contents",
     operation_id="list_contents",
-    response_model=ResponseModel[PaginatedResponse[ContentOut]],
+    response_model=ApiResponse[PaginatedResponse[ContentOut]],
     responses={
         200: {
             "description": "Contents retrieved successfully",
@@ -137,15 +139,16 @@ async def get_contents(
     )
     result = await query.execute(db, page, per_page)
 
-    return ResponseModel(
-        status="success",
+    return create_response(
+        status=ResponseStatus.SUCCESS,
         message="Contents retrieved successfully",
         data=PaginatedResponse(
             items=[ContentOut.model_validate(content) for content in result.items],
             total=result.total,
             page=page,
             per_page=per_page,
-        ),
+        ).model_dump(),
+        status_code=status.HTTP_200_OK,
     )
 
 

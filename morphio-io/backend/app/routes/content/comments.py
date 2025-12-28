@@ -32,6 +32,7 @@ logger = logging.getLogger(__name__)
     "/{content_id}/comments",
     operation_id="create_comment",
     response_model=ApiResponse[CommentOut],
+    status_code=status.HTTP_201_CREATED,
     responses={
         201: {
             "description": "Comment created successfully",

@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..database import get_db
 from ..models.user import User
-from ..schemas.response_schema import ApiResponse, ResponseModel
+from ..schemas.response_schema import ApiResponse
 from ..schemas.template_schema import TemplateCreate, TemplateOut, TemplateUpdate
 from ..services.security import get_current_user
 from ..services.template import (
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 @router.get(
     "/get-templates",
     operation_id="list_templates",
-    response_model=ResponseModel[List[TemplateOut]],
+    response_model=ApiResponse[List[TemplateOut]],
     responses={
         200: {
             "description": "Templates retrieved successfully",
@@ -41,10 +41,11 @@ async def get_templates(
     db: AsyncSession = Depends(get_db),
 ):
     templates = await get_all_templates(db, current_user.id)
-    return ResponseModel(
-        status=ResponseStatus.SUCCESS.value,
+    return create_response(
+        status=ResponseStatus.SUCCESS,
         message="Templates retrieved successfully",
         data=templates,
+        status_code=status.HTTP_200_OK,
     )
 
 

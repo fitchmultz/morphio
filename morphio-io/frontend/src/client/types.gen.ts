@@ -175,6 +175,38 @@ export type ApiResponseContentOut = {
 };
 
 /**
+ * ApiResponse[ConversationResponse]
+ */
+export type ApiResponseConversationResponse = {
+    status: ResponseStatus;
+    /**
+     * Message
+     */
+    message: string;
+    data?: ConversationResponse | null;
+    /**
+     * Timestamp
+     */
+    timestamp?: string | null;
+};
+
+/**
+ * ApiResponse[ConversationThreadOut]
+ */
+export type ApiResponseConversationThreadOut = {
+    status: ResponseStatus;
+    /**
+     * Message
+     */
+    message: string;
+    data?: ConversationThreadOut | null;
+    /**
+     * Timestamp
+     */
+    timestamp?: string | null;
+};
+
+/**
  * ApiResponse[CsrfTokenPayload]
  */
 export type ApiResponseCsrfTokenPayload = {
@@ -222,6 +254,44 @@ export type ApiResponseListContentOut = {
      * Data
      */
     data?: Array<ContentOut> | null;
+    /**
+     * Timestamp
+     */
+    timestamp?: string | null;
+};
+
+/**
+ * ApiResponse[List[ConversationSummary]]
+ */
+export type ApiResponseListConversationSummary = {
+    status: ResponseStatus;
+    /**
+     * Message
+     */
+    message: string;
+    /**
+     * Data
+     */
+    data?: Array<ConversationSummary> | null;
+    /**
+     * Timestamp
+     */
+    timestamp?: string | null;
+};
+
+/**
+ * ApiResponse[List[TemplateOut]]
+ */
+export type ApiResponseListTemplateOut = {
+    status: ResponseStatus;
+    /**
+     * Message
+     */
+    message: string;
+    /**
+     * Data
+     */
+    data?: Array<TemplateOut> | null;
     /**
      * Timestamp
      */
@@ -305,6 +375,22 @@ export type ApiResponseNoneType = {
      * Data
      */
     data?: null;
+    /**
+     * Timestamp
+     */
+    timestamp?: string | null;
+};
+
+/**
+ * ApiResponse[PaginatedResponse[ContentOut]]
+ */
+export type ApiResponsePaginatedResponseContentOut = {
+    status: ResponseStatus;
+    /**
+     * Message
+     */
+    message: string;
+    data?: PaginatedResponseContentOut | null;
     /**
      * Timestamp
      */
@@ -1163,102 +1249,6 @@ export type PortalSessionData = {
 export type ProcessingStage = 'queued' | 'downloading' | 'chunking' | 'transcribing' | 'diarizing' | 'generating' | 'saving' | 'completed' | 'failed';
 
 /**
- * ResponseModel[ContentOut]
- */
-export type ResponseModelContentOut = {
-    /**
-     * Status
-     */
-    status: string;
-    /**
-     * Message
-     */
-    message: string;
-    data?: ContentOut | null;
-};
-
-/**
- * ResponseModel[ConversationResponse]
- */
-export type ResponseModelConversationResponse = {
-    /**
-     * Status
-     */
-    status: string;
-    /**
-     * Message
-     */
-    message: string;
-    data?: ConversationResponse | null;
-};
-
-/**
- * ResponseModel[ConversationThreadOut]
- */
-export type ResponseModelConversationThreadOut = {
-    /**
-     * Status
-     */
-    status: string;
-    /**
-     * Message
-     */
-    message: string;
-    data?: ConversationThreadOut | null;
-};
-
-/**
- * ResponseModel[List[ConversationSummary]]
- */
-export type ResponseModelListConversationSummary = {
-    /**
-     * Status
-     */
-    status: string;
-    /**
-     * Message
-     */
-    message: string;
-    /**
-     * Data
-     */
-    data?: Array<ConversationSummary> | null;
-};
-
-/**
- * ResponseModel[List[TemplateOut]]
- */
-export type ResponseModelListTemplateOut = {
-    /**
-     * Status
-     */
-    status: string;
-    /**
-     * Message
-     */
-    message: string;
-    /**
-     * Data
-     */
-    data?: Array<TemplateOut> | null;
-};
-
-/**
- * ResponseModel[PaginatedResponse[ContentOut]]
- */
-export type ResponseModelPaginatedResponseContentOut = {
-    /**
-     * Status
-     */
-    status: string;
-    /**
-     * Message
-     */
-    message: string;
-    data?: PaginatedResponseContentOut | null;
-};
-
-/**
  * ResponseStatus
  */
 export type ResponseStatus = 'success' | 'error' | 'warning' | 'info';
@@ -1809,13 +1799,9 @@ export type SaveContentError = SaveContentErrors[keyof SaveContentErrors];
 
 export type SaveContentResponses = {
     /**
-     * Successful Response
-     */
-    200: ResponseModelContentOut;
-    /**
      * Content saved successfully
      */
-    201: unknown;
+    201: ApiResponseContentOut;
 };
 
 export type SaveContentResponse = SaveContentResponses[keyof SaveContentResponses];
@@ -1867,7 +1853,7 @@ export type ListContentsResponses = {
     /**
      * Contents retrieved successfully
      */
-    200: ResponseModelPaginatedResponseContentOut;
+    200: ApiResponsePaginatedResponseContentOut;
 };
 
 export type ListContentsResponse = ListContentsResponses[keyof ListContentsResponses];
@@ -2206,13 +2192,9 @@ export type CreateCommentError = CreateCommentErrors[keyof CreateCommentErrors];
 
 export type CreateCommentResponses = {
     /**
-     * Successful Response
-     */
-    200: ApiResponseCommentOut;
-    /**
      * Comment created successfully
      */
-    201: unknown;
+    201: ApiResponseCommentOut;
 };
 
 export type CreateCommentResponse = CreateCommentResponses[keyof CreateCommentResponses];
@@ -2354,7 +2336,7 @@ export type ListContentConversationsResponses = {
     /**
      * Conversations retrieved successfully
      */
-    200: ResponseModelListConversationSummary;
+    200: ApiResponseListConversationSummary;
 };
 
 export type ListContentConversationsResponse = ListContentConversationsResponses[keyof ListContentConversationsResponses];
@@ -2454,7 +2436,7 @@ export type GetConversationThreadResponses = {
     /**
      * Conversation retrieved successfully
      */
-    200: ResponseModelConversationThreadOut;
+    200: ApiResponseConversationThreadOut;
 };
 
 export type GetConversationThreadResponse = GetConversationThreadResponses[keyof GetConversationThreadResponses];
@@ -2504,7 +2486,7 @@ export type ContinueConversationResponses = {
     /**
      * Conversation updated successfully
      */
-    200: ResponseModelConversationResponse;
+    200: ApiResponseConversationResponse;
 };
 
 export type ContinueConversationResponse = ContinueConversationResponses[keyof ContinueConversationResponses];
@@ -2520,7 +2502,7 @@ export type ListTemplatesResponses = {
     /**
      * Templates retrieved successfully
      */
-    200: ResponseModelListTemplateOut;
+    200: ApiResponseListTemplateOut;
 };
 
 export type ListTemplatesResponse = ListTemplatesResponses[keyof ListTemplatesResponses];

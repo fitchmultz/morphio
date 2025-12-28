@@ -452,20 +452,13 @@
 					"required": true
 				},
 				"responses": {
-					"200": {
-						"description": "Successful Response",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ResponseModel_ContentOut_"
-								}
-							}
-						}
-					},
 					"201": {
 						"description": "Content saved successfully",
 						"content": {
 							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_ContentOut_"
+								},
 								"example": {
 									"status": "success",
 									"message": "Content saved successfully",
@@ -590,7 +583,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ResponseModel_PaginatedResponse_ContentOut__"
+									"$ref": "#/components/schemas/ApiResponse_PaginatedResponse_ContentOut__"
 								},
 								"example": {
 									"status": "success",
@@ -1114,20 +1107,13 @@
 					}
 				},
 				"responses": {
-					"200": {
-						"description": "Successful Response",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ApiResponse_CommentOut_"
-								}
-							}
-						}
-					},
 					"201": {
 						"description": "Comment created successfully",
 						"content": {
 							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_CommentOut_"
+								},
 								"example": {
 									"status": "success",
 									"message": "Comment created successfully",
@@ -1516,7 +1502,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ResponseModel_List_ConversationSummary__"
+									"$ref": "#/components/schemas/ApiResponse_List_ConversationSummary__"
 								}
 							}
 						}
@@ -1603,7 +1589,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ResponseModel_ConversationThreadOut_"
+									"$ref": "#/components/schemas/ApiResponse_ConversationThreadOut_"
 								}
 							}
 						}
@@ -1780,7 +1766,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ResponseModel_ConversationResponse_"
+									"$ref": "#/components/schemas/ApiResponse_ConversationResponse_"
 								}
 							}
 						}
@@ -1845,7 +1831,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ResponseModel_List_TemplateOut__"
+									"$ref": "#/components/schemas/ApiResponse_List_TemplateOut__"
 								}
 							}
 						}
@@ -4308,6 +4294,78 @@
 				"required": ["status", "message"],
 				"title": "ApiResponse[ContentOut]"
 			},
+			"ApiResponse_ConversationResponse_": {
+				"properties": {
+					"status": {
+						"$ref": "#/components/schemas/ResponseStatus"
+					},
+					"message": {
+						"type": "string",
+						"title": "Message"
+					},
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/ConversationResponse"
+							},
+							{
+								"type": "null"
+							}
+						]
+					},
+					"timestamp": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Timestamp"
+					}
+				},
+				"type": "object",
+				"required": ["status", "message"],
+				"title": "ApiResponse[ConversationResponse]"
+			},
+			"ApiResponse_ConversationThreadOut_": {
+				"properties": {
+					"status": {
+						"$ref": "#/components/schemas/ResponseStatus"
+					},
+					"message": {
+						"type": "string",
+						"title": "Message"
+					},
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/ConversationThreadOut"
+							},
+							{
+								"type": "null"
+							}
+						]
+					},
+					"timestamp": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Timestamp"
+					}
+				},
+				"type": "object",
+				"required": ["status", "message"],
+				"title": "ApiResponse[ConversationThreadOut]"
+			},
 			"ApiResponse_CsrfTokenPayload_": {
 				"properties": {
 					"status": {
@@ -4423,6 +4481,86 @@
 				"type": "object",
 				"required": ["status", "message"],
 				"title": "ApiResponse[List[ContentOut]]"
+			},
+			"ApiResponse_List_ConversationSummary__": {
+				"properties": {
+					"status": {
+						"$ref": "#/components/schemas/ResponseStatus"
+					},
+					"message": {
+						"type": "string",
+						"title": "Message"
+					},
+					"data": {
+						"anyOf": [
+							{
+								"items": {
+									"$ref": "#/components/schemas/ConversationSummary"
+								},
+								"type": "array"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Data"
+					},
+					"timestamp": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Timestamp"
+					}
+				},
+				"type": "object",
+				"required": ["status", "message"],
+				"title": "ApiResponse[List[ConversationSummary]]"
+			},
+			"ApiResponse_List_TemplateOut__": {
+				"properties": {
+					"status": {
+						"$ref": "#/components/schemas/ResponseStatus"
+					},
+					"message": {
+						"type": "string",
+						"title": "Message"
+					},
+					"data": {
+						"anyOf": [
+							{
+								"items": {
+									"$ref": "#/components/schemas/TemplateOut"
+								},
+								"type": "array"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Data"
+					},
+					"timestamp": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Timestamp"
+					}
+				},
+				"type": "object",
+				"required": ["status", "message"],
+				"title": "ApiResponse[List[TemplateOut]]"
 			},
 			"ApiResponse_LogsProcessingResponse_": {
 				"properties": {
@@ -4597,6 +4735,42 @@
 				"type": "object",
 				"required": ["status", "message"],
 				"title": "ApiResponse[NoneType]"
+			},
+			"ApiResponse_PaginatedResponse_ContentOut__": {
+				"properties": {
+					"status": {
+						"$ref": "#/components/schemas/ResponseStatus"
+					},
+					"message": {
+						"type": "string",
+						"title": "Message"
+					},
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/PaginatedResponse_ContentOut_"
+							},
+							{
+								"type": "null"
+							}
+						]
+					},
+					"timestamp": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Timestamp"
+					}
+				},
+				"type": "object",
+				"required": ["status", "message"],
+				"title": "ApiResponse[PaginatedResponse[ContentOut]]"
 			},
 			"ApiResponse_PortalSessionData_": {
 				"properties": {
@@ -6055,164 +6229,6 @@
 				],
 				"title": "ProcessingStage",
 				"description": "Detailed processing stages for progress reporting.\n\nEach stage has a typical progress range:\n- QUEUED: 0-5%\n- DOWNLOADING: 5-20%\n- CHUNKING: 20-30%\n- TRANSCRIBING: 30-60%\n- DIARIZING: 50-70% (overlaps with transcribing)\n- GENERATING: 70-90%\n- SAVING: 90-100%"
-			},
-			"ResponseModel_ContentOut_": {
-				"properties": {
-					"status": {
-						"type": "string",
-						"title": "Status"
-					},
-					"message": {
-						"type": "string",
-						"title": "Message"
-					},
-					"data": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/ContentOut"
-							},
-							{
-								"type": "null"
-							}
-						]
-					}
-				},
-				"type": "object",
-				"required": ["status", "message"],
-				"title": "ResponseModel[ContentOut]"
-			},
-			"ResponseModel_ConversationResponse_": {
-				"properties": {
-					"status": {
-						"type": "string",
-						"title": "Status"
-					},
-					"message": {
-						"type": "string",
-						"title": "Message"
-					},
-					"data": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/ConversationResponse"
-							},
-							{
-								"type": "null"
-							}
-						]
-					}
-				},
-				"type": "object",
-				"required": ["status", "message"],
-				"title": "ResponseModel[ConversationResponse]"
-			},
-			"ResponseModel_ConversationThreadOut_": {
-				"properties": {
-					"status": {
-						"type": "string",
-						"title": "Status"
-					},
-					"message": {
-						"type": "string",
-						"title": "Message"
-					},
-					"data": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/ConversationThreadOut"
-							},
-							{
-								"type": "null"
-							}
-						]
-					}
-				},
-				"type": "object",
-				"required": ["status", "message"],
-				"title": "ResponseModel[ConversationThreadOut]"
-			},
-			"ResponseModel_List_ConversationSummary__": {
-				"properties": {
-					"status": {
-						"type": "string",
-						"title": "Status"
-					},
-					"message": {
-						"type": "string",
-						"title": "Message"
-					},
-					"data": {
-						"anyOf": [
-							{
-								"items": {
-									"$ref": "#/components/schemas/ConversationSummary"
-								},
-								"type": "array"
-							},
-							{
-								"type": "null"
-							}
-						],
-						"title": "Data"
-					}
-				},
-				"type": "object",
-				"required": ["status", "message"],
-				"title": "ResponseModel[List[ConversationSummary]]"
-			},
-			"ResponseModel_List_TemplateOut__": {
-				"properties": {
-					"status": {
-						"type": "string",
-						"title": "Status"
-					},
-					"message": {
-						"type": "string",
-						"title": "Message"
-					},
-					"data": {
-						"anyOf": [
-							{
-								"items": {
-									"$ref": "#/components/schemas/TemplateOut"
-								},
-								"type": "array"
-							},
-							{
-								"type": "null"
-							}
-						],
-						"title": "Data"
-					}
-				},
-				"type": "object",
-				"required": ["status", "message"],
-				"title": "ResponseModel[List[TemplateOut]]"
-			},
-			"ResponseModel_PaginatedResponse_ContentOut__": {
-				"properties": {
-					"status": {
-						"type": "string",
-						"title": "Status"
-					},
-					"message": {
-						"type": "string",
-						"title": "Message"
-					},
-					"data": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/PaginatedResponse_ContentOut_"
-							},
-							{
-								"type": "null"
-							}
-						]
-					}
-				},
-				"type": "object",
-				"required": ["status", "message"],
-				"title": "ResponseModel[PaginatedResponse[ContentOut]]"
 			},
 			"ResponseStatus": {
 				"type": "string",
