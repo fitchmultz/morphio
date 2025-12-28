@@ -371,6 +371,13 @@ def convert_to_messages(messages: list[dict]) -> list[Message]:
     ]
 
 
+def sanitize_markdown(text: str) -> str:
+    """Sanitize markdown via morphio-core inside the adapter boundary."""
+    from morphio_core.llm import sanitize_markdown as core_sanitize_markdown
+
+    return core_sanitize_markdown(text)
+
+
 __all__ = [
     # Core functions
     "get_llm_router",
@@ -378,6 +385,7 @@ __all__ = [
     "generate_completion_with_usage",
     "simple_completion",
     "convert_to_messages",
+    "sanitize_markdown",
     # Response types
     "GenerationWithUsage",
     # Model resolution

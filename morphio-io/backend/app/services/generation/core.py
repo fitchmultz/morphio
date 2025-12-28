@@ -8,7 +8,6 @@ LLM adapter for all provider interactions.
 import logging
 from decimal import Decimal
 
-from morphio_core.llm import sanitize_markdown
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...adapters.llm import (
@@ -19,6 +18,7 @@ from ...adapters.llm import (
     generate_completion_with_usage,
     get_model_token_limit,
     resolve_model_alias,
+    sanitize_markdown,
 )
 from ...config import settings
 from ...utils.enums import UsageType
