@@ -59,7 +59,7 @@ These items were completed in the documentation normalization work:
 - [ ] Set up staging environment
 - [x] Add Prometheus metrics endpoint
 - [ ] Configure log aggregation
-- [ ] Add health check dashboard
+- [x] Add health check dashboard
 
 ## Long-Term (This Year)
 

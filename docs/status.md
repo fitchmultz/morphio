@@ -1,6 +1,6 @@
 # Morphio Project Status
 
-> **Last Updated:** 2025-12-25
+> **Last Updated:** 2025-12-29
 
 ## Overview
 
@@ -104,6 +104,7 @@ Completed on 2025-12-23:
 ### Admin Dashboard ✅
 - [x] Export LLM usage reports (CSV) with date range filters
 - [x] LLM usage summary by provider (requests, tokens, cost)
+- [x] Admin System Health panel with aggregated component status checks
 
 ### User Billing ✅
 - [x] Usage alerts when credits < 20% (warning) or < 5% (critical)

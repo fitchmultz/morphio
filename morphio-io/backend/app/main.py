@@ -151,9 +151,11 @@ app.include_router(web.router, prefix="/web", tags=["Web Scraping"])
 app.include_router(admin.router, prefix="/admin", tags=["Admin"])
 
 # Admin sub-routers for extended functionality
+from .routes.admin import health_router as admin_health_router
 from .routes.admin import usage_router as admin_usage_router
 
 app.include_router(admin_usage_router, prefix="/admin", tags=["Admin"])
+app.include_router(admin_health_router, prefix="/admin", tags=["Admin"])
 
 # Billing routes (Stripe integration)
 from .routes import billing

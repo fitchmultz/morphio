@@ -414,6 +414,22 @@ export type ApiResponsePortalSessionData = {
 };
 
 /**
+ * ApiResponse[SystemHealthOut]
+ */
+export type ApiResponseSystemHealthOut = {
+    status: ResponseStatus;
+    /**
+     * Message
+     */
+    message: string;
+    data?: SystemHealthOut | null;
+    /**
+     * Timestamp
+     */
+    timestamp?: string | null;
+};
+
+/**
  * ApiResponse[TemplateOut]
  */
 export type ApiResponseTemplateOut = {
@@ -1086,6 +1102,30 @@ export type HttpValidationError = {
 };
 
 /**
+ * HealthComponentOut
+ */
+export type HealthComponentOut = {
+    status: HealthComponentStatus;
+    /**
+     * Latency Ms
+     *
+     * Elapsed time for the component check in milliseconds.
+     */
+    latency_ms?: number | null;
+    /**
+     * Detail
+     *
+     * Short, non-sensitive diagnostic detail for the component.
+     */
+    detail?: string | null;
+};
+
+/**
+ * HealthComponentStatus
+ */
+export type HealthComponentStatus = 'ok' | 'error' | 'skipped';
+
+/**
  * Item
  */
 export type Item = {
@@ -1297,6 +1337,24 @@ export type SubscriptionOut = {
     updated_at?: string | null;
     user?: UserBasicOut | null;
 };
+
+/**
+ * SystemHealthOut
+ */
+export type SystemHealthOut = {
+    overall_status: SystemHealthStatus;
+    /**
+     * Components
+     */
+    components: {
+        [key: string]: HealthComponentOut;
+    };
+};
+
+/**
+ * SystemHealthStatus
+ */
+export type SystemHealthStatus = 'ok' | 'degraded' | 'down';
 
 /**
  * TemplateCreate
@@ -3298,6 +3356,41 @@ export type GetLlmUsageSummaryResponses = {
 };
 
 export type GetLlmUsageSummaryResponse = GetLlmUsageSummaryResponses[keyof GetLlmUsageSummaryResponses];
+
+export type GetAdminHealthData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/admin/health';
+};
+
+export type GetAdminHealthErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+    /**
+     * Not authorized
+     */
+    403: unknown;
+    /**
+     * Too Many Requests
+     */
+    429: unknown;
+    /**
+     * Internal Server Error
+     */
+    500: unknown;
+};
+
+export type GetAdminHealthResponses = {
+    /**
+     * Successful Response
+     */
+    200: ApiResponseSystemHealthOut;
+};
+
+export type GetAdminHealthResponse = GetAdminHealthResponses[keyof GetAdminHealthResponses];
 
 export type CreateCheckoutSessionData = {
     body?: never;
