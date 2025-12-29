@@ -42,16 +42,27 @@ logger = logging.getLogger(__name__)
     operation_id="login",
     response_model=ApiResponse[AuthTokenPayload],
     responses={
+        **common_responses,
         200: {
             "description": "Successful Login",
             "content": {
                 "application/json": {
                     "example": {
-                        "access_token": "xxx",
-                        "user": {
-                            "id": 1,
-                            "email": "user1@example.com",
-                            "display_name": "user1",
+                        "status": "success",
+                        "message": "Login successful",
+                        "data": {
+                            "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                            "refresh_token": "",
+                            "user": {
+                                "id": 1,
+                                "email": "user1@example.com",
+                                "display_name": "user1",
+                                "role": "USER",
+                                "created_at": "2025-01-01T12:00:00Z",
+                                "last_login": "2025-01-10T08:30:00Z",
+                                "is_active": True,
+                                "content_count": 3,
+                            },
                         },
                     }
                 }
@@ -59,9 +70,16 @@ logger = logging.getLogger(__name__)
         },
         401: {
             "description": "Unauthorized",
-            "content": {"application/json": {"example": {"detail": "Incorrect email or password"}}},
+            "content": {
+                "application/json": {
+                    "example": {
+                        "status": "error",
+                        "message": "Incorrect email or password",
+                        "data": {"error_type": "HTTPException", "details": {}},
+                    }
+                }
+            },
         },
-        **common_responses,
     },
 )
 @rate_limit("60/minute")
@@ -70,7 +88,10 @@ logger = logging.getLogger(__name__)
 async def login(
     request: Request,
     response: Response,
-    user_login: UserLogin = Body(...),
+    user_login: UserLogin = Body(
+        ...,
+        examples=[{"email": "user1@example.com", "password": "Str0ngP@ssword!"}],
+    ),
     db: AsyncSession = Depends(get_db),
 ):
     logger.debug(f"Attempting login for user: {user_login.email}")

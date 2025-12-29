@@ -15,7 +15,13 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/UserLogin"
+								"$ref": "#/components/schemas/UserLogin",
+								"examples": [
+									{
+										"email": "user1@example.com",
+										"password": "Str0ngP@ssword!"
+									}
+								]
 							}
 						}
 					},
@@ -30,11 +36,21 @@
 									"$ref": "#/components/schemas/ApiResponse_AuthTokenPayload_"
 								},
 								"example": {
-									"access_token": "xxx",
-									"user": {
-										"id": 1,
-										"email": "user1@example.com",
-										"display_name": "user1"
+									"status": "success",
+									"message": "Login successful",
+									"data": {
+										"access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+										"refresh_token": "",
+										"user": {
+											"id": 1,
+											"email": "user1@example.com",
+											"display_name": "user1",
+											"role": "USER",
+											"created_at": "2025-01-01T12:00:00Z",
+											"last_login": "2025-01-10T08:30:00Z",
+											"is_active": true,
+											"content_count": 3
+										}
 									}
 								}
 							}
@@ -45,7 +61,12 @@
 						"content": {
 							"application/json": {
 								"example": {
-									"detail": "Not authenticated"
+									"status": "error",
+									"message": "Incorrect email or password",
+									"data": {
+										"error_type": "HTTPException",
+										"details": {}
+									}
 								}
 							}
 						}
@@ -150,7 +171,14 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/UserCreate"
+								"$ref": "#/components/schemas/UserCreate",
+								"examples": [
+									{
+										"email": "some@example.com",
+										"password": "Str0ngP@ssword!",
+										"display_name": "NewUser"
+									}
+								]
 							}
 						}
 					},
@@ -168,11 +196,16 @@
 									"status": "success",
 									"message": "User registered successfully",
 									"data": {
-										"access_token": "xxx",
+										"access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+										"refresh_token": "",
 										"user": {
 											"id": 1,
 											"email": "some@example.com",
-											"display_name": "NewUser"
+											"display_name": "NewUser",
+											"role": "USER",
+											"created_at": "2025-01-01T12:00:00Z",
+											"is_active": true,
+											"content_count": 0
 										}
 									}
 								}
@@ -184,7 +217,12 @@
 						"content": {
 							"application/json": {
 								"example": {
-									"detail": "Email already registered"
+									"status": "error",
+									"message": "Email already registered",
+									"data": {
+										"error_type": "ApplicationException",
+										"details": {}
+									}
 								}
 							}
 						}
@@ -194,7 +232,12 @@
 						"content": {
 							"application/json": {
 								"example": {
-									"detail": "Registration is currently disabled"
+									"status": "error",
+									"message": "Registration is currently disabled",
+									"data": {
+										"error_type": "ApplicationException",
+										"details": {}
+									}
 								}
 							}
 						}
@@ -337,11 +380,29 @@
 				"operationId": "refresh_token",
 				"responses": {
 					"200": {
-						"description": "Successful Response",
+						"description": "Refresh token rotated successfully",
 						"content": {
 							"application/json": {
 								"schema": {
 									"$ref": "#/components/schemas/ApiResponse_AuthTokenPayload_"
+								},
+								"example": {
+									"status": "success",
+									"message": "Refresh token updated",
+									"data": {
+										"access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+										"refresh_token": "",
+										"user": {
+											"id": 1,
+											"email": "user1@example.com",
+											"display_name": "user1",
+											"role": "USER",
+											"created_at": "2025-01-01T12:00:00Z",
+											"last_login": "2025-01-10T08:30:00Z",
+											"is_active": true,
+											"content_count": 3
+										}
+									}
 								}
 							}
 						}
@@ -351,7 +412,12 @@
 						"content": {
 							"application/json": {
 								"example": {
-									"detail": "Not authenticated"
+									"status": "error",
+									"message": "Invalid refresh token",
+									"data": {
+										"error_type": "HTTPException",
+										"details": {}
+									}
 								}
 							}
 						}
@@ -376,7 +442,18 @@
 							}
 						}
 					}
-				}
+				},
+				"parameters": [
+					{
+						"name": "refresh_token",
+						"in": "cookie",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"example": "refresh_token_cookie_value"
+					}
+				]
 			}
 		},
 		"/auth/csrf-token": {
@@ -2258,11 +2335,25 @@
 				"operationId": "get_user_credits",
 				"responses": {
 					"200": {
-						"description": "Successful Response",
+						"description": "User credits retrieved successfully",
 						"content": {
 							"application/json": {
 								"schema": {
 									"$ref": "#/components/schemas/ApiResponse_UserCredits_"
+								},
+								"example": {
+									"status": "success",
+									"message": "User credits retrieved successfully",
+									"data": {
+										"plan": "free",
+										"limit": 50,
+										"used": 12,
+										"remaining": 38,
+										"remaining_pct": 76.0,
+										"reset_date": "2025-02-01",
+										"resets_monthly": true,
+										"is_admin": false
+									}
 								}
 							}
 						}
@@ -2272,7 +2363,12 @@
 						"content": {
 							"application/json": {
 								"example": {
-									"detail": "Not authenticated"
+									"status": "error",
+									"message": "Not authenticated",
+									"data": {
+										"error_type": "HTTPException",
+										"details": {}
+									}
 								}
 							}
 						}
@@ -2504,18 +2600,18 @@
 							"application/json": {
 								"schema": {
 									"$ref": "#/components/schemas/ApiResponse_MediaProcessingResponse_"
+								},
+								"example": {
+									"status": "success",
+									"message": "Media processing job enqueued",
+									"data": {
+										"job_id": "video_123e4567-e89b-12d3-a456-426614174000",
+										"status": "pending",
+										"message": "Media processing job enqueued."
+									}
 								}
 							}
 						}
-					},
-					"400": {
-						"description": "Bad Request"
-					},
-					"413": {
-						"description": "Payload Too Large"
-					},
-					"404": {
-						"description": "Template not found"
 					},
 					"401": {
 						"description": "Unauthorized",
@@ -2543,6 +2639,51 @@
 							"application/json": {
 								"example": {
 									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"example": {
+									"status": "error",
+									"message": "Either video URL or media file is required",
+									"data": {
+										"error_type": "ApplicationException",
+										"details": {}
+									}
+								}
+							}
+						}
+					},
+					"413": {
+						"description": "Payload Too Large",
+						"content": {
+							"application/json": {
+								"example": {
+									"status": "error",
+									"message": "File size exceeds the maximum allowed limit.",
+									"data": {
+										"error_type": "ApplicationException",
+										"details": {}
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Template not found",
+						"content": {
+							"application/json": {
+								"example": {
+									"status": "error",
+									"message": "Template not found",
+									"data": {
+										"error_type": "ApplicationException",
+										"details": {}
+									}
 								}
 							}
 						}
@@ -2582,8 +2723,11 @@
 						"required": true,
 						"schema": {
 							"type": "string",
+							"description": "Media processing job ID",
+							"examples": ["video_123e4567-e89b-12d3-a456-426614174000"],
 							"title": "Job Id"
-						}
+						},
+						"description": "Media processing job ID"
 					}
 				],
 				"responses": {
@@ -2593,12 +2737,23 @@
 							"application/json": {
 								"schema": {
 									"$ref": "#/components/schemas/ApiResponse_MediaProcessingStatusResponse_"
+								},
+								"example": {
+									"status": "success",
+									"message": "Media processing status retrieved",
+									"data": {
+										"job_id": "video_123e4567-e89b-12d3-a456-426614174000",
+										"status": "completed",
+										"progress": 100,
+										"stage": "completed",
+										"message": "Media processing completed",
+										"result": {
+											"content_id": 101
+										}
+									}
 								}
 							}
 						}
-					},
-					"404": {
-						"description": "Not Found"
 					},
 					"401": {
 						"description": "Unauthorized",
@@ -2626,6 +2781,22 @@
 							"application/json": {
 								"example": {
 									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"example": {
+									"status": "error",
+									"message": "Job not found",
+									"data": {
+										"job_id": "video_123e4567-e89b-12d3-a456-426614174000",
+										"status": "not_found",
+										"progress": 0
+									}
 								}
 							}
 						}
@@ -3363,6 +3534,27 @@
 							"application/json": {
 								"schema": {
 									"$ref": "#/components/schemas/ApiResponse_list_APIKeyOut__"
+								},
+								"example": {
+									"status": "success",
+									"message": "Found 2 API key(s)",
+									"data": [
+										{
+											"id": 42,
+											"name": "CI Key",
+											"key_prefix": "mk_live_",
+											"scopes": ["logs:write", "media:read"],
+											"last_used_at": "2025-01-20T09:00:00Z",
+											"created_at": "2025-01-15T10:00:00Z"
+										},
+										{
+											"id": 43,
+											"name": "Integration Key",
+											"key_prefix": "mk_live_",
+											"scopes": [],
+											"created_at": "2025-01-18T12:30:00Z"
+										}
+									]
 								}
 							}
 						}
@@ -3372,7 +3564,12 @@
 						"content": {
 							"application/json": {
 								"example": {
-									"detail": "Not authenticated"
+									"status": "error",
+									"message": "Not authenticated",
+									"data": {
+										"error_type": "HTTPException",
+										"details": {}
+									}
 								}
 							}
 						}
@@ -3413,7 +3610,13 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/APIKeyCreate"
+								"$ref": "#/components/schemas/APIKeyCreate",
+								"examples": [
+									{
+										"name": "CI Key",
+										"scopes": ["logs:write", "media:read"]
+									}
+								]
 							}
 						}
 					},
@@ -3426,12 +3629,36 @@
 							"application/json": {
 								"schema": {
 									"$ref": "#/components/schemas/ApiResponse_APIKeyCreatedOut_"
+								},
+								"example": {
+									"status": "success",
+									"message": "API key created successfully. Store it securely - it won't be shown again!",
+									"data": {
+										"id": 42,
+										"name": "CI Key",
+										"key_prefix": "mk_live_",
+										"scopes": ["logs:write", "media:read"],
+										"created_at": "2025-01-15T10:00:00Z",
+										"key": "mk_live_abcdefghijklmnopqrstuvwxyz"
+									}
 								}
 							}
 						}
 					},
 					"400": {
-						"description": "Invalid request"
+						"description": "Invalid request",
+						"content": {
+							"application/json": {
+								"example": {
+									"status": "error",
+									"message": "An API key with name 'CI Key' already exists",
+									"data": {
+										"error_type": "HTTPException",
+										"details": {}
+									}
+								}
+							}
+						}
 					},
 					"401": {
 						"description": "Unauthorized",
@@ -3499,8 +3726,11 @@
 						"required": true,
 						"schema": {
 							"type": "integer",
+							"description": "API key ID",
+							"examples": [42],
 							"title": "Key Id"
-						}
+						},
+						"description": "API key ID"
 					}
 				],
 				"responses": {
@@ -3510,12 +3740,16 @@
 							"application/json": {
 								"schema": {
 									"$ref": "#/components/schemas/ApiResponse_dict_"
+								},
+								"example": {
+									"status": "success",
+									"message": "API key revoked successfully",
+									"data": {
+										"id": 42
+									}
 								}
 							}
 						}
-					},
-					"404": {
-						"description": "API key not found"
 					},
 					"401": {
 						"description": "Unauthorized",
@@ -3543,6 +3777,21 @@
 							"application/json": {
 								"example": {
 									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "API key not found",
+						"content": {
+							"application/json": {
+								"example": {
+									"status": "error",
+									"message": "API key not found",
+									"data": {
+										"error_type": "HTTPException",
+										"details": {}
+									}
 								}
 							}
 						}
@@ -3636,6 +3885,7 @@
 						"schema": {
 							"type": "boolean",
 							"description": "Anonymize sensitive data before processing",
+							"examples": [false],
 							"default": false,
 							"title": "Anonymize"
 						},
@@ -3672,15 +3922,17 @@
 							}
 						}
 					},
-					"400": {
-						"description": "Bad Request"
-					},
 					"401": {
 						"description": "Unauthorized",
 						"content": {
 							"application/json": {
 								"example": {
-									"detail": "Not authenticated"
+									"status": "error",
+									"message": "Not authenticated",
+									"data": {
+										"error_type": "HTTPException",
+										"details": {}
+									}
 								}
 							}
 						}
@@ -3701,6 +3953,36 @@
 							"application/json": {
 								"example": {
 									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"example": {
+									"status": "error",
+									"message": "Invalid file type. Only .log, .txt files are supported.",
+									"data": {
+										"error_type": "ApplicationException",
+										"details": {}
+									}
+								}
+							}
+						}
+					},
+					"413": {
+						"description": "Payload Too Large",
+						"content": {
+							"application/json": {
+								"example": {
+									"status": "error",
+									"message": "Log file exceeds maximum upload size.",
+									"data": {
+										"error_type": "ApplicationException",
+										"details": {}
+									}
 								}
 							}
 						}
@@ -3736,8 +4018,11 @@
 						"required": true,
 						"schema": {
 							"type": "string",
+							"description": "Log processing job ID",
+							"examples": ["123e4567-e89b-12d3-a456-426614174000"],
 							"title": "Job Id"
-						}
+						},
+						"description": "Log processing job ID"
 					}
 				],
 				"responses": {
@@ -3768,15 +4053,17 @@
 							}
 						}
 					},
-					"404": {
-						"description": "Job not found"
-					},
 					"401": {
 						"description": "Unauthorized",
 						"content": {
 							"application/json": {
 								"example": {
-									"detail": "Not authenticated"
+									"status": "error",
+									"message": "Not authenticated",
+									"data": {
+										"error_type": "HTTPException",
+										"details": {}
+									}
 								}
 							}
 						}
@@ -3797,6 +4084,22 @@
 							"application/json": {
 								"example": {
 									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Job not found",
+						"content": {
+							"application/json": {
+								"example": {
+									"status": "error",
+									"message": "Job not found",
+									"data": {
+										"job_id": "123e4567-e89b-12d3-a456-426614174000",
+										"status": "not_found",
+										"progress": 0
+									}
 								}
 							}
 						}
@@ -5150,7 +5453,9 @@
 					"log_file": {
 						"type": "string",
 						"format": "binary",
-						"title": "Log File"
+						"title": "Log File",
+						"description": "Log file to process",
+						"examples": ["app.log"]
 					}
 				},
 				"type": "object",
@@ -5161,11 +5466,14 @@
 				"properties": {
 					"input_url": {
 						"type": "string",
-						"title": "Input Url"
+						"title": "Input Url",
+						"description": "Optional media URL (YouTube, Rumble, X.com, TikTok)",
+						"examples": ["https://www.youtube.com/watch?v=example"]
 					},
 					"template_id": {
 						"type": "string",
-						"title": "Template Id"
+						"title": "Template Id",
+						"examples": ["12", "log-summary"]
 					},
 					"input_file": {
 						"anyOf": [
@@ -5177,15 +5485,19 @@
 								"type": "null"
 							}
 						],
-						"title": "Input File"
+						"title": "Input File",
+						"description": "Media file upload (video or audio)",
+						"examples": ["meeting.mp4"]
 					},
 					"model": {
 						"type": "string",
-						"title": "Model"
+						"title": "Model",
+						"examples": ["gpt-5.1"]
 					},
 					"media_type": {
 						"type": "string",
-						"title": "Media Type"
+						"title": "Media Type",
+						"examples": ["video"]
 					},
 					"enable_diarization": {
 						"type": "boolean",

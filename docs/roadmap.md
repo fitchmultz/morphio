@@ -38,9 +38,9 @@ These items were completed in the documentation normalization work:
 - [x] Improve test coverage for usage tracking
 
 ### Documentation
-- [ ] Add API examples to OpenAPI docs
-- [ ] Create architecture decision records (ADRs)
-- [ ] Document upgrade procedures
+- [x] Add API examples to OpenAPI docs
+- [x] Create architecture decision records (ADRs)
+- [x] Document upgrade procedures
 
 ## Medium-Term (This Quarter)
 

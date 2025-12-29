@@ -47,11 +47,17 @@ logger = logging.getLogger(__name__)
                         "status": "success",
                         "message": "User registered successfully",
                         "data": {
-                            "access_token": "xxx",
+                            "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                            "refresh_token": "",
                             "user": {
                                 "id": 1,
                                 "email": "some@example.com",
                                 "display_name": "NewUser",
+                                "role": "USER",
+                                "created_at": "2025-01-01T12:00:00Z",
+                                "last_login": None,
+                                "is_active": True,
+                                "content_count": 0,
                             },
                         },
                     }
@@ -60,12 +66,26 @@ logger = logging.getLogger(__name__)
         },
         400: {
             "description": "Bad Request",
-            "content": {"application/json": {"example": {"detail": "Email already registered"}}},
+            "content": {
+                "application/json": {
+                    "example": {
+                        "status": "error",
+                        "message": "Email already registered",
+                        "data": {"error_type": "ApplicationException", "details": {}},
+                    }
+                }
+            },
         },
         403: {
             "description": "Registration disabled",
             "content": {
-                "application/json": {"example": {"detail": "Registration is currently disabled"}}
+                "application/json": {
+                    "example": {
+                        "status": "error",
+                        "message": "Registration is currently disabled",
+                        "data": {"error_type": "ApplicationException", "details": {}},
+                    }
+                }
             },
         },
         **common_responses,
@@ -75,8 +95,17 @@ logger = logging.getLogger(__name__)
 @handle_route_errors
 async def register(
     request: Request,
-    user: UserCreate,
     response: Response,
+    user: UserCreate = Body(
+        ...,
+        examples=[
+            {
+                "email": "some@example.com",
+                "password": "Str0ngP@ssword!",
+                "display_name": "NewUser",
+            }
+        ],
+    ),
     db: AsyncSession = Depends(get_db),
 ):
     if not settings.REGISTRATION_ENABLED:

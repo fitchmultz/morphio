@@ -32,7 +32,57 @@ logger = logging.getLogger(__name__)
     "/refresh-token",
     operation_id="refresh_token",
     response_model=ApiResponse[AuthTokenPayload],
-    responses={**common_responses},
+    responses={
+        **common_responses,
+        200: {
+            "description": "Refresh token rotated successfully",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "status": "success",
+                        "message": "Refresh token updated",
+                        "data": {
+                            "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                            "refresh_token": "",
+                            "user": {
+                                "id": 1,
+                                "email": "user1@example.com",
+                                "display_name": "user1",
+                                "role": "USER",
+                                "created_at": "2025-01-01T12:00:00Z",
+                                "last_login": "2025-01-10T08:30:00Z",
+                                "is_active": True,
+                                "content_count": 3,
+                            },
+                        },
+                    }
+                }
+            },
+        },
+        401: {
+            "description": "Unauthorized",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "status": "error",
+                        "message": "Invalid refresh token",
+                        "data": {"error_type": "HTTPException", "details": {}},
+                    }
+                }
+            },
+        },
+    },
+    openapi_extra={
+        "parameters": [
+            {
+                "name": "refresh_token",
+                "in": "cookie",
+                "required": True,
+                "schema": {"type": "string"},
+                "example": "refresh_token_cookie_value",
+            }
+        ]
+    },
 )
 @rate_limit("30/minute")
 @handle_route_errors

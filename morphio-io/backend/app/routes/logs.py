@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 
 import aiofiles
-from fastapi import APIRouter, Depends, File, Query, Request, UploadFile, status
+from fastapi import APIRouter, Depends, File, Path as PathParam, Query, Request, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..config import settings
@@ -34,6 +34,7 @@ ALLOWED_LOG_EXTENSIONS = {ext.lower() for ext in settings.ALLOWED_LOG_EXTENSIONS
     operation_id="process_logs",
     response_model=ApiResponse[LogsProcessingResponse],
     responses={
+        **common_responses,
         200: {
             "description": "Log processing job enqueued successfully",
             "content": {
@@ -50,9 +51,42 @@ ALLOWED_LOG_EXTENSIONS = {ext.lower() for ext in settings.ALLOWED_LOG_EXTENSIONS
                 }
             },
         },
-        400: {"description": "Bad Request"},
-        401: {"description": "Unauthorized"},
-        **common_responses,
+        400: {
+            "description": "Bad Request",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "status": "error",
+                        "message": "Invalid file type. Only .log, .txt files are supported.",
+                        "data": {"error_type": "ApplicationException", "details": {}},
+                    }
+                }
+            },
+        },
+        401: {
+            "description": "Unauthorized",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "status": "error",
+                        "message": "Not authenticated",
+                        "data": {"error_type": "HTTPException", "details": {}},
+                    }
+                }
+            },
+        },
+        413: {
+            "description": "Payload Too Large",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "status": "error",
+                        "message": "Log file exceeds maximum upload size.",
+                        "data": {"error_type": "ApplicationException", "details": {}},
+                    }
+                }
+            },
+        },
     },
 )
 @rate_limit("100/minute")
@@ -60,8 +94,16 @@ ALLOWED_LOG_EXTENSIONS = {ext.lower() for ext in settings.ALLOWED_LOG_EXTENSIONS
 @handle_route_errors
 async def process_logs(
     request: Request,
-    log_file: UploadFile = File(...),
-    anonymize: bool = Query(False, description="Anonymize sensitive data before processing"),
+    log_file: UploadFile = File(
+        ...,
+        description="Log file to process",
+        examples=["app.log"],
+    ),
+    anonymize: bool = Query(
+        False,
+        description="Anonymize sensitive data before processing",
+        examples=[False],
+    ),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -141,6 +183,7 @@ async def process_logs(
     operation_id="get_logs_processing_status",
     response_model=ApiResponse[LogsProcessingStatusResponse],
     responses={
+        **common_responses,
         200: {
             "description": "Log processing status retrieved successfully",
             "content": {
@@ -166,15 +209,48 @@ async def process_logs(
                 }
             },
         },
-        404: {"description": "Job not found"},
-        401: {"description": "Unauthorized"},
-        **common_responses,
+        404: {
+            "description": "Job not found",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "status": "error",
+                        "message": "Job not found",
+                        "data": {
+                            "job_id": "123e4567-e89b-12d3-a456-426614174000",
+                            "status": "not_found",
+                            "progress": 0,
+                            "stage": None,
+                            "message": None,
+                            "result": None,
+                            "error": None,
+                        },
+                    }
+                }
+            },
+        },
+        401: {
+            "description": "Unauthorized",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "status": "error",
+                        "message": "Not authenticated",
+                        "data": {"error_type": "HTTPException", "details": {}},
+                    }
+                }
+            },
+        },
     },
 )
 @rate_limit("150/minute")
 @handle_route_errors
 async def get_logs_processing_status_route(
-    job_id: str,
+    job_id: str = PathParam(
+        ...,
+        description="Log processing job ID",
+        examples=["123e4567-e89b-12d3-a456-426614174000"],
+    ),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):

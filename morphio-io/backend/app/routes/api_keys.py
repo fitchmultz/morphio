@@ -4,7 +4,7 @@ import logging
 from datetime import datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, status
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -55,16 +55,49 @@ class APIKeyCreatedOut(APIKeyOut):
     operation_id="create_api_key",
     response_model=ApiResponse[APIKeyCreatedOut],
     responses={
-        200: {"description": "API key created successfully"},
-        400: {"description": "Invalid request"},
+        200: {
+            "description": "API key created successfully",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "status": "success",
+                        "message": "API key created successfully. Store it securely - it won't be shown again!",
+                        "data": {
+                            "id": 42,
+                            "name": "CI Key",
+                            "key_prefix": "mk_live_",
+                            "scopes": ["logs:write", "media:read"],
+                            "last_used_at": None,
+                            "created_at": "2025-01-15T10:00:00Z",
+                            "key": "mk_live_abcdefghijklmnopqrstuvwxyz",
+                        },
+                    }
+                }
+            },
+        },
+        400: {
+            "description": "Invalid request",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "status": "error",
+                        "message": "An API key with name 'CI Key' already exists",
+                        "data": {"error_type": "HTTPException", "details": {}},
+                    }
+                }
+            },
+        },
         **common_responses,
     },
 )
 @require_auth
 @handle_route_errors
 async def create_api_key(
-    body: APIKeyCreate,
     current_user: Annotated[User, Depends(get_current_user)],
+    body: APIKeyCreate = Body(
+        ...,
+        examples=[{"name": "CI Key", "scopes": ["logs:write", "media:read"]}],
+    ),
     db: AsyncSession = Depends(get_db),
 ):
     """
@@ -120,8 +153,48 @@ async def create_api_key(
     operation_id="list_api_keys",
     response_model=ApiResponse[list[APIKeyOut]],
     responses={
-        200: {"description": "List of API keys"},
         **common_responses,
+        200: {
+            "description": "List of API keys",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "status": "success",
+                        "message": "Found 2 API key(s)",
+                        "data": [
+                            {
+                                "id": 42,
+                                "name": "CI Key",
+                                "key_prefix": "mk_live_",
+                                "scopes": ["logs:write", "media:read"],
+                                "last_used_at": "2025-01-20T09:00:00Z",
+                                "created_at": "2025-01-15T10:00:00Z",
+                            },
+                            {
+                                "id": 43,
+                                "name": "Integration Key",
+                                "key_prefix": "mk_live_",
+                                "scopes": [],
+                                "last_used_at": None,
+                                "created_at": "2025-01-18T12:30:00Z",
+                            },
+                        ],
+                    }
+                }
+            },
+        },
+        401: {
+            "description": "Unauthorized",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "status": "error",
+                        "message": "Not authenticated",
+                        "data": {"error_type": "HTTPException", "details": {}},
+                    }
+                }
+            },
+        },
     },
 )
 @require_auth
@@ -169,16 +242,38 @@ async def list_api_keys(
     operation_id="revoke_api_key",
     response_model=ApiResponse[dict],
     responses={
-        200: {"description": "API key revoked"},
-        404: {"description": "API key not found"},
         **common_responses,
+        200: {
+            "description": "API key revoked",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "status": "success",
+                        "message": "API key revoked successfully",
+                        "data": {"id": 42},
+                    }
+                }
+            },
+        },
+        404: {
+            "description": "API key not found",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "status": "error",
+                        "message": "API key not found",
+                        "data": {"error_type": "HTTPException", "details": {}},
+                    }
+                }
+            },
+        },
     },
 )
 @require_auth
 @handle_route_errors
 async def revoke_api_key(
-    key_id: int,
     current_user: Annotated[User, Depends(get_current_user)],
+    key_id: int = Path(..., description="API key ID", examples=[42]),
     db: AsyncSession = Depends(get_db),
 ):
     """
