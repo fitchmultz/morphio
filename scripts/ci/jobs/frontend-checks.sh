@@ -9,3 +9,4 @@ corepack prepare "$(node -p "require('./package.json').packageManager")" --activ
 pnpm install --frozen-lockfile
 pnpm biome ci .
 pnpm type-check
+pnpm test

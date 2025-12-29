@@ -1,6 +1,6 @@
 # Morphio Roadmap
 
-> **Last Updated:** 2025-12-28
+> **Last Updated:** 2025-12-29
 
 This document tracks future work items and enhancement ideas for the Morphio project.
 
@@ -33,9 +33,9 @@ These items were completed in the documentation normalization work:
 - [x] Add development troubleshooting FAQ
 
 ### Testing
-- [ ] Add E2E tests for credits display flow
-- [ ] Add integration tests for stage progress updates
-- [ ] Improve test coverage for usage tracking
+- [x] Add E2E tests for credits display flow
+- [x] Add integration tests for stage progress updates
+- [x] Improve test coverage for usage tracking
 
 ### Documentation
 - [ ] Add API examples to OpenAPI docs

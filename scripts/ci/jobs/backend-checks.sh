@@ -27,3 +27,5 @@ UV_PROJECT_ENVIRONMENT=.venv-ci uv run --project morphio-io/backend ruff format 
 cd "${ROOT_DIR}/morphio-io/backend"
 UV_PROJECT_ENVIRONMENT=../../.venv-ci uv run ty check --exclude "worker_ml/" --exclude "crawler/" --exclude "app/services/diarization/" --exclude "tests/performance/"
 UV_PROJECT_ENVIRONMENT=../../.venv-ci uv run pytest -q tests/unit/test_stage_progression.py
+UV_PROJECT_ENVIRONMENT=../../.venv-ci uv run pytest -q tests/integration/test_user_credits_flow.py
+UV_PROJECT_ENVIRONMENT=../../.venv-ci uv run pytest -q tests/integration/test_logs_stage_progress_updates.py
