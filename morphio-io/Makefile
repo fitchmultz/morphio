@@ -1,7 +1,7 @@
 # Morphio Monorepo - Root-level Management
 # Run everything from project root - no cd'ing needed!
 
-.PHONY: help install install-backend install-frontend install-native dev dev-full dev-backend dev-frontend dev-worker-ml dev-crawler dev-docker dev-docker-build dev-docker-down dev-docker-clean dev-docker-logs dev-docker-logs-backend dev-docker-logs-frontend dev-docker-shell-backend dev-docker-shell-frontend dev-docker-restart-backend dev-docker-restart-frontend test test-backend test-frontend lint lint-backend lint-frontend format format-backend format-frontend clean clean-backend clean-frontend setup update update-backend update-frontend outdated outdated-backend outdated-frontend update-pkg type-check type-check-backend type-check-frontend build build-backend build-frontend check openapi openapi-export openapi-generate
+.PHONY: help install install-backend install-frontend install-native dev dev-full dev-backend dev-frontend dev-worker-ml dev-crawler dev-docker dev-docker-build dev-docker-down dev-docker-clean dev-docker-logs dev-docker-logs-backend dev-docker-logs-frontend dev-docker-shell-backend dev-docker-shell-frontend dev-docker-restart-backend dev-docker-restart-frontend test test-backend test-frontend lint lint-backend lint-frontend format format-backend format-frontend clean clean-backend clean-frontend setup update update-backend update-frontend outdated outdated-backend outdated-frontend update-pkg type-check type-check-backend type-check-frontend build build-backend build-frontend ci check openapi openapi-export openapi-generate
 
 help: ## Show this help message
 	@echo "Morphio Monorepo Commands"
@@ -158,8 +158,11 @@ type-check-frontend: ## Type check frontend
 audit-env: ## Audit env template matches backend config
 	@python3 scripts/audit_env_template.py
 
-check: openapi format type-check lint build-frontend test audit-env ## Run openapi, format, type check, lint, build, tests, and env audit (full pre-commit check)
-	@echo "✅ All checks passed!"
+ci: openapi format type-check lint build-frontend test audit-env ## Full CI gate: openapi → format → type-check → lint → build → test (required for PRs)
+	@echo "✅ CI passed - ready for PR!"
+
+# Compatibility alias (use 'make ci' instead)
+check: ci ## Alias for 'make ci' (deprecated - use 'make ci')
 
 openapi: openapi-export openapi-generate ## Regenerate frontend API types from backend (no server needed)
 

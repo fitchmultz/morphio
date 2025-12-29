@@ -30,7 +30,7 @@ Morphio is a monorepo containing three main projects:
 # From monorepo root
 make install      # Install all dependencies
 make dev          # Start backend + frontend
-make check        # Run all checks (required before commits)
+make ci           # Full CI gate (required for PRs)
 make test         # Run all tests
 ```
 

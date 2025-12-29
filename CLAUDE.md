@@ -19,7 +19,7 @@ This monorepo uses **uv workspaces** with a single `.venv` at the root.
 # From monorepo root (recommended)
 make install      # Install all deps (Python + frontend)
 make dev          # Start backend + frontend
-make check        # Run all checks (required before commits)
+make ci           # Full CI gate (required for PRs)
 make test         # Run all tests
 
 # Or work in subdirectories
@@ -57,7 +57,7 @@ morphio-core = { workspace = true }
 
 ### Working on morphio-io (web app)
 See `morphio-io/CLAUDE.md` for detailed guidelines. Key points:
-- Run `make check` before commits (from root or `morphio-io/`)
+- Run `make ci` before commits (from root or `morphio-io/`)
 - Backend: FastAPI with Python 3.13+
 - Frontend: Next.js with TypeScript, pnpm, Biome
 
@@ -141,7 +141,7 @@ Docker Compose files already include `platform: linux/amd64` for worker-ml.
 | Install all dependencies | `make install` |
 | Update all dependencies | `make update` |
 | Start dev servers | `make dev` |
-| Run all checks (pre-commit) | `make check` |
+| Full CI gate (required for PRs) | `make ci` |
 | Run all tests | `make test` |
 | Run morphio-core tests only | `make test-core` |
 | Run morphio-io tests only | `make test-io` |

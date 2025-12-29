@@ -422,13 +422,13 @@ class MorphioAdapter(Protocol):
 1. Extend `adapters/llm.py` with model alias resolution
 2. Refactor `services/generation/core.py` to use adapter
 3. Remove direct SDK imports from generation/core.py
-4. Run `make check` (all tests must pass)
+4. Run `make ci` (all tests must pass)
 
 ### Phase 11.3: Remove Backward Compat Layers (Required)
 1. Find all usages of utils/youtube_utils.py and utils/anonymizer.py
 2. Update imports to use adapters directly
 3. Delete the compatibility files
-4. Run `make check`
+4. Run `make ci`
 
 ### Phase 11.4: Testing & Documentation (Required)
 1. Create adapter test suite (20+ tests)
@@ -449,7 +449,7 @@ class MorphioAdapter(Protocol):
 - [ ] `app/adapters/base.py` protocol created
 - [ ] All morphio-core tests pass (140+ expected)
 - [ ] All morphio-io tests pass
-- [ ] `make check` passes
+- [ ] `make ci` passes
 
 ---
 

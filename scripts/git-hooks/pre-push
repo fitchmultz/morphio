@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if ! bash scripts/ci/run.sh; then
-  echo "Push blocked: local CI failed"
+if ! make ci; then
+  echo "Push blocked: make ci failed"
   exit 1
 fi
