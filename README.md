@@ -68,7 +68,7 @@ morphio-core/
 | Command | Description |
 |---------|-------------|
 | `make dev` | Start backend + frontend |
-| `make check` | Full check (openapi, format, lint, build, test) |
+| `make ci` | Full CI gate (required for PRs) |
 | `make test` | Run backend + frontend tests |
 | `make dev-docker` | Run everything in Docker |
 

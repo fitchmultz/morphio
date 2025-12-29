@@ -112,7 +112,7 @@ Organized morphio-all as a proper monorepo.
   - `make dev` - Start morphio-io dev environment
   - `make test` - Run all tests (morphio-core + morphio-io)
   - `make lint` - Lint everything
-  - `make check` - Full CI check
+  - `make ci` - Full CI gate
 - [x] Delegates to child Makefiles/commands
 
 ### 10.2 Update Root README ✅

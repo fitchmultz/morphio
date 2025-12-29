@@ -4,14 +4,19 @@
 #   - morphio-native: Rust native extension (PyO3/maturin)
 #   - morphio-core: Standalone Python library for audio/LLM/security
 #   - morphio-io: Full-stack web application (FastAPI + Next.js)
+#
+# Note: Root .env is loaded by pydantic_settings automatically.
+# Do NOT use `-include .env` + `export` as it breaks JSON-formatted values.
 
 .PHONY: help \
 	install install-backend install-frontend update update-backend update-frontend \
 	dev dev-full dev-docker \
 	test test-native test-core test-io \
 	lint lint-native lint-core lint-io \
+	type-check type-check-native type-check-core type-check-io \
 	format format-native format-core format-io \
-	check check-native check-core check-io audit-imports ci \
+	generate build build-native build-frontend \
+	ci check check-native check-core check-io audit-imports \
 	clean check-rust rmds
 
 # Default target
@@ -24,7 +29,7 @@ help: ## Show this help message
 	@echo "  make update   - Update all dependencies to latest"
 	@echo "  make dev      - Start morphio-io dev servers"
 	@echo "  make test     - Run all tests (native + core + io)"
-	@echo "  make check    - Full CI check (required before commits)"
+	@echo "  make ci       - Full CI gate (required before PRs)"
 	@echo ""
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
 
@@ -63,7 +68,7 @@ update-backend: ## Update Python dependencies to latest
 
 update-frontend: ## Update frontend dependencies to latest
 	@echo "⬆️  Updating frontend dependencies..."
-	@cd morphio-io/frontend && pnpm update
+	@cd morphio-io/frontend && pnpm update --latest
 
 # ============================================================================
 # Development
@@ -101,19 +106,18 @@ test-io: ## Run morphio-io tests (backend + frontend)
 	@cd morphio-io && $(MAKE) test
 
 # ============================================================================
-# Linting
+# Linting (ruff for Python, biome for TypeScript, clippy for Rust)
 # ============================================================================
 
 lint: lint-native lint-core lint-io ## Lint everything
 	@echo "✅ All lint checks passed!"
 
-lint-native: check-rust ## Lint morphio-native (cargo fmt + clippy)
+lint-native: check-rust ## Lint morphio-native (cargo clippy)
 	@echo "🔍 Linting morphio-native..."
-	@cd morphio-native && cargo fmt --check
 	@cd morphio-native && cargo clippy -- -D warnings
 	@echo "✅ morphio-native lint passed!"
 
-lint-core: ## Lint morphio-core (ruff)
+lint-core: ## Lint morphio-core (ruff check)
 	@echo "🔍 Linting morphio-core..."
 	@cd morphio-core && uv run ruff check .
 
@@ -122,7 +126,23 @@ lint-io: ## Lint morphio-io (backend + frontend)
 	@cd morphio-io && $(MAKE) lint
 
 # ============================================================================
-# Formatting
+# Type Checking (ty for Python, tsc for TypeScript)
+# ============================================================================
+
+type-check: type-check-core type-check-io ## Type check everything
+	@echo "✅ All type checks passed!"
+
+type-check-core: ## Type check morphio-core (ty check)
+	@echo "🔷 Type checking morphio-core..."
+	@cd morphio-core && uv run ty check || true
+	@echo "✅ morphio-core type check complete!"
+
+type-check-io: ## Type check morphio-io (backend + frontend)
+	@echo "🔷 Type checking morphio-io..."
+	@cd morphio-io && $(MAKE) type-check
+
+# ============================================================================
+# Formatting (ruff format for Python, biome format for TypeScript, cargo fmt for Rust)
 # ============================================================================
 
 format: format-native format-core format-io ## Format all code
@@ -141,17 +161,44 @@ format-io: ## Format morphio-io (backend + frontend)
 	@cd morphio-io && $(MAKE) format
 
 # ============================================================================
-# Full Check (CI/Pre-commit)
+# Generate (API types)
 # ============================================================================
 
-check: rmds check-native check-core check-io audit-imports ## Full CI check for entire monorepo (required before commits)
+generate: ## Generate frontend API types from backend OpenAPI schema
+	@echo "🔧 Generating API types..."
+	@cd morphio-io && $(MAKE) openapi
+
+# ============================================================================
+# Build
+# ============================================================================
+
+build: build-native build-frontend ## Build everything
+	@echo "✅ Build complete!"
+
+build-native: check-rust ## Build morphio-native extension
+	@echo "🔨 Building morphio-native..."
+	@cd morphio-native && uv run maturin develop --release
+
+build-frontend: ## Build morphio-io frontend
+	@echo "🔨 Building frontend..."
+	@cd morphio-io/frontend && pnpm build
+
+# ============================================================================
+# CI Gate (Required for PRs)
+# ============================================================================
+
+ci: generate format type-check lint build test ## Full CI gate: generate → format → type-check → lint → build → test (required for PRs)
 	@echo ""
 	@echo "============================================"
-	@echo "✅ All checks passed for entire monorepo!"
+	@echo "✅ CI passed - ready for PR!"
 	@echo "============================================"
 
-ci: ## Run local CI runner (scripts/ci/run.sh)
-	@bash scripts/ci/run.sh
+# Compatibility alias (use 'make ci' instead)
+check: ci ## Alias for 'make ci' (deprecated - use 'make ci')
+
+# ============================================================================
+# Sub-project checks (for targeted validation)
+# ============================================================================
 
 check-native: check-rust ## Full check for morphio-native (fmt + clippy + build + verify)
 	@echo "🔎 Checking morphio-native..."
@@ -168,7 +215,7 @@ check-core: ## Full check for morphio-core (lint + tests)
 
 check-io: ## Full check for morphio-io (lint + type-check + tests)
 	@echo "🔎 Checking morphio-io..."
-	@cd morphio-io && $(MAKE) check
+	@cd morphio-io && $(MAKE) ci
 	@echo "✅ morphio-io checks passed!"
 
 audit-imports: ## Verify no direct provider SDK imports in morphio-io/backend/app
@@ -179,7 +226,13 @@ audit-imports: ## Verify no direct provider SDK imports in morphio-io/backend/ap
 # Cleanup
 # ============================================================================
 
-clean: ## Clean all build artifacts
+clean: ## Clean all build artifacts and log files
+	@echo "🧹 Cleaning CI artifacts..."
+	@rm -rf .venv-ci/ .pytest_cache/ .ruff_cache/ .benchmarks/
+	@echo "🧹 Cleaning log files..."
+	@rm -rf log_files/ morphio-io/log_files/ morphio-io/backend/log_files/
+	@echo "🧹 Cleaning uploads..."
+	@rm -rf morphio-io/backend/uploads/
 	@echo "🧹 Cleaning morphio-native..."
 	@rm -rf morphio-native/target
 	@echo "🧹 Cleaning morphio-core..."

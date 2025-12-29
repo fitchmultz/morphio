@@ -15,19 +15,19 @@ make dev        # Also works
 
 ## Pre-Commit Requirements
 
-**IMPORTANT**: Always run `make check` before committing (from here or monorepo root). This runs OpenAPI type generation, type checking, linting, build, and tests for both frontend and backend. All checks must pass (green) before commits.
+**IMPORTANT**: Always run `make ci` before committing (from here or monorepo root). This runs OpenAPI type generation, type checking, linting, build, and tests for both frontend and backend. All checks must pass (green) before commits.
 
 ```bash
-make check  # Run from project root - must pass before committing
+make ci  # Run from project root - must pass before committing
 ```
 
-OpenAPI types are automatically regenerated as part of `make check`, so frontend TypeScript types stay in sync with backend API contracts without requiring a running server.
+OpenAPI types are automatically regenerated as part of `make ci`, so frontend TypeScript types stay in sync with backend API contracts without requiring a running server.
 
 ## Makefile Commands (Preferred)
 
 Run all commands from the **project root** using the Makefile:
 
-- `make check` - **Required before commits**: openapi, format, type-check, lint, build, and test everything
+- `make ci` - **Required before commits**: openapi, format, type-check, lint, build, and test everything
 - `make openapi` - Regenerate frontend API types from backend (no server needed)
 - `make test` - Run all tests (backend + frontend)
 - `make lint` - Lint everything
@@ -101,6 +101,6 @@ Frontend API types are auto-generated from the backend OpenAPI schema using @hey
 - **Generated files**: `frontend/src/client/` (DO NOT manually edit these files)
 - **When to regenerate**: After any backend API changes (routes, schemas, models)
 - **How to regenerate**: Run `make openapi` from project root (no server needed)
-- **Automatic regeneration**: `make check` includes OpenAPI regeneration automatically
+- **Automatic regeneration**: `make ci` includes OpenAPI regeneration automatically
 - **Usage**: Import types and SDK functions from `@/client` or `@/client/sdk.gen`
 - **Wrapper functions**: `src/lib/apiWrappers.ts` provides compatibility wrappers with simpler signatures

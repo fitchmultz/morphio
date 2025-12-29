@@ -44,7 +44,9 @@ VALID_THINKING_LEVELS: frozenset[str] = frozenset(e.value for e in ThinkingLevel
 VALID_REASONING_EFFORTS: frozenset[str] = frozenset(e.value for e in ReasoningEffort)
 
 
-def _validate_str_enum[E: StrEnum](value: str | None, enum_cls: type[E], param_name: str) -> E | None:
+def _validate_str_enum[E: StrEnum](
+    value: str | None, enum_cls: type[E], param_name: str
+) -> E | None:
     """Validate and normalize a string value against a StrEnum.
 
     Args:

@@ -144,7 +144,9 @@ class GeminiProvider:
                         f"Gemini Pro models only support {', '.join(sorted(PRO_THINKING_LEVELS))}, got '{level}'. "
                         f"Use 'high' or 'low' for Pro models."
                     )
-                config_params["thinking_config"] = types.ThinkingConfig(thinking_level=level.upper())
+                config_params["thinking_config"] = types.ThinkingConfig(
+                    thinking_level=level.upper()
+                )
 
         return types.GenerateContentConfig(**config_params)
 

@@ -8,7 +8,7 @@ This project is part of the `morphio-all` monorepo using **uv workspaces**. The 
 # From monorepo root (recommended)
 make install    # Install all deps
 make dev        # Start backend + frontend
-make check      # Run all checks (required before commits)
+make ci         # Full CI gate (required for PRs)
 ```
 
 ## Project Structure & Module Organization
@@ -19,9 +19,9 @@ make check      # Run all checks (required before commits)
 
 ## Makefile Commands (Preferred)
 
-**IMPORTANT**: Use Makefile commands from the project root. Always run `make check` before commits.
+**IMPORTANT**: Use Makefile commands from the project root. Always run `make ci` before commits.
 
-- `make check` - **Required before commits**: type-check, lint, build, and test everything
+- `make ci` - **Required before commits**: type-check, lint, build, and test everything
 - `make test` - Run all tests (backend + frontend)
 - `make lint` - Lint everything
 - `make format` - Format all code
@@ -73,7 +73,7 @@ make check      # Run all checks (required before commits)
 - Commits: short, imperative, descriptive (e.g., "Fix session cleanup in get_db").
 - Branches: use `feature/*`, `fix/*`; open PRs against `main`.
 - PRs must:
-  - Pass `make check` (lint + type-check + format + build + test).
+  - Pass `make ci` (lint + type-check + format + build + test).
   - Include clear description, linked issue, and screenshots for UI changes.
 
 **After Backend API Changes**: Regenerate frontend API types:
