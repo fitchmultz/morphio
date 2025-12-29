@@ -19,6 +19,7 @@ from ...utils.decorators import require_auth
 from ...utils.enums import ResponseStatus
 from ...utils.response_utils import create_response
 from ...utils.route_helpers import common_responses, handle_route_errors
+from .health import router as health_router
 from .usage import router as usage_router
 
 logger = logging.getLogger(__name__)
@@ -120,4 +121,4 @@ async def get_subscriptions(
     )
 
 
-__all__ = ["router", "usage_router"]
+__all__ = ["router", "usage_router", "health_router"]

@@ -3378,6 +3378,63 @@
 				}
 			}
 		},
+		"/admin/health": {
+			"get": {
+				"tags": ["Admin", "Admin"],
+				"summary": "Get Admin Health",
+				"operationId": "get_admin_health",
+				"responses": {
+					"200": {
+						"description": "Successful Response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_SystemHealthOut_"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Not authorized"
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Not authenticated"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "Rate limit exceeded. Try again in 60 seconds."
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"example": {
+									"detail": "An unexpected error occurred."
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"OAuth2PasswordBearer": []
+					}
+				]
+			}
+		},
 		"/billing/checkout-session": {
 			"post": {
 				"tags": ["Billing", "Billing"],
@@ -5111,6 +5168,42 @@
 				"required": ["status", "message"],
 				"title": "ApiResponse[PortalSessionData]"
 			},
+			"ApiResponse_SystemHealthOut_": {
+				"properties": {
+					"status": {
+						"$ref": "#/components/schemas/ResponseStatus"
+					},
+					"message": {
+						"type": "string",
+						"title": "Message"
+					},
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/SystemHealthOut"
+							},
+							{
+								"type": "null"
+							}
+						]
+					},
+					"timestamp": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Timestamp"
+					}
+				},
+				"type": "object",
+				"required": ["status", "message"],
+				"title": "ApiResponse[SystemHealthOut]"
+			},
 			"ApiResponse_TemplateOut_": {
 				"properties": {
 					"status": {
@@ -6272,6 +6365,45 @@
 				"type": "object",
 				"title": "HTTPValidationError"
 			},
+			"HealthComponentOut": {
+				"properties": {
+					"status": {
+						"$ref": "#/components/schemas/HealthComponentStatus"
+					},
+					"latency_ms": {
+						"anyOf": [
+							{
+								"type": "integer"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Latency Ms",
+						"description": "Elapsed time for the component check in milliseconds."
+					},
+					"detail": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "null"
+							}
+						],
+						"title": "Detail",
+						"description": "Short, non-sensitive diagnostic detail for the component."
+					}
+				},
+				"type": "object",
+				"required": ["status"],
+				"title": "HealthComponentOut"
+			},
+			"HealthComponentStatus": {
+				"type": "string",
+				"enum": ["ok", "error", "skipped"],
+				"title": "HealthComponentStatus"
+			},
 			"Item": {
 				"properties": {
 					"name": {
@@ -6616,6 +6748,28 @@
 				"type": "object",
 				"required": ["id", "user_id", "plan", "status", "created_at"],
 				"title": "SubscriptionOut"
+			},
+			"SystemHealthOut": {
+				"properties": {
+					"overall_status": {
+						"$ref": "#/components/schemas/SystemHealthStatus"
+					},
+					"components": {
+						"additionalProperties": {
+							"$ref": "#/components/schemas/HealthComponentOut"
+						},
+						"type": "object",
+						"title": "Components"
+					}
+				},
+				"type": "object",
+				"required": ["overall_status", "components"],
+				"title": "SystemHealthOut"
+			},
+			"SystemHealthStatus": {
+				"type": "string",
+				"enum": ["ok", "degraded", "down"],
+				"title": "SystemHealthStatus"
 			},
 			"TemplateCreate": {
 				"properties": {

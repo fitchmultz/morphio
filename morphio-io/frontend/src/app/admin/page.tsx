@@ -9,6 +9,7 @@ import {
 	type SubscriptionOut,
 } from "@/client";
 import { Skeleton } from "@/components/common/Skeleton";
+import { SystemHealthPanel } from "@/components/features/admin/SystemHealthPanel";
 import { useAuth } from "@/contexts/AuthContext";
 import logger from "@/lib/logger";
 import { notifyError, notifySuccess } from "@/lib/toast";
@@ -232,6 +233,8 @@ export default function AdminPage() {
 	return (
 		<div className="max-w-7xl mx-auto py-8 px-4">
 			<h1 className="morphio-h2 mb-8">Admin Dashboard</h1>
+
+			<SystemHealthPanel />
 
 			{/* LLM Usage Summary and Export */}
 			<section className="morphio-card p-6 mb-8">
