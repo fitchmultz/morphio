@@ -67,7 +67,7 @@ export const changePassword = <ThrowOnError extends boolean = false>(options: Op
 /**
  * Refresh Token
  */
-export const refreshToken = <ThrowOnError extends boolean = false>(options?: Options<RefreshTokenData, ThrowOnError>) => (options?.client ?? client).post<RefreshTokenResponses, RefreshTokenErrors, ThrowOnError>({ url: '/auth/refresh-token', ...options });
+export const refreshToken = <ThrowOnError extends boolean = false>(options: Options<RefreshTokenData, ThrowOnError>) => (options.client ?? client).post<RefreshTokenResponses, RefreshTokenErrors, ThrowOnError>({ url: '/auth/refresh-token', ...options });
 
 /**
  * Get Csrf Token

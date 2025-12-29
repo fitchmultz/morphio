@@ -593,6 +593,8 @@ export type BodyGenerateSplunkConfig = {
 export type BodyProcessLogs = {
     /**
      * Log File
+     *
+     * Log file to process
      */
     log_file: Blob | File;
 };
@@ -603,6 +605,8 @@ export type BodyProcessLogs = {
 export type BodyProcessMedia = {
     /**
      * Input Url
+     *
+     * Optional media URL (YouTube, Rumble, X.com, TikTok)
      */
     input_url?: string;
     /**
@@ -611,6 +615,8 @@ export type BodyProcessMedia = {
     template_id: string;
     /**
      * Input File
+     *
+     * Media file upload (video or audio)
      */
     input_file?: Blob | File | null;
     /**
@@ -1727,7 +1733,7 @@ export type RefreshTokenErrors = {
 
 export type RefreshTokenResponses = {
     /**
-     * Successful Response
+     * Refresh token rotated successfully
      */
     200: ApiResponseAuthTokenPayload;
 };
@@ -2771,7 +2777,7 @@ export type GetUserCreditsErrors = {
 
 export type GetUserCreditsResponses = {
     /**
-     * Successful Response
+     * User credits retrieved successfully
      */
     200: ApiResponseUserCredits;
 };
@@ -2925,6 +2931,8 @@ export type GetMediaProcessingStatusData = {
     path: {
         /**
          * Job Id
+         *
+         * Media processing job ID
          */
         job_id: string;
     };
@@ -3457,6 +3465,8 @@ export type RevokeApiKeyData = {
     path: {
         /**
          * Key Id
+         *
+         * API key ID
          */
         key_id: number;
     };
@@ -3570,6 +3580,10 @@ export type ProcessLogsErrors = {
      */
     401: unknown;
     /**
+     * Payload Too Large
+     */
+    413: unknown;
+    /**
      * Validation Error
      */
     422: HttpValidationError;
@@ -3599,6 +3613,8 @@ export type GetLogsProcessingStatusData = {
     path: {
         /**
          * Job Id
+         *
+         * Log processing job ID
          */
         job_id: string;
     };

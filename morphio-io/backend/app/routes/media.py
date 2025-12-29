@@ -5,7 +5,7 @@ from typing import Annotated, Optional
 
 
 import aiofiles
-from fastapi import APIRouter, Depends, File, Form, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, Path as PathParam, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..config import settings
@@ -123,22 +123,78 @@ async def get_available_models():
     operation_id="process_media",
     response_model=ApiResponse[MediaProcessingResponse],
     responses={
-        200: {"description": "Media processing job enqueued successfully"},
-        400: {"description": "Bad Request"},
-        413: {"description": "Payload Too Large"},
-        404: {"description": "Template not found"},
         **common_responses,
+        200: {
+            "description": "Media processing job enqueued successfully",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "status": "success",
+                        "message": "Media processing job enqueued",
+                        "data": {
+                            "job_id": "video_123e4567-e89b-12d3-a456-426614174000",
+                            "status": "pending",
+                            "message": "Media processing job enqueued.",
+                        },
+                    }
+                }
+            },
+        },
+        400: {
+            "description": "Bad Request",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "status": "error",
+                        "message": "Either video URL or media file is required",
+                        "data": {"error_type": "ApplicationException", "details": {}},
+                    }
+                }
+            },
+        },
+        413: {
+            "description": "Payload Too Large",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "status": "error",
+                        "message": "File size exceeds the maximum allowed limit.",
+                        "data": {"error_type": "ApplicationException", "details": {}},
+                    }
+                }
+            },
+        },
+        404: {
+            "description": "Template not found",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "status": "error",
+                        "message": "Template not found",
+                        "data": {"error_type": "ApplicationException", "details": {}},
+                    }
+                }
+            },
+        },
     },
 )
 @rate_limit("100/minute")
 @require_auth
 @handle_route_errors
 async def process_media_route(
-    input_url: str = Form(None),
-    template_id: str = Form(...),
-    input_file: Optional[UploadFile] = File(None),
-    model: str = Form(None),
-    media_type: str = Form(...),
+    input_url: str = Form(
+        None,
+        description="Optional media URL (YouTube, Rumble, X.com, TikTok)",
+        examples=["https://www.youtube.com/watch?v=example"],
+    ),
+    template_id: str = Form(..., examples=["12", "log-summary"]),
+    input_file: Optional[UploadFile] = File(
+        None,
+        description="Media file upload (video or audio)",
+        examples=["meeting.mp4"],
+    ),
+    model: str = Form(None, examples=["gpt-5.1"]),
+    media_type: str = Form(..., examples=["video"]),
     enable_diarization: bool = Form(False),
     min_speakers: Optional[int] = Form(None),
     max_speakers: Optional[int] = Form(None),
@@ -310,16 +366,58 @@ async def process_media_route(
     operation_id="get_media_processing_status",
     response_model=ApiResponse[MediaProcessingStatusResponse],
     responses={
-        200: {"description": "Media processing status retrieved successfully"},
-        404: {"description": "Not Found"},
         **common_responses,
+        200: {
+            "description": "Media processing status retrieved successfully",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "status": "success",
+                        "message": "Media processing status retrieved",
+                        "data": {
+                            "job_id": "video_123e4567-e89b-12d3-a456-426614174000",
+                            "status": "completed",
+                            "progress": 100,
+                            "stage": "completed",
+                            "message": "Media processing completed",
+                            "result": {"content_id": 101},
+                            "error": None,
+                        },
+                    }
+                }
+            },
+        },
+        404: {
+            "description": "Not Found",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "status": "error",
+                        "message": "Job not found",
+                        "data": {
+                            "job_id": "video_123e4567-e89b-12d3-a456-426614174000",
+                            "status": "not_found",
+                            "progress": 0,
+                            "stage": None,
+                            "message": None,
+                            "result": None,
+                            "error": None,
+                        },
+                    }
+                }
+            },
+        },
     },
 )
 @rate_limit("150/minute")
 @handle_route_errors
 async def get_media_processing_status_route(
-    job_id: str,
     current_user: Annotated[User, Depends(get_current_user)],
+    job_id: str = PathParam(
+        ...,
+        description="Media processing job ID",
+        examples=["video_123e4567-e89b-12d3-a456-426614174000"],
+    ),
 ):
     logger.info(f"Retrieving status for job {job_id}")
     if job_id.startswith("video_"):

@@ -107,7 +107,42 @@ async def change_email(
     "/credits",
     operation_id="get_user_credits",
     response_model=ApiResponse[UserCredits],
-    responses={**common_responses},
+    responses={
+        **common_responses,
+        200: {
+            "description": "User credits retrieved successfully",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "status": "success",
+                        "message": "User credits retrieved successfully",
+                        "data": {
+                            "plan": "free",
+                            "limit": 50,
+                            "used": 12,
+                            "remaining": 38,
+                            "remaining_pct": 76.0,
+                            "reset_date": "2025-02-01",
+                            "resets_monthly": True,
+                            "is_admin": False,
+                        },
+                    }
+                }
+            },
+        },
+        401: {
+            "description": "Unauthorized",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "status": "error",
+                        "message": "Not authenticated",
+                        "data": {"error_type": "HTTPException", "details": {}},
+                    }
+                }
+            },
+        },
+    },
 )
 @handle_route_errors
 async def get_user_credits(

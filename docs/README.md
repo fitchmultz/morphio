@@ -12,6 +12,8 @@ Shared documentation for the Morphio monorepo.
 
 - **[Project Status](./status.md)** - Current state, completed work, and what's next
 - **[Configuration Guide](./configuration.md)** - Environment variables and setup
+- **[Upgrade Procedures](./upgrade-procedures.md)** - How to run dependency and schema upgrades
+- **[Architecture Decision Records](./adrs/README.md)** - Key architectural decisions and rationale
 - **[Contributing](../CONTRIBUTING.md)** - Workflow, PR protocol, and non-negotiables
 - **[Troubleshooting FAQ](./troubleshooting.md)** - Common setup and CI fixes
 - **[Roadmap](./roadmap.md)** - Upcoming features and priorities
