@@ -75,6 +75,7 @@ services:
     container_name: morphio-staging-worker-ml
     environment:
       - WHISPER_MODEL=small
+    command: ["uvicorn", "worker_ml.main:app", "--host", "0.0.0.0", "--port", "8001", "--workers", "1"]
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:8001/health/"]
       interval: 30s

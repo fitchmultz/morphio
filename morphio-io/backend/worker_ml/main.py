@@ -1,14 +1,21 @@
 import asyncio
 import logging
 import os
+import time
+import uuid
 
 import uvicorn
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, Request, UploadFile
 from fastapi.responses import JSONResponse
+
+from worker_ml import model_cache
 
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Morphio ML Worker", version="1.0.0")
+
+_inference_semaphore: asyncio.Semaphore | None = None
+_inference_limit: int | None = None
 
 
 @app.get("/health/")
@@ -16,58 +23,67 @@ async def health() -> dict:
     return {"status": "ok"}
 
 
-async def _transcribe(file_path: str, model_name: str) -> dict:
+def _get_max_concurrency() -> int:
+    raw = os.getenv("WORKER_ML_MAX_CONCURRENCY", "1")
+    try:
+        value = int(raw)
+    except ValueError:
+        value = 1
+    return max(1, value)
+
+
+def _get_inference_semaphore() -> asyncio.Semaphore:
+    global _inference_semaphore, _inference_limit
+    limit = _get_max_concurrency()
+    if _inference_semaphore is None or _inference_limit != limit:
+        _inference_semaphore = asyncio.Semaphore(limit)
+        _inference_limit = limit
+    return _inference_semaphore
+
+
+def _reset_inference_semaphore() -> None:
+    global _inference_semaphore, _inference_limit
+    _inference_semaphore = None
+    _inference_limit = None
+
+
+async def _transcribe(file_path: str, model_name: str, request_id: str | None = None) -> dict:
     """Transcribe audio using MLX (Apple Silicon) or Torch (Docker/Linux)."""
     use_mlx = os.environ.get("USE_MLX") == "1"
+    backend_name = "MLX" if use_mlx else "Torch"
+    logger.info("Using %s backend for transcription", backend_name)
 
-    if use_mlx:
-        logger.info("Using MLX backend for transcription")
-        try:
-            import mlx_whisper
+    try:
+        transcriber, model_load_ms = await model_cache.get_transcriber(model_name, use_mlx)
+    except ImportError as exc:
+        raise ImportError("MLX deps not installed. Run: make install-native") from exc
 
-            result = await asyncio.to_thread(
-                mlx_whisper.transcribe,
-                file_path,
-                path_or_hf_repo=f"mlx-community/whisper-{model_name}-mlx",
-            )
-            return {
-                "text": result.get("text", ""),
-                "segments": result.get("segments", []),
-                "language": result.get("language", "en"),
-            }
-        except ImportError:
-            raise ImportError("MLX deps not installed. Run: make install-native")
-    else:
-        logger.info("Using Torch backend for transcription")
-        import whisper
-        import torch
-
-        def _device() -> str:
-            try:
-                if torch.cuda.is_available():
-                    return "cuda"
-                if getattr(torch.backends, "mps", None) and torch.backends.mps.is_available():
-                    return "mps"
-            except Exception:
-                pass
-            return "cpu"
-
-        device = _device()
-        model = await asyncio.to_thread(whisper.load_model, model_name)
-        model = model.to(device)
-        result = await asyncio.to_thread(model.transcribe, file_path)
-        return {"text": result.get("text", ""), "confidence": result.get("confidence")}
+    semaphore = _get_inference_semaphore()
+    max_concurrency = _get_max_concurrency()
+    start = time.perf_counter()
+    async with semaphore:
+        result = await asyncio.to_thread(transcriber, file_path)
+    transcribe_ms = int((time.perf_counter() - start) * 1000)
+    logger.info(
+        "Transcription timing model_load_ms=%s transcribe_ms=%s max_concurrency=%s request_id=%s",
+        model_load_ms,
+        transcribe_ms,
+        max_concurrency,
+        request_id,
+    )
+    return result
 
 
 @app.post("/transcribe")
-async def transcribe(file: UploadFile = File(...)) -> JSONResponse:
+async def transcribe(request: Request, file: UploadFile = File(...)) -> JSONResponse:
     temp_path = f"/tmp/{file.filename}"
     try:
         with open(temp_path, "wb") as f:
             f.write(await file.read())
 
         model = os.getenv("WHISPER_MODEL", "small")
-        result = await _transcribe(temp_path, model)
+        request_id = request.headers.get("x-request-id") or str(uuid.uuid4())
+        result = await _transcribe(temp_path, model, request_id=request_id)
         return JSONResponse({"status": "success", **result})
     except Exception as e:
         logger.exception("Transcription failed")
