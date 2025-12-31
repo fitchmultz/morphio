@@ -1,9 +1,11 @@
+import json
 import logging
 from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ..config import settings
 from ..database import get_db
 from ..models.user import User
 from ..schemas.response_schema import ApiResponse
@@ -17,11 +19,33 @@ from ..services.template import (
     update_custom_template,
     validate_template_content,
 )
-from ..utils.decorators import cache, rate_limit
-from ..utils.response_utils import ResponseStatus, create_response
+from ..utils.decorators import rate_limit
+from ..utils.json_cache import delete_many, get_or_set_json
+from ..utils.response_utils import CustomJSONEncoder, ResponseStatus, create_response
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
+
+TEMPLATES_LIST_CACHE_KEY = "templates:list:v1"
+
+
+def _template_detail_cache_key(template_id: int) -> str:
+    return f"templates:detail:v1:{template_id}"
+
+
+def _serialize_cache_list(payload: list) -> list:
+    return json.loads(json.dumps(payload, cls=CustomJSONEncoder))
+
+
+def _serialize_cache_dict(payload: dict) -> dict:
+    return json.loads(json.dumps(payload, cls=CustomJSONEncoder))
+
+
+async def _invalidate_template_cache(template_id: int | None = None) -> None:
+    keys = [TEMPLATES_LIST_CACHE_KEY]
+    if template_id is not None:
+        keys.append(_template_detail_cache_key(template_id))
+    await delete_many(keys)
 
 
 @router.get(
@@ -35,12 +59,22 @@ logger = logging.getLogger(__name__)
     },
 )
 @rate_limit("100/minute")
-@cache(expire=300)
 async def get_templates(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    templates = await get_all_templates(db, current_user.id)
+    async def load_templates() -> list:
+        templates = await get_all_templates(db, current_user.id)
+        return _serialize_cache_list(templates)
+
+    if settings.CACHE_TEMPLATES_ENABLED:
+        templates = await get_or_set_json(
+            TEMPLATES_LIST_CACHE_KEY,
+            settings.CACHE_TEMPLATES_TTL_S,
+            load_templates,
+        )
+    else:
+        templates = await load_templates()
     return create_response(
         status=ResponseStatus.SUCCESS,
         message="Templates retrieved successfully",
@@ -74,6 +108,7 @@ async def save_template(
 
     template.user_id = current_user.id
     new_template = await create_custom_template(db, template)
+    await _invalidate_template_cache(new_template["id"])
     logger.info(f"Template saved successfully for user {current_user.id}")
     return create_response(
         status=ResponseStatus.SUCCESS,
@@ -95,13 +130,23 @@ async def save_template(
     },
 )
 @rate_limit("60/minute")
-@cache(expire=300)
 async def get_template(
     template_id: int,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    tmpl = await get_template_by_id(db, template_id, current_user.id)
+    async def load_template() -> dict:
+        tmpl = await get_template_by_id(db, template_id, current_user.id)
+        return _serialize_cache_dict(tmpl)
+
+    if settings.CACHE_TEMPLATES_ENABLED:
+        tmpl = await get_or_set_json(
+            _template_detail_cache_key(template_id),
+            settings.CACHE_TEMPLATES_TTL_S,
+            load_template,
+        )
+    else:
+        tmpl = await load_template()
     return create_response(
         status=ResponseStatus.SUCCESS,
         message="Template retrieved successfully",
@@ -137,6 +182,7 @@ async def update_template_route(
     updated_template = await update_custom_template(
         db, template_id, template_update, current_user.id
     )
+    await _invalidate_template_cache(template_id)
 
     logger.info(f"Template {template_id} updated successfully for user {current_user.id}")
     return create_response(
@@ -167,6 +213,7 @@ async def delete_template_route(
 ):
     logger.info(f"Deleting template {template_id} for user {current_user.id}")
     await delete_custom_template(db, template_id, current_user.id)
+    await _invalidate_template_cache(template_id)
 
     logger.info(f"Template {template_id} deleted successfully for user {current_user.id}")
     return create_response(
