@@ -41,6 +41,7 @@ make test         # Run all tests
 - Redis-backed template caching for templates list/detail with explicit invalidation.
 - Usage tracking credits aggregation optimized with SQL + indexes.
 - Transcript caching normalized (single-encoded JSON + diarization-aware keys).
+- WebSocket job status streaming for media/logs/web progress updates.
 
 ## Completed Work
 
