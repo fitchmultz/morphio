@@ -10,7 +10,7 @@ Tests the GET /user/credits endpoint to verify:
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import select
+from sqlalchemy import event, select
 
 from app.config import settings
 from app.models.subscription import Subscription
@@ -133,3 +133,26 @@ class TestCreditsFlowWithSubscription:
         assert data["limit"] == pro_limit
         assert data["used"] == 0
         assert data["remaining"] == pro_limit
+
+
+class TestCreditsQueryCount:
+    async def test_credits_query_count_bounded(self, async_client, db_session):
+        access_token = await _register_user(async_client)
+        headers = {"Authorization": f"Bearer {access_token}"}
+
+        counter = {"count": 0}
+        bind = db_session.get_bind()
+        engine = bind.sync_engine if hasattr(bind, "sync_engine") else bind
+
+        def before_cursor_execute(_conn, _cursor, statement, _parameters, _context, _executemany):
+            if statement.lstrip().upper().startswith("SELECT"):
+                counter["count"] += 1
+
+        event.listen(engine, "before_cursor_execute", before_cursor_execute)
+        try:
+            counter["count"] = 0
+            response = await async_client.get("/user/credits", headers=headers)
+            assert response.status_code == 200
+            assert counter["count"] <= 12
+        finally:
+            event.remove(engine, "before_cursor_execute", before_cursor_execute)
