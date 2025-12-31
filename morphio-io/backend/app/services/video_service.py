@@ -58,7 +58,10 @@ async def process_video(input_data: MediaProcessingInput, job_id: str, db: Async
             raise ApplicationException("Invalid YouTube URL", 400)
         cached = await get_cached_youtube_transcript(video_id)
         if cached:
-            transcript_text = json.loads(cached)
+            cached_value = json.loads(cached)
+            transcript_text = (
+                cached_value.get("text", "") if isinstance(cached_value, dict) else cached_value
+            )
         else:
             # Delegate to function expected by tests (patched in the test)
             transcript_text = await process_youtube_video(str(input_data.url))
@@ -70,7 +73,10 @@ async def process_video(input_data: MediaProcessingInput, job_id: str, db: Async
         fh = await compute_file_hash(input_data.file_path)
         cached = await get_cached_whisper_transcription(fh)
         if cached:
-            transcript_text = json.loads(cached)
+            cached_value = json.loads(cached)
+            transcript_text = (
+                cached_value.get("text", "") if isinstance(cached_value, dict) else cached_value
+            )
         else:
             # Delegate to underlying local processing function (patcheable in tests)
             transcript_text = await process_local_video(

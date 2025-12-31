@@ -153,27 +153,29 @@ async def invalidate_cache(prefix: str, *args: CacheKeyComponent) -> None:
 async def cache_whisper_transcription(file_hash: str, transcription: TranscriptionLike) -> None:
     """Store Whisper transcription as JSON dict with 'text' field."""
     key = cache_key_builder("whisper_transcription", file_hash, settings.AUDIO_TRANSCRIPTION_MODEL)
-    raw_str = serialize_transcription(transcription)
-    await set_cache(key, raw_str, expire=604800)
+    payload = serialize_transcription(transcription)
+    await set_cache(key, payload, expire=604800)
 
 
 async def get_cached_whisper_transcription(file_hash: str) -> Optional[str]:
-    """Retrieve cached Whisper transcription as JSON string."""
+    """Retrieve cached Whisper transcription as JSON object string."""
     key = cache_key_builder("whisper_transcription", file_hash, settings.AUDIO_TRANSCRIPTION_MODEL)
-    return await get_cache(key)
+    raw_value = await get_cache(key)
+    return _normalize_cached_transcription(raw_value)
 
 
 async def cache_youtube_transcript(video_id: str, transcript: TranscriptionLike) -> None:
     """Store YouTube transcription in cache."""
     key = cache_key_builder("youtube_transcript", video_id, settings.AUDIO_TRANSCRIPTION_MODEL)
-    raw_str = serialize_transcription(transcript)
-    await set_cache(key, raw_str, expire=86400)
+    payload = serialize_transcription(transcript)
+    await set_cache(key, payload, expire=86400)
 
 
 async def get_cached_youtube_transcript(video_id: str) -> Optional[str]:
-    """Retrieve cached YouTube transcription as JSON string."""
+    """Retrieve cached YouTube transcription as JSON object string."""
     key = cache_key_builder("youtube_transcript", video_id, settings.AUDIO_TRANSCRIPTION_MODEL)
-    return await get_cache(key)
+    raw_value = await get_cache(key)
+    return _normalize_cached_transcription(raw_value)
 
 
 def compute_template_hash(template_content: str) -> str:
@@ -231,20 +233,50 @@ async def get_cached_generated_content(
     return await get_cache(key)
 
 
-def serialize_transcription(transcription: TranscriptionLike) -> str:
-    """Serialize transcription to JSON string."""
+def serialize_transcription(transcription: TranscriptionLike) -> dict:
+    """Serialize transcription to a JSON-compatible dict."""
     from .types import HasText, SupportsToDict
 
     # Check protocols using isinstance (runtime_checkable)
+    if isinstance(transcription, dict):
+        return transcription
     if isinstance(transcription, str):
-        return json.dumps({"text": transcription})
+        return {"text": transcription}
     if isinstance(transcription, SupportsToDict):
-        return json.dumps(transcription.to_dict())
+        return transcription.to_dict()
     if isinstance(transcription, HasText):
-        return json.dumps({"text": transcription.text})
+        return {"text": transcription.text}
     if hasattr(transcription, "__dict__"):
-        return json.dumps(transcription.__dict__)
-    return json.dumps({"text": str(transcription)})
+        return dict(transcription.__dict__)
+    return {"text": str(transcription)}
+
+
+def _normalize_cached_transcription(raw_value: Optional[str]) -> Optional[str]:
+    """Normalize legacy transcription cache payloads to JSON object strings."""
+    if raw_value is None:
+        return None
+
+    if isinstance(raw_value, bytes):
+        raw_value = raw_value.decode("utf-8", errors="replace")
+
+    try:
+        parsed = json.loads(raw_value)
+    except json.JSONDecodeError:
+        return json.dumps({"text": raw_value})
+
+    if isinstance(parsed, dict):
+        return json.dumps(parsed)
+
+    if isinstance(parsed, str):
+        try:
+            nested = json.loads(parsed)
+        except json.JSONDecodeError:
+            return json.dumps({"text": parsed})
+        if isinstance(nested, dict):
+            return json.dumps(nested)
+        return json.dumps({"text": str(nested)})
+
+    return json.dumps({"text": str(parsed)})
 
 
 async def cache_transcription(

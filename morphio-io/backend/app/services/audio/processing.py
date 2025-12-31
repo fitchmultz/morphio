@@ -116,16 +116,15 @@ async def transcribe_and_generate_audio(
         if not audio_file:
             raise ApplicationException("No audio file provided", status_code=400)
 
-        file_hash = await compute_file_hash(audio_file)
-        cached_transcription = await get_cached_whisper_transcription(file_hash)
-
         enable_diarization = getattr(input_data, "enable_diarization", False)
         min_speakers = getattr(input_data, "min_speakers", None)
         max_speakers = getattr(input_data, "max_speakers", None)
 
         speaker_segments: List[TranscriptionSpeakerSegment] = []
         num_speakers = 0
-        cache_suffix = "_diarized" if enable_diarization else ""
+        cache_suffix = "_diarized" if should_use_diarization(enable_diarization) else ""
+        file_hash = await compute_file_hash(audio_file)
+        cached_transcription = await get_cached_whisper_transcription(file_hash + cache_suffix)
 
         if cached_transcription:
             transcription_text = _load_cached_transcription(
@@ -263,12 +262,12 @@ async def _transcribe_audio(
                     "num_speakers": num,
                     "diarization_enabled": True,
                 }
-                await cache_whisper_transcription(file_hash + cache_suffix, json.dumps(cache_data))
+                await cache_whisper_transcription(file_hash + cache_suffix, cache_data)
             return text, segments, num
         else:
             text = await transcribe_chunks_standard(chunk_paths, job_id)
             if text:
-                await cache_whisper_transcription(file_hash, json.dumps({"text": text}))
+                await cache_whisper_transcription(file_hash, {"text": text})
             return text, [], 0
     finally:
         await cleanup_chunks(chunk_paths)
