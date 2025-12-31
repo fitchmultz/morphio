@@ -66,7 +66,7 @@ These items were completed in the documentation normalization work:
 ### Platform
 - [ ] Multi-tenant workspace support
 - [ ] Batch processing API
-- [ ] WebSocket-based real-time updates
+- [x] WebSocket-based real-time updates
 
 ### Integrations
 - [ ] Slack notifications

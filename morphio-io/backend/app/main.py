@@ -27,7 +27,7 @@ from .middlewares import (
     SecurityHeadersMiddleware,
     SecurityLoggingMiddleware,
 )
-from .routes import admin, auth, content, docs, health, logs, media, template, user, web
+from .routes import admin, auth, content, docs, health, logs, media, template, user, web, ws
 from .services.template import insert_default_templates
 from .utils.create_admin import ensure_admin_user_exists
 from .utils.decorators import init_limiter
@@ -149,6 +149,7 @@ app.include_router(media.router, prefix="/media", tags=["Media Processing"])
 app.include_router(docs.router, tags=["Documentation"])
 app.include_router(web.router, prefix="/web", tags=["Web Scraping"])
 app.include_router(admin.router, prefix="/admin", tags=["Admin"])
+app.include_router(ws.router, tags=["WebSocket"])
 
 # Admin sub-routers for extended functionality
 from .routes.admin import health_router as admin_health_router

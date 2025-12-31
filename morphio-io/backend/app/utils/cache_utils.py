@@ -33,6 +33,11 @@ def _get_redis_client() -> Redis:
     return _redis_client
 
 
+def get_redis_client() -> Redis:
+    """Expose the Redis client for pub/sub usage."""
+    return _get_redis_client()
+
+
 def is_redis_available() -> bool:
     """Check if Redis client is available."""
     return _redis_client is not None
@@ -139,6 +144,24 @@ async def set_cache(key: str, value: JsonValue, expire: int = 3600) -> bool:
     except Exception as e:
         logger.error(f"Error setting cache for key {key}: {e}", exc_info=True)
         return False
+
+
+async def publish_redis_message(channel: str, payload: JsonValue) -> bool:
+    """Publish a JSON payload to a Redis pub/sub channel."""
+    if not is_redis_available():
+        logger.debug(f"Redis not available. Skipping PUBLISH for channel: {channel}")
+        return False
+    try:
+        client = _get_redis_client()
+        message = json.dumps(payload)
+        await client.publish(channel, message)
+        logger.debug(f"Published Redis message to channel: {channel}")
+        return True
+    except aioredis.RedisError as e:
+        logger.warning(f"Redis error in publish_redis_message: {str(e)}", exc_info=True)
+    except Exception as e:
+        logger.warning(f"Unexpected error in publish_redis_message: {str(e)}", exc_info=True)
+    return False
 
 
 async def invalidate_cache(prefix: str, *args: CacheKeyComponent) -> None:

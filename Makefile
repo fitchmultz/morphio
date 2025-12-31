@@ -91,8 +91,11 @@ dev-docker: ## Start morphio-io in Docker with hot reload
 staging-secrets: ## Generate staging secrets (idempotent)
 	@cd morphio-io && ./scripts/bootstrap_staging_secrets.sh
 
+staging-build: ## Build staging images (Docker)
+	@cd morphio-io && docker compose -f docker-compose.staging.yml build
+
 staging-up: ## Start staging stack (Docker)
-	@cd morphio-io && docker compose -f docker-compose.staging.yml up -d --build
+	@cd morphio-io && docker compose -f docker-compose.staging.yml up -d
 
 staging-down: ## Stop staging stack and remove volumes
 	@cd morphio-io && docker compose -f docker-compose.staging.yml down -v --remove-orphans
@@ -103,6 +106,7 @@ staging-logs: ## Tail staging stack logs
 staging-smoke: ## Run staging smoke checks (brings up staging stack)
 	@bash -c '\
 	set -euo pipefail; \
+	if [ "$${STAGING_BUILD:-0}" = "1" ]; then $(MAKE) staging-build; fi; \
 	$(MAKE) staging-up; \
 	api="http://localhost:8005"; \
 	dashboards="http://localhost:5601"; \
