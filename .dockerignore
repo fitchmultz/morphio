@@ -45,7 +45,7 @@
 # Caches and logs
 **/.cache
 **/*.log
-**/logs/
+**/log_files/
 
 # Data files
 **/*.db

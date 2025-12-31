@@ -18,6 +18,10 @@ depends_on = None
 
 
 def upgrade() -> None:
+    # Ensure alembic version column can hold longer revision ids.
+    if op.get_bind().dialect.name == "postgresql":
+        op.execute("ALTER TABLE alembic_version ALTER COLUMN version_num TYPE VARCHAR(64)")
+
     # Add Stripe billing fields to users table
     op.add_column(
         "users",

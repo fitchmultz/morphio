@@ -198,7 +198,7 @@ async def refresh_token(
 )
 @rate_limit("60/minute")
 @handle_route_errors
-async def get_csrf_token(response: Response):
+async def get_csrf_token(request: Request, response: Response):
     """
     Generate a CSRF token and set it in a cookie.
     Returns the token in the response body for AJAX requests.

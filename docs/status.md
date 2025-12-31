@@ -34,6 +34,11 @@ make ci           # Full CI gate (required for PRs)
 make test         # Run all tests
 ```
 
+## Infrastructure Updates
+
+- Staging environment available via `make staging-secrets && make staging-up`.
+- Log aggregation available via local OpenSearch + Dashboards + Vector in staging.
+
 ## Completed Work
 
 ### Phases 1-14 ✅ Complete
