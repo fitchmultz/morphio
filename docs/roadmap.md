@@ -1,6 +1,6 @@
 # Morphio Roadmap
 
-> **Last Updated:** 2025-12-29
+> **Last Updated:** 2025-12-31
 
 This document tracks future work items and enhancement ideas for the Morphio project.
 
@@ -52,7 +52,7 @@ These items were completed in the documentation normalization work:
 
 ### Performance
 - [ ] Profile and optimize transcript generation
-- [ ] Add caching layer for frequently accessed content
+- [x] Add caching layer for frequently accessed content
 - [ ] Optimize database queries in usage tracking
 
 ### Infrastructure

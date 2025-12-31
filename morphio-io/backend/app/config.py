@@ -85,6 +85,12 @@ class Settings(BaseSettings):
         default=3600,
         json_schema_extra={"env": "JOB_CACHE_TTL"},  # 1 hour in seconds
     )
+    CACHE_TEMPLATES_TTL_S: int = Field(
+        default=300, json_schema_extra={"env": "CACHE_TEMPLATES_TTL_S"}
+    )
+    CACHE_TEMPLATES_ENABLED: bool = Field(
+        default=True, json_schema_extra={"env": "CACHE_TEMPLATES_ENABLED"}
+    )
     ANTHROPIC_API_KEY: SecretStr = Field(
         default=SecretStr(""), json_schema_extra={"env": "ANTHROPIC_API_KEY"}
     )

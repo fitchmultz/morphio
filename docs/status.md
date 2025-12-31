@@ -1,6 +1,6 @@
 # Morphio Project Status
 
-> **Last Updated:** 2025-12-29
+> **Last Updated:** 2025-12-31
 
 ## Overview
 
@@ -38,6 +38,7 @@ make test         # Run all tests
 
 - Staging environment available via `make staging-secrets && make staging-up`.
 - Log aggregation available via local OpenSearch + Dashboards + Vector in staging.
+- Redis-backed template caching for templates list/detail with explicit invalidation.
 
 ## Completed Work
 
