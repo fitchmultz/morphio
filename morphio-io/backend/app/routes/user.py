@@ -14,6 +14,7 @@ from ..schemas.user_schema import UserCredits, UserOut, UserUpdate
 from ..utils.enums import UserRole
 from ..utils.response_utils import utc_now
 from ..services.security import get_current_user
+from ..services.usage import get_current_period_usage_credits
 from ..services.security.protection import rate_limit_by_ip
 from ..utils.response_utils import ResponseStatus, create_response
 from ..utils.route_helpers import common_responses, handle_route_errors
@@ -166,22 +167,8 @@ async def get_user_credits(
     plan_limit = settings.SUBSCRIPTION_PLAN_LIMITS.get(subscription_plan, 50)
     is_admin = current_user.role == UserRole.ADMIN
 
-    # Sum up current period usage credits
-    results = await db.execute(
-        select(Usage).where(Usage.user_id == current_user.id, Usage.deleted_at.is_(None))
-    )
-    usage_list = results.scalars().all()
-
     now = utc_now()
-    total_used = 0
-    for usage_item in usage_list:
-        # Check if this usage is from the current month
-        if usage_item.updated_at:
-            if usage_item.updated_at.month == now.month and usage_item.updated_at.year == now.year:
-                total_used += usage_item.usage_credits
-        elif usage_item.created_at:
-            if usage_item.created_at.month == now.month and usage_item.created_at.year == now.year:
-                total_used += usage_item.usage_credits
+    total_used = await get_current_period_usage_credits(db, current_user.id, now=now)
 
     # Admins have unlimited credits
     if is_admin:

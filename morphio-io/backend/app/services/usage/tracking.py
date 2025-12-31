@@ -1,7 +1,8 @@
 import logging
+from datetime import UTC, datetime
 from decimal import Decimal
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...config import settings
@@ -14,6 +15,37 @@ from ...utils.error_handlers import ApplicationException
 from ...utils.response_utils import utc_now
 
 logger = logging.getLogger(__name__)
+
+
+def _current_billing_period(now: datetime) -> tuple[datetime, datetime]:
+    period_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    if now.month == 12:
+        period_end = datetime(now.year + 1, 1, 1, tzinfo=UTC)
+    else:
+        period_end = datetime(now.year, now.month + 1, 1, tzinfo=UTC)
+    return period_start, period_end
+
+
+async def get_current_period_usage_credits(
+    db: AsyncSession,
+    user_id: int,
+    *,
+    now: datetime | None = None,
+) -> int:
+    if now is None:
+        now = utc_now()
+
+    period_start, period_end = _current_billing_period(now)
+    usage_ts = func.coalesce(Usage.updated_at, Usage.created_at)
+    result = await db.execute(
+        select(func.coalesce(func.sum(Usage.usage_credits), 0)).where(
+            Usage.user_id == user_id,
+            Usage.deleted_at.is_(None),
+            usage_ts >= period_start,
+            usage_ts < period_end,
+        )
+    )
+    return int(result.scalar_one() or 0)
 
 
 async def check_usage_limit(
