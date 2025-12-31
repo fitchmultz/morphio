@@ -6,6 +6,8 @@ services:
     container_name: morphio-io-backend
     environment:
       - APP_ENV=production
+      - WORKER_ML_URL=http://worker-ml:8001
+      - CRAWLER_URL=http://crawler:8002
     ports:
       - '8005:8005'
     depends_on:

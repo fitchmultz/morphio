@@ -1,0 +1,32 @@
+[sources.docker]
+type = "docker_logs"
+docker_host = "unix:///var/run/docker.sock"
+include_containers = [
+  "morphio-staging-backend",
+  "morphio-staging-worker-ml",
+  "morphio-staging-crawler",
+]
+
+[transforms.parse]
+type = "remap"
+inputs = ["docker"]
+source = '''
+.container = .container_name
+msg = .message ?? .log
+if is_string(msg) {
+  parsed, err = parse_json(msg)
+  if err == null { . = merge(., parsed) } else { .message = msg }
+}
+del(.log)
+del(.message)
+'''
+
+[sinks.opensearch]
+type = "elasticsearch"
+inputs = ["parse"]
+endpoint = "http://opensearch:9200"
+mode = "bulk"
+bulk.action = "index"
+index = "morphio-staging-%Y-%m-%d"
+request.retry_max_attempts = 5
+request.rate_limit_duration_secs = 1

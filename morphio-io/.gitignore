@@ -19,6 +19,8 @@
 !.env.example
 !stack.env.example
 **/*.env
+**/secrets/
+**/secrets-*/
 
 # Database files
 **/*.db

@@ -56,9 +56,9 @@ These items were completed in the documentation normalization work:
 - [ ] Optimize database queries in usage tracking
 
 ### Infrastructure
-- [ ] Set up staging environment
+- [x] Set up staging environment
 - [x] Add Prometheus metrics endpoint
-- [ ] Configure log aggregation
+- [x] Configure log aggregation
 - [x] Add health check dashboard
 
 ## Long-Term (This Year)

@@ -18,6 +18,7 @@ COMPOSE_FILES = [
     ROOT / "docker-compose.yml",
     ROOT / "docker-compose.watch.yml",
     ROOT / "docker-compose.prod.yml",
+    ROOT / "docker-compose.staging.yml",
 ]
 
 

@@ -1,0 +1,162 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: morphio-staging-postgres
+    environment:
+      - POSTGRES_DB=morphio
+      - POSTGRES_USER=morphio
+      - POSTGRES_PASSWORD_FILE=/run/secrets/DB_PASSWORD
+    volumes:
+      - postgresdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U morphio -d morphio"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    secrets:
+      - DB_PASSWORD
+
+  redis:
+    image: redis:alpine
+    container_name: morphio-staging-redis
+    command: ["sh", "-lc", "redis-server --port 6384 --appendonly yes --requirepass \"$$(cat /run/secrets/REDIS_PASSWORD)\""]
+    ports:
+      - "6384:6384"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -p 6384 -a \"$(cat /run/secrets/REDIS_PASSWORD)\" ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    secrets:
+      - REDIS_PASSWORD
+
+  backend:
+    build:
+      context: ..
+      dockerfile: morphio-io/backend/Dockerfile.api
+    container_name: morphio-staging-backend
+    environment:
+      - APP_ENV=production
+      - APP_PORT=8005
+      - WORKER_ML_URL=http://worker-ml:8001
+      - CRAWLER_URL=http://crawler:8002
+      - ADMIN_PASSWORD_FILE=/run/secrets/ADMIN_PASSWORD
+    ports:
+      - "8005:8005"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      worker-ml:
+        condition: service_healthy
+      crawler:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8005/health/"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    secrets:
+      - SECRET_KEY
+      - JWT_SECRET_KEY
+      - DATABASE_URL
+      - REDIS_URL
+      - ADMIN_PASSWORD
+
+  worker-ml:
+    build:
+      context: ..
+      dockerfile: morphio-io/backend/Dockerfile.worker-ml
+    platform: linux/amd64  # Required: torchcodec lacks Linux ARM64 wheels
+    container_name: morphio-staging-worker-ml
+    environment:
+      - WHISPER_MODEL=small
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8001/health/"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  crawler:
+    build:
+      context: ..
+      dockerfile: morphio-io/backend/Dockerfile.crawler
+    container_name: morphio-staging-crawler
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8002/health/"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  opensearch:
+    image: opensearchproject/opensearch:2.11.1
+    container_name: morphio-staging-opensearch
+    environment:
+      - discovery.type=single-node
+      - DISABLE_INSTALL_DEMO_CONFIG=true
+      - DISABLE_SECURITY_PLUGIN=true
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+    volumes:
+      - opensearchdata:/usr/share/opensearch/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:9200"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:2.11.1
+    container_name: morphio-staging-opensearch-dashboards
+    environment:
+      - OPENSEARCH_HOSTS=["http://opensearch:9200"]
+      - DISABLE_SECURITY_DASHBOARDS_PLUGIN=true
+      - DISABLE_SECURITY_PLUGIN=true
+    ports:
+      - "5601:5601"
+    depends_on:
+      opensearch:
+        condition: service_healthy
+
+  vector:
+    image: timberio/vector:0.40.0-debian
+    container_name: morphio-staging-vector
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./vector/vector.staging.toml:/etc/vector/vector.toml:ro
+    depends_on:
+      backend:
+        condition: service_started
+      worker-ml:
+        condition: service_started
+      crawler:
+        condition: service_started
+      opensearch:
+        condition: service_healthy
+    restart: unless-stopped
+
+secrets:
+  SECRET_KEY:
+    file: ./secrets/SECRET_KEY
+  JWT_SECRET_KEY:
+    file: ./secrets/JWT_SECRET_KEY
+  DATABASE_URL:
+    file: ./secrets/DATABASE_URL
+  REDIS_URL:
+    file: ./secrets/REDIS_URL
+  REDIS_PASSWORD:
+    file: ./secrets/REDIS_PASSWORD
+  DB_PASSWORD:
+    file: ./secrets/DB_PASSWORD
+  ADMIN_PASSWORD:
+    file: ./secrets/ADMIN_PASSWORD
+
+volumes:
+  postgresdata:
+  redisdata:
+  opensearchdata:

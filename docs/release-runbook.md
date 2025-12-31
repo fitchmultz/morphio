@@ -3,10 +3,12 @@
 This runbook covers staging, deployment, rollback, and verification.
 
 ## Staging
-- Sync `.env`/secrets for staging.
-- Deploy with `docker-compose.prod.yml` (or the pinned release compose).
-- Run smoke tests: login, content generation, log upload, billing.
-- Validate `/health` and `/metrics` endpoints.
+- Generate staging secrets, bring up the stack, and smoke test:
+  - `make staging-secrets`
+  - `make staging-up`
+  - `make staging-smoke`
+- Validate `/health`, `/health/db`, `/health/redis`, and `/admin/health`.
+- Confirm OpenSearch Dashboards is reachable on port 5601.
 
 ## Deploy
 - Run `make ci` from the repo root (local CI is the release gate; Actions are disabled).

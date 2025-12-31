@@ -11,6 +11,7 @@
 .PHONY: help \
 	install install-backend install-frontend update update-backend update-frontend \
 	dev dev-full dev-docker \
+	staging-secrets staging-up staging-down staging-logs staging-smoke \
 	test test-native test-core test-io \
 	lint lint-native lint-core lint-io \
 	type-check type-check-native type-check-core type-check-io \
@@ -83,6 +84,53 @@ dev-full: ## Start ALL morphio-io services natively (Apple Silicon)
 dev-docker: ## Start morphio-io in Docker with hot reload
 	@cd morphio-io && $(MAKE) dev-docker
 
+# ============================================================================
+# Staging Environment
+# ============================================================================
+
+staging-secrets: ## Generate staging secrets (idempotent)
+	@cd morphio-io && ./scripts/bootstrap_staging_secrets.sh
+
+staging-up: ## Start staging stack (Docker)
+	@cd morphio-io && docker compose -f docker-compose.staging.yml up -d --build
+
+staging-down: ## Stop staging stack and remove volumes
+	@cd morphio-io && docker compose -f docker-compose.staging.yml down -v --remove-orphans
+
+staging-logs: ## Tail staging stack logs
+	@cd morphio-io && docker compose -f docker-compose.staging.yml logs -f
+
+staging-smoke: ## Run staging smoke checks (brings up staging stack)
+	@bash -c '\
+	set -euo pipefail; \
+	$(MAKE) staging-up; \
+	api="http://localhost:8005"; \
+	dashboards="http://localhost:5601"; \
+	for path in /health/ /health/db /health/redis; do \
+		echo "Waiting for $$api$$path"; \
+		for i in {1..60}; do \
+			if curl -fsS "$$api$$path" >/dev/null; then break; fi; \
+			sleep 2; \
+			if [ $$i -eq 60 ]; then echo "Timeout waiting for $$path"; exit 1; fi; \
+		done; \
+	done; \
+	echo "Waiting for OpenSearch Dashboards..."; \
+	for i in {1..60}; do \
+		code=$$(curl -s -o /dev/null -w "%{http_code}" "$$dashboards" || true); \
+		if [ "$$code" = "200" ] || [ "$$code" = "302" ] || [ "$$code" = "401" ] || [ "$$code" = "403" ]; then break; fi; \
+		sleep 2; \
+		if [ $$i -eq 60 ]; then echo "Timeout waiting for Dashboards"; exit 1; fi; \
+	done; \
+	admin_password=$$(cat morphio-io/secrets/ADMIN_PASSWORD); \
+	csrf_token=$$(curl -fsS "$$api/auth/csrf-token" \
+		| python3 -c "import json,sys; print(json.load(sys.stdin)[\"data\"][\"csrf_token\"])"); \
+	token=$$(curl -fsS -X POST "$$api/auth/login" -H "Content-Type: application/json" -H "X-CSRF-Token: $$csrf_token" \
+		-b "csrf_token=$$csrf_token" \
+		-d "{\"email\":\"admin@morphio.io\",\"password\":\"$$admin_password\"}" \
+		| python3 -c "import json,sys; print(json.load(sys.stdin)[\"data\"][\"access_token\"])"); \
+	curl -fsS "$$api/admin/health" -H "Authorization: Bearer $$token" >/dev/null; \
+	echo "✅ Staging smoke checks passed."; \
+	'
 # ============================================================================
 # Testing
 # ============================================================================

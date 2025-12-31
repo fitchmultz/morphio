@@ -11,6 +11,11 @@ Use this checklist after local changes or before release candidates.
 - Redis health: `curl -fsS http://localhost:8005/health/redis`
 - Frontend health: `curl -fsS http://localhost:3005/api/health`
 
+## Staging
+
+- Generate secrets and bring up staging: `make staging-secrets && make staging-up`
+- Run smoke checks: `make staging-smoke`
+
 ## Metrics (optional)
 
 - Set `PROMETHEUS_ENABLED=true`, restart backend, then:
