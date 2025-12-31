@@ -40,6 +40,7 @@ make test         # Run all tests
 - Log aggregation available via local OpenSearch + Dashboards + Vector in staging.
 - Redis-backed template caching for templates list/detail with explicit invalidation.
 - Usage tracking credits aggregation optimized with SQL + indexes.
+- Transcript caching normalized (single-encoded JSON + diarization-aware keys).
 
 ## Completed Work
 

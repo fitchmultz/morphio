@@ -101,7 +101,7 @@ async def test_youtube_transcript_caching(mock_redis):
     # Test retrieval
     mock_redis.get.return_value = json.dumps(transcript)
     result = await get_cached_youtube_transcript(video_id)
-    assert result == json.dumps(transcript)
+    assert result == json.dumps({"text": transcript})
 
 
 @pytest.mark.asyncio
@@ -116,7 +116,18 @@ async def test_whisper_transcription_caching(mock_redis):
     # Test retrieval
     mock_redis.get.return_value = json.dumps(transcription)
     result = await get_cached_whisper_transcription(file_hash)
-    assert result == json.dumps(transcription)
+    assert result == json.dumps({"text": transcription})
+
+
+@pytest.mark.asyncio
+async def test_cached_transcription_legacy_double_encoded_normalizes(mock_redis):
+    file_hash = "legacy_file_hash"
+    legacy_value = json.dumps(json.dumps({"text": "Legacy transcript"}))
+
+    mock_redis.get.return_value = legacy_value
+    result = await get_cached_whisper_transcription(file_hash)
+
+    assert result == json.dumps({"text": "Legacy transcript"})
 
 
 @pytest.mark.asyncio
@@ -254,12 +265,7 @@ async def test_process_video_with_caching(mock_redis):
         assert result["status"] == "success"
 
         # Check if transcription was cached
-        # serialize_transcription wraps strings in {"text": "..."}
-        # set_redis_data does json.dumps() again, so we get double encoding
-        # First encode: {"text": "Test Local Video Transcript"}
-        first_encode = json.dumps({"text": "Test Local Video Transcript"})
-        # Second encode (by set_redis_data): json.dumps() on the already-encoded string
-        expected_transcription = json.dumps(first_encode)
+        expected_transcription = json.dumps({"text": "Test Local Video Transcript"})
         mock_redis.set.assert_any_call(
             cache_key_builder(
                 "whisper_transcription",
@@ -298,7 +304,7 @@ async def test_process_video_with_caching(mock_redis):
 
         # Test with cached transcription for local video
         mock_redis.get.side_effect = [
-            json.dumps("Cached Local Video Transcript"),
+            json.dumps({"text": "Cached Local Video Transcript"}),
             None,  # Simulating no cached content
         ]
         # Mock file hash computation again
