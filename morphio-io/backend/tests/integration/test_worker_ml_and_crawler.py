@@ -9,15 +9,15 @@ from fastapi.testclient import TestClient
 _playwright_available = importlib.util.find_spec("playwright") is not None
 
 
-def test_worker_ml_transcribe_mocked():
+def test_worker_ml_transcribe_mocked(monkeypatch):
     # Import worker app and monkeypatch the heavy transcribe
     from worker_ml.main import app as worker_app
     import worker_ml.main as worker_mod
 
-    async def fake_transcribe(path: str, model: str):
+    async def fake_transcribe(path: str, model: str, request_id: str | None = None):  # noqa: ARG001
         return {"text": "hello world", "confidence": 0.99}
 
-    worker_mod._transcribe = fake_transcribe  # type: ignore[attr-defined]
+    monkeypatch.setattr(worker_mod, "_transcribe", fake_transcribe)
 
     client = TestClient(worker_app)
     data = {"file": ("hello.mp3", io.BytesIO(b"fake-bytes"), "audio/mpeg")}
