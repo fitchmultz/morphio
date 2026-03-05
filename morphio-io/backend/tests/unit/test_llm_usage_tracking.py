@@ -1,7 +1,7 @@
 """Tests for LLM usage tracking.
 
 These tests verify that LLMUsageRecord entries are correctly created
-and that token counts are accurately stored for billing/analytics.
+and that token counts are accurately stored for usage analytics.
 """
 
 from decimal import Decimal

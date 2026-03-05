@@ -7,7 +7,7 @@ Date: 2025-12-29
 
 Morphio needs a consistent way to track usage and enforce plan limits across
 processing workloads. Without a unified approach, limits are inconsistent and
-billing logic becomes fragmented.
+usage-quota logic becomes fragmented.
 
 ## Decision
 

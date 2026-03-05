@@ -2,7 +2,7 @@
 Detailed LLM usage tracking model.
 
 Tracks per-call token usage for LLM generations, enabling:
-- Cost estimation and billing
+- Cost estimation and usage analytics
 - Usage analytics and optimization
 - Rate limiting by tokens
 """

@@ -6,8 +6,6 @@ const mockUpdateUserData = jest.fn();
 
 jest.mock("@/client/sdk.gen", () => ({
 	createApiKey: jest.fn(),
-	createCheckoutSession: jest.fn(),
-	createPortalSession: jest.fn(),
 	getUserCredits: jest.fn(),
 	getUserProfile: jest.fn(),
 	listApiKeys: jest.fn(),
@@ -126,7 +124,7 @@ describe("ProfileManagement Credits", () => {
 		});
 	});
 
-	test("renders Upgrade to Pro button when plan is free", async () => {
+	test("renders monthly quota guidance when plan is free", async () => {
 		(sdk.getUserCredits as jest.Mock).mockResolvedValue({
 			data: {
 				status: "success",
@@ -147,7 +145,7 @@ describe("ProfileManagement Credits", () => {
 
 		await waitFor(() => {
 			expect(
-				screen.getByRole("button", { name: /upgrade to pro/i }),
+				screen.getByText(/fixed monthly quotas for demo stability/i),
 			).toBeInTheDocument();
 		});
 	});
@@ -180,7 +178,7 @@ describe("ProfileManagement Credits", () => {
 		).not.toBeInTheDocument();
 	});
 
-	test("renders Manage Billing button when plan is pro", async () => {
+	test("does not render billing actions for paid plans", async () => {
 		(sdk.getUserCredits as jest.Mock).mockResolvedValue({
 			data: {
 				status: "success",
@@ -200,12 +198,12 @@ describe("ProfileManagement Credits", () => {
 		render(<ProfileManagement />);
 
 		await waitFor(() => {
-			expect(
-				screen.getByRole("button", { name: /manage billing/i }),
-			).toBeInTheDocument();
+			expect(screen.getByText("pro")).toBeInTheDocument();
 		});
 
-		// Should not show upgrade button for pro users
+		expect(
+			screen.queryByRole("button", { name: /manage billing/i }),
+		).not.toBeInTheDocument();
 		expect(
 			screen.queryByRole("button", { name: /upgrade to pro/i }),
 		).not.toBeInTheDocument();

@@ -1,3 +1,10 @@
+"""Purpose: Define the persisted user account model.
+Responsibilities: Store authentication, profile, role, and ownership relationships.
+Scope: SQLAlchemy ORM mapping for application users.
+Usage: Referenced by auth, content, usage, template, and API key workflows.
+Invariants/Assumptions: Public-release user state should stay focused on account and portfolio-demo features, not dormant billing vendors.
+"""
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -32,12 +39,6 @@ class User(Base, SoftDeleteMixin):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     # CHANGED HERE: Now default=UserRole.USER means "USER" (uppercase)
     role: Mapped[UserRole] = mapped_column(Enum(UserRole), default=UserRole.USER)
-
-    # Stripe billing fields
-    stripe_customer_id: Mapped[str | None] = mapped_column(String(255), nullable=True, index=True)
-    subscription_status: Mapped[str | None] = mapped_column(
-        String(50), nullable=True, default=None
-    )  # active, canceled, past_due, etc.
 
     contents: Mapped[list["Content"]] = relationship(
         "Content", back_populates="user", lazy="selectin"

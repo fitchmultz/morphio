@@ -1,6 +1,6 @@
 """Admin usage export endpoints.
 
-Provides CSV export of LLM usage data for billing and analytics.
+Provides CSV export of LLM usage data for operational analytics.
 """
 
 import csv
@@ -48,7 +48,7 @@ async def export_llm_usage(
     format: str = Query("csv", description="Export format (only csv supported)"),
 ):
     """
-    Export LLM usage records as CSV for billing and analytics.
+    Export LLM usage records as CSV for operational analytics.
 
     Aggregates usage by date, user, provider, and model.
     Returns: date, user_id, user_email, provider, model, total_tokens, estimated_cost

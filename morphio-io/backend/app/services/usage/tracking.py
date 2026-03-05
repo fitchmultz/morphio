@@ -1,3 +1,10 @@
+"""Purpose: Enforce usage quotas and persist monthly credit consumption.
+Responsibilities: Calculate current-period usage, gate expensive operations, and increment counters.
+Scope: Shared service functions used by generation and user-credit flows.
+Usage: Called before and after quota-metered operations.
+Invariants/Assumptions: Public demo quotas are fixed by plan and should fail with clear monthly-limit messaging rather than monetization prompts.
+"""
+
 import logging
 from datetime import UTC, datetime
 from decimal import Decimal
@@ -17,7 +24,7 @@ from ...utils.response_utils import utc_now
 logger = logging.getLogger(__name__)
 
 
-def _current_billing_period(now: datetime) -> tuple[datetime, datetime]:
+def _current_monthly_usage_period(now: datetime) -> tuple[datetime, datetime]:
     period_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     if now.month == 12:
         period_end = datetime(now.year + 1, 1, 1, tzinfo=UTC)
@@ -35,7 +42,7 @@ async def get_current_period_usage_credits(
     if now is None:
         now = utc_now()
 
-    period_start, period_end = _current_billing_period(now)
+    period_start, period_end = _current_monthly_usage_period(now)
     usage_ts = func.coalesce(Usage.updated_at, Usage.created_at)
     result = await db.execute(
         select(func.coalesce(func.sum(Usage.usage_credits), 0)).where(
@@ -116,8 +123,8 @@ async def check_usage_limit(
     # Check if would exceed limit
     if current_credits + cost > plan_limit:
         msg = (
-            f"You have reached the usage credit limit for your '{subscription_plan}' plan. "
-            "Please upgrade your subscription or wait for the monthly reset."
+            f"You have reached the monthly usage limit for the '{subscription_plan}' plan. "
+            "Please wait for the monthly reset."
         )
         logger.warning(f"Usage limit check failed for user {user_id}: {msg}")
         raise ApplicationException(msg, status_code=403)
@@ -207,8 +214,8 @@ async def increment_usage(db: AsyncSession, user_id: int, usage_type: UsageType 
     # 5) Check plan limit
     if usage.usage_credits + cost > plan_limit:
         msg = (
-            f"You have reached the usage credit limit for your '{subscription_plan}' plan. "
-            "Please upgrade your subscription or wait for the monthly reset."
+            f"You have reached the monthly usage limit for the '{subscription_plan}' plan. "
+            "Please wait for the monthly reset."
         )
         logger.warning(f"Usage limit exceeded for user {user_id}: {msg}")
         raise ApplicationException(msg, status_code=403)

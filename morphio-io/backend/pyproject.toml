@@ -24,7 +24,6 @@ dependencies = [
   "email-validator",
   "fastapi",
   "httpx",
-  "stripe",
   "tenacity",
 
   # Database / async

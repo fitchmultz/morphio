@@ -1,3 +1,10 @@
+"""Purpose: Define subscription-plan records used for quota and usage policies.
+Responsibilities: Store plan/status data that informs monthly credit limits.
+Scope: SQLAlchemy ORM mapping for internal plan assignment records.
+Usage: Queried by usage tracking and user credit summary endpoints.
+Invariants/Assumptions: Subscription records represent generic quota tiers, not direct payment-provider state.
+"""
+
 from __future__ import annotations
 
 import logging
@@ -34,8 +41,6 @@ class Subscription(Base, SoftDeleteMixin):
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False)
     plan: Mapped[str] = mapped_column(String, default=SubscriptionPlanEnum.FREE.value)
     status: Mapped[str] = mapped_column(String, default=SubscriptionStatusEnum.ACTIVE.value)
-    stripe_customer_id: Mapped[str | None] = mapped_column(String, nullable=True)
-    stripe_subscription_id: Mapped[str | None] = mapped_column(String, nullable=True)
     created_at: Mapped[DateTime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

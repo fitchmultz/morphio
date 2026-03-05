@@ -1,11 +1,17 @@
+/**
+ * Purpose: Render the authenticated user's profile, quota summary, and API key tools.
+ * Responsibilities: Load profile data, show monthly usage, and manage personal API keys.
+ * Scope: Client-side profile management UI for account settings.
+ * Usage: Mounted on the profile page for signed-in users.
+ * Invariants/Assumptions: Public portfolio builds should emphasize product capabilities and developer tooling, not dormant billing flows.
+ */
+
 "use client";
 
 import type { FC } from "react";
 import { useCallback, useEffect, useState } from "react";
 import {
 	createApiKey,
-	createCheckoutSession,
-	createPortalSession,
 	getUserCredits,
 	getUserProfile,
 	listApiKeys,
@@ -39,7 +45,6 @@ export const ProfileManagement: FC = () => {
 	const [credits, setCredits] = useState<UserCredits | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [fetchError, setFetchError] = useState<string | null>(null);
-	const [isUpgrading, setIsUpgrading] = useState(false);
 	const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
 	const [apiKeysLoading, setApiKeysLoading] = useState(true);
 	const [apiKeyError, setApiKeyError] = useState<string | null>(null);
@@ -137,26 +142,6 @@ export const ProfileManagement: FC = () => {
 		}
 	};
 
-	const handleUpgrade = async (plan: "pro" | "enterprise") => {
-		try {
-			setIsUpgrading(true);
-			const response = await createCheckoutSession({
-				query: { plan },
-			});
-			const checkoutUrl = response.data?.data?.checkout_url;
-			if (checkoutUrl) {
-				window.location.href = checkoutUrl;
-			} else {
-				notifyError("Failed to create checkout session");
-			}
-		} catch (error) {
-			logger.error("Failed to create checkout session", { error });
-			notifyError("Failed to start upgrade process. Please try again.");
-		} finally {
-			setIsUpgrading(false);
-		}
-	};
-
 	const handleCreateApiKey = async () => {
 		const trimmedName = apiKeyName.trim();
 		if (!trimmedName) {
@@ -238,24 +223,6 @@ export const ProfileManagement: FC = () => {
 			notifyError("Failed to revoke API key. Please try again.");
 		} finally {
 			setRevokingKeyId(null);
-		}
-	};
-
-	const handleManageBilling = async () => {
-		try {
-			setIsUpgrading(true);
-			const response = await createPortalSession();
-			const portalUrl = response.data?.data?.portal_url;
-			if (portalUrl) {
-				window.location.href = portalUrl;
-			} else {
-				notifyError("Failed to create portal session");
-			}
-		} catch (error) {
-			logger.error("Failed to create portal session", { error });
-			notifyError("Failed to open billing portal. Please try again.");
-		} finally {
-			setIsUpgrading(false);
 		}
 	};
 
@@ -413,42 +380,12 @@ export const ProfileManagement: FC = () => {
 									)}
 								</div>
 
-								{/* Upgrade CTA */}
 								<div className="pt-4 border-t border-gray-200 dark:border-gray-600">
-									{credits.plan === "free" ? (
-										<div className="space-y-2">
-											<p className="morphio-body-sm text-gray-600 dark:text-gray-300">
-												Upgrade for more credits and features
-											</p>
-											<div className="flex gap-3">
-												<button
-													type="button"
-													onClick={() => handleUpgrade("pro")}
-													disabled={isUpgrading}
-													className="morphio-button px-4 py-2 text-sm"
-												>
-													{isUpgrading ? "Loading..." : "Upgrade to Pro"}
-												</button>
-												<button
-													type="button"
-													onClick={() => handleUpgrade("enterprise")}
-													disabled={isUpgrading}
-													className="morphio-button-secondary px-4 py-2 text-sm"
-												>
-													{isUpgrading ? "Loading..." : "Enterprise"}
-												</button>
-											</div>
-										</div>
-									) : (
-										<button
-											type="button"
-											onClick={handleManageBilling}
-											disabled={isUpgrading}
-											className="morphio-button-secondary px-4 py-2 text-sm"
-										>
-											{isUpgrading ? "Loading..." : "Manage Billing"}
-										</button>
-									)}
+									<p className="morphio-body-sm text-gray-600 dark:text-gray-300">
+										This public release uses fixed monthly quotas for demo
+										stability. When you hit the limit, access resumes on the
+										next monthly reset.
+									</p>
 								</div>
 							</>
 						)}

@@ -150,7 +150,7 @@ async def get_user_credits(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Get summary of user's credit usage for the current billing period."""
+    """Get summary of a user's credit usage for the current monthly period."""
     # Determine subscription plan
     subscription_plan = "free"
     subscription_result = await db.execute(

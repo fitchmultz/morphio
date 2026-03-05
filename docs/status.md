@@ -124,10 +124,8 @@ Completed on 2025-12-23:
 - [x] LLM usage summary by provider (requests, tokens, cost)
 - [x] Admin System Health panel with aggregated component status checks
 
-### User Billing ✅
+### User Quotas ✅
 - [x] Usage alerts when credits < 20% (warning) or < 5% (critical)
-- [x] Stripe checkout integration for plan upgrades
-- [x] Billing portal for subscription management
 
 ### Programmatic Access ✅
 - [x] API key model with SHA256 hashing

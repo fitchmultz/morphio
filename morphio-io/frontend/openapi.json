@@ -2331,7 +2331,7 @@
 			"get": {
 				"tags": ["User", "User"],
 				"summary": "Get User Credits",
-				"description": "Get summary of user's credit usage for the current billing period.",
+				"description": "Get summary of a user's credit usage for the current monthly period.",
 				"operationId": "get_user_credits",
 				"responses": {
 					"200": {
@@ -3095,68 +3095,11 @@
 				]
 			}
 		},
-		"/admin/get-subscriptions": {
-			"get": {
-				"tags": ["Admin", "Admin"],
-				"summary": "Get Subscriptions",
-				"operationId": "get_subscriptions",
-				"responses": {
-					"200": {
-						"description": "Successful Response",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ApiResponse_list_SubscriptionOut__"
-								}
-							}
-						}
-					},
-					"403": {
-						"description": "Not authorized"
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"example": {
-									"detail": "Not authenticated"
-								}
-							}
-						}
-					},
-					"429": {
-						"description": "Too Many Requests",
-						"content": {
-							"application/json": {
-								"example": {
-									"detail": "Rate limit exceeded. Try again in 60 seconds."
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"example": {
-									"detail": "An unexpected error occurred."
-								}
-							}
-						}
-					}
-				},
-				"security": [
-					{
-						"OAuth2PasswordBearer": []
-					}
-				]
-			}
-		},
 		"/admin/usage/export": {
 			"get": {
 				"tags": ["Admin", "Admin"],
 				"summary": "Export Llm Usage",
-				"description": "Export LLM usage records as CSV for billing and analytics.\n\nAggregates usage by date, user, provider, and model.\nReturns: date, user_id, user_email, provider, model, total_tokens, estimated_cost",
+				"description": "Export LLM usage records as CSV for operational analytics.\n\nAggregates usage by date, user, provider, and model.\nReturns: date, user_id, user_email, provider, model, total_tokens, estimated_cost",
 				"operationId": "export_llm_usage",
 				"security": [
 					{
@@ -3396,149 +3339,6 @@
 					},
 					"403": {
 						"description": "Not authorized"
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"example": {
-									"detail": "Not authenticated"
-								}
-							}
-						}
-					},
-					"429": {
-						"description": "Too Many Requests",
-						"content": {
-							"application/json": {
-								"example": {
-									"detail": "Rate limit exceeded. Try again in 60 seconds."
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"example": {
-									"detail": "An unexpected error occurred."
-								}
-							}
-						}
-					}
-				},
-				"security": [
-					{
-						"OAuth2PasswordBearer": []
-					}
-				]
-			}
-		},
-		"/billing/checkout-session": {
-			"post": {
-				"tags": ["Billing", "Billing"],
-				"summary": "Create Checkout Session",
-				"description": "Create a Stripe Checkout Session for upgrading to a paid plan.\n\nReturns a URL to redirect the user to Stripe's hosted checkout page.",
-				"operationId": "create_checkout_session",
-				"security": [
-					{
-						"OAuth2PasswordBearer": []
-					}
-				],
-				"parameters": [
-					{
-						"name": "plan",
-						"in": "query",
-						"required": true,
-						"schema": {
-							"type": "string",
-							"title": "Plan"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "Checkout session created",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ApiResponse_CheckoutSessionData_"
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Invalid plan"
-					},
-					"503": {
-						"description": "Stripe not configured"
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"example": {
-									"detail": "Not authenticated"
-								}
-							}
-						}
-					},
-					"429": {
-						"description": "Too Many Requests",
-						"content": {
-							"application/json": {
-								"example": {
-									"detail": "Rate limit exceeded. Try again in 60 seconds."
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"example": {
-									"detail": "An unexpected error occurred."
-								}
-							}
-						}
-					},
-					"422": {
-						"description": "Validation Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/HTTPValidationError"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/billing/portal-session": {
-			"post": {
-				"tags": ["Billing", "Billing"],
-				"summary": "Create Portal Session",
-				"description": "Create a Stripe Customer Portal session for managing subscriptions.\n\nReturns a URL to redirect the user to Stripe's billing portal.",
-				"operationId": "create_portal_session",
-				"responses": {
-					"200": {
-						"description": "Portal session created",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ApiResponse_PortalSessionData_"
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "No Stripe customer found"
-					},
-					"503": {
-						"description": "Stripe not configured"
 					},
 					"401": {
 						"description": "Unauthorized",
@@ -4546,42 +4346,6 @@
 				"required": ["status", "message"],
 				"title": "ApiResponse[AuthTokenPayload]"
 			},
-			"ApiResponse_CheckoutSessionData_": {
-				"properties": {
-					"status": {
-						"$ref": "#/components/schemas/ResponseStatus"
-					},
-					"message": {
-						"type": "string",
-						"title": "Message"
-					},
-					"data": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/CheckoutSessionData"
-							},
-							{
-								"type": "null"
-							}
-						]
-					},
-					"timestamp": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "null"
-							}
-						],
-						"title": "Timestamp"
-					}
-				},
-				"type": "object",
-				"required": ["status", "message"],
-				"title": "ApiResponse[CheckoutSessionData]"
-			},
 			"ApiResponse_CommentOut_": {
 				"properties": {
 					"status": {
@@ -5132,42 +4896,6 @@
 				"required": ["status", "message"],
 				"title": "ApiResponse[PaginatedResponse[ContentOut]]"
 			},
-			"ApiResponse_PortalSessionData_": {
-				"properties": {
-					"status": {
-						"$ref": "#/components/schemas/ResponseStatus"
-					},
-					"message": {
-						"type": "string",
-						"title": "Message"
-					},
-					"data": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/PortalSessionData"
-							},
-							{
-								"type": "null"
-							}
-						]
-					},
-					"timestamp": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "null"
-							}
-						],
-						"title": "Timestamp"
-					}
-				},
-				"type": "object",
-				"required": ["status", "message"],
-				"title": "ApiResponse[PortalSessionData]"
-			},
 			"ApiResponse_SystemHealthOut_": {
 				"properties": {
 					"status": {
@@ -5428,46 +5156,6 @@
 				"required": ["status", "message"],
 				"title": "ApiResponse[list[APIKeyOut]]"
 			},
-			"ApiResponse_list_SubscriptionOut__": {
-				"properties": {
-					"status": {
-						"$ref": "#/components/schemas/ResponseStatus"
-					},
-					"message": {
-						"type": "string",
-						"title": "Message"
-					},
-					"data": {
-						"anyOf": [
-							{
-								"items": {
-									"$ref": "#/components/schemas/SubscriptionOut"
-								},
-								"type": "array"
-							},
-							{
-								"type": "null"
-							}
-						],
-						"title": "Data"
-					},
-					"timestamp": {
-						"anyOf": [
-							{
-								"type": "string",
-								"format": "date-time"
-							},
-							{
-								"type": "null"
-							}
-						],
-						"title": "Timestamp"
-					}
-				},
-				"type": "object",
-				"required": ["status", "message"],
-				"title": "ApiResponse[list[SubscriptionOut]]"
-			},
 			"ApiResponse_list_dict__": {
 				"properties": {
 					"status": {
@@ -5664,24 +5352,6 @@
 				"type": "object",
 				"required": ["current_password", "new_password"],
 				"title": "ChangePasswordRequest"
-			},
-			"CheckoutSessionData": {
-				"properties": {
-					"checkout_url": {
-						"type": "string",
-						"title": "Checkout Url",
-						"description": "URL to redirect user to Stripe checkout"
-					},
-					"session_id": {
-						"type": "string",
-						"title": "Session Id",
-						"description": "Stripe session ID"
-					}
-				},
-				"type": "object",
-				"required": ["checkout_url", "session_id"],
-				"title": "CheckoutSessionData",
-				"description": "Data returned from checkout session creation."
 			},
 			"CommentCreate": {
 				"properties": {
@@ -6645,19 +6315,6 @@
 				"required": ["items", "total", "page", "per_page"],
 				"title": "PaginatedResponse[ContentOut]"
 			},
-			"PortalSessionData": {
-				"properties": {
-					"portal_url": {
-						"type": "string",
-						"title": "Portal Url",
-						"description": "URL to redirect user to Stripe billing portal"
-					}
-				},
-				"type": "object",
-				"required": ["portal_url"],
-				"title": "PortalSessionData",
-				"description": "Data returned from portal session creation."
-			},
 			"ProcessingStage": {
 				"type": "string",
 				"enum": [
@@ -6678,76 +6335,6 @@
 				"type": "string",
 				"enum": ["success", "error", "warning", "info"],
 				"title": "ResponseStatus"
-			},
-			"SubscriptionOut": {
-				"properties": {
-					"id": {
-						"type": "integer",
-						"title": "Id"
-					},
-					"user_id": {
-						"type": "integer",
-						"title": "User Id"
-					},
-					"plan": {
-						"type": "string",
-						"title": "Plan"
-					},
-					"status": {
-						"type": "string",
-						"title": "Status"
-					},
-					"stripe_customer_id": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "null"
-							}
-						],
-						"title": "Stripe Customer Id"
-					},
-					"stripe_subscription_id": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "null"
-							}
-						],
-						"title": "Stripe Subscription Id"
-					},
-					"created_at": {
-						"type": "string",
-						"title": "Created At"
-					},
-					"updated_at": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "null"
-							}
-						],
-						"title": "Updated At"
-					},
-					"user": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/UserBasicOut"
-							},
-							{
-								"type": "null"
-							}
-						]
-					}
-				},
-				"type": "object",
-				"required": ["id", "user_id", "plan", "status", "created_at"],
-				"title": "SubscriptionOut"
 			},
 			"SystemHealthOut": {
 				"properties": {
@@ -6905,25 +6492,6 @@
 				"type": "object",
 				"title": "TemplateUpdate"
 			},
-			"UserBasicOut": {
-				"properties": {
-					"id": {
-						"type": "integer",
-						"title": "Id"
-					},
-					"email": {
-						"type": "string",
-						"title": "Email"
-					},
-					"display_name": {
-						"type": "string",
-						"title": "Display Name"
-					}
-				},
-				"type": "object",
-				"required": ["id", "email", "display_name"],
-				"title": "UserBasicOut"
-			},
 			"UserCreate": {
 				"properties": {
 					"email": {
@@ -7006,7 +6574,7 @@
 				"type": "object",
 				"required": ["plan", "limit", "used", "remaining", "remaining_pct"],
 				"title": "UserCredits",
-				"description": "Summary of user's credit usage for the current billing period."
+				"description": "Summary of a user's credit usage for the current monthly period."
 			},
 			"UserLogin": {
 				"properties": {

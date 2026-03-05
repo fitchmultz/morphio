@@ -45,8 +45,6 @@ Only `/.env` and `/.env.example` are allowed in the repo. `/.env` is local-only 
 | `USER_ROUTES_RATE_LIMIT` | No | `60` | Requests per window for user routes |
 | `USER_ROUTES_RATE_WINDOW` | No | `60` | Rate limit window in seconds |
 | `CSRF_COOKIE_EXPIRE_SECONDS` | No | `86400` | CSRF cookie lifetime in seconds |
-| `STRIPE_PRO_PRICE_ID` | No | - | Stripe Pro price ID |
-| `STRIPE_ENTERPRISE_PRICE_ID` | No | - | Stripe Enterprise price ID |
 | `WORKER_ML_URL` | No | - | Optional ML worker URL |
 | `CRAWLER_URL` | No | - | Optional crawler service URL |
 | `SERVICE_TIMEOUT` | No | `60` | Upstream service timeout in seconds |

@@ -1,4 +1,9 @@
-"""Admin routes package."""
+"""Purpose: Expose admin-only operational and analytics routes.
+Responsibilities: Provide usage visibility and system-health endpoints for administrators.
+Scope: Admin HTTP endpoints mounted under the main FastAPI app.
+Usage: Imported by `app.main` and composed with admin sub-routers.
+Invariants/Assumptions: Admin routes should expose portfolio-relevant operational data, not dormant monetization workflows.
+"""
 
 import logging
 from typing import Annotated
@@ -7,13 +12,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
-
 from ...database import get_db
-from ...models.subscription import Subscription
 from ...models.usage import Usage
 from ...models.user import User
 from ...schemas.response_schema import ApiResponse
-from ...schemas.subscription_schema import SubscriptionOut
 from ...services.security import get_current_user
 from ...utils.decorators import require_auth
 from ...utils.enums import ResponseStatus
@@ -85,39 +87,6 @@ async def get_usage(
         status=ResponseStatus.SUCCESS,
         message="Usage stats retrieved",
         data=usage_data,
-    )
-
-
-@router.get(
-    "/get-subscriptions",
-    operation_id="get_subscriptions",
-    response_model=ApiResponse[list[SubscriptionOut]],
-    responses={403: {"description": "Not authorized"}, **common_responses},
-)
-@require_auth
-@handle_route_errors
-async def get_subscriptions(
-    current_user: Annotated[User, Depends(get_current_user)],
-    db: AsyncSession = Depends(get_db),
-):
-    if not current_user.is_admin:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to view subscription data",
-        )
-
-    result = await db.execute(
-        select(Subscription)
-        .where(Subscription.deleted_at.is_(None))
-        .options(joinedload(Subscription.user))
-    )
-    subs = result.scalars().all()
-    subs_out = [SubscriptionOut.model_validate(s).model_dump() for s in subs]
-
-    return create_response(
-        status=ResponseStatus.SUCCESS,
-        message="Subscription data retrieved",
-        data=subs_out,
     )
 
 

@@ -47,7 +47,6 @@ These items were completed in the documentation normalization work:
 ### Features
 - [x] Export LLM usage reports (CSV) - Admin can export usage data with date filters
 - [x] Add usage alerts when approaching limit - Warning/critical banners in Profile
-- [x] Implement plan upgrade flow in UI - Stripe checkout integration
 - [x] Add API key authentication for programmatic access - Bearer token auth with scopes
 
 ### Performance

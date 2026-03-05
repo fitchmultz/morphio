@@ -3,7 +3,7 @@
 These tests verify that the usage limit check (check_usage_limit) properly
 blocks operations BEFORE expensive LLM calls when credits are exhausted.
 
-This is a critical billing protection - users should not be able to exceed
+This is a critical quota-enforcement protection - users should not be able to exceed
 their plan limits.
 """
 

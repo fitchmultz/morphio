@@ -3,8 +3,8 @@
 import { type DefaultError, type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { changeDisplayName, changeEmail, changePassword, continueConversation, createApiKey, createCheckoutSession, createComment, createItem, createPortalSession, deleteComment, deleteContent, deleteConversation, deleteTemplate, exportLlmUsage, generateSplunkConfig, getAdminHealth, getAdminUsage, getAvailableModels, getContent, getConversationThread, getCsrfToken, getLlmUsageSummary, getLogConfig, getLogsProcessingStatus, getMediaConfig, getMediaProcessingStatus, getSubscriptions, getTemplate, getUserCredits, getUserProfile, getUserUsage, getWebProcessingStatus, healthCheck, healthDb, healthRedis, listApiKeys, listComments, listContentConversations, listContents, listTemplates, login, logout, type Options, processLogs, processMedia, processWeb, readItem, readUsersMe, refreshToken, register, revokeApiKey, saveContent, saveTemplate, updateComment, updateContent, updateContentTitle, updateMultipleContents, updateTemplate } from '../sdk.gen';
-import type { ChangeDisplayNameData, ChangeDisplayNameError, ChangeDisplayNameResponse, ChangeEmailData, ChangeEmailError, ChangeEmailResponse, ChangePasswordData, ChangePasswordError, ChangePasswordResponse, ContinueConversationData, ContinueConversationError, ContinueConversationResponse, CreateApiKeyData, CreateApiKeyError, CreateApiKeyResponse, CreateCheckoutSessionData, CreateCheckoutSessionError, CreateCheckoutSessionResponse, CreateCommentData, CreateCommentError, CreateCommentResponse, CreateItemData, CreateItemError, CreateItemResponse, CreatePortalSessionData, CreatePortalSessionResponse, DeleteCommentData, DeleteCommentError, DeleteCommentResponse, DeleteContentData, DeleteContentError, DeleteContentResponse, DeleteConversationData, DeleteConversationError, DeleteConversationResponse, DeleteTemplateData, DeleteTemplateError, DeleteTemplateResponse, ExportLlmUsageData, ExportLlmUsageError, GenerateSplunkConfigData, GenerateSplunkConfigError, GenerateSplunkConfigResponse, GetAdminHealthData, GetAdminHealthResponse, GetAdminUsageData, GetAdminUsageResponse, GetAvailableModelsData, GetAvailableModelsResponse, GetContentData, GetContentError, GetContentResponse, GetConversationThreadData, GetConversationThreadError, GetConversationThreadResponse, GetCsrfTokenData, GetCsrfTokenResponse, GetLlmUsageSummaryData, GetLlmUsageSummaryError, GetLlmUsageSummaryResponse, GetLogConfigData, GetLogConfigResponse, GetLogsProcessingStatusData, GetLogsProcessingStatusError, GetLogsProcessingStatusResponse, GetMediaConfigData, GetMediaConfigResponse, GetMediaProcessingStatusData, GetMediaProcessingStatusError, GetMediaProcessingStatusResponse, GetSubscriptionsData, GetSubscriptionsResponse, GetTemplateData, GetTemplateError, GetTemplateResponse, GetUserCreditsData, GetUserCreditsResponse, GetUserProfileData, GetUserProfileResponse, GetUserUsageData, GetUserUsageResponse, GetWebProcessingStatusData, GetWebProcessingStatusError, GetWebProcessingStatusResponse, HealthCheckData, HealthCheckResponse, HealthDbData, HealthDbResponse, HealthRedisData, HealthRedisResponse, ListApiKeysData, ListApiKeysResponse, ListCommentsData, ListCommentsError, ListCommentsResponse, ListContentConversationsData, ListContentConversationsError, ListContentConversationsResponse, ListContentsData, ListContentsError, ListContentsResponse, ListTemplatesData, ListTemplatesResponse, LoginData, LoginError, LoginResponse, LogoutData, LogoutResponse, ProcessLogsData, ProcessLogsError, ProcessLogsResponse, ProcessMediaData, ProcessMediaError, ProcessMediaResponse, ProcessWebData, ProcessWebError, ProcessWebResponse, ReadItemData, ReadItemError, ReadUsersMeData, RefreshTokenData, RefreshTokenResponse, RegisterData, RegisterError, RegisterResponse, RevokeApiKeyData, RevokeApiKeyError, RevokeApiKeyResponse, SaveContentData, SaveContentError, SaveContentResponse, SaveTemplateData, SaveTemplateError, SaveTemplateResponse, UpdateCommentData, UpdateCommentError, UpdateCommentResponse, UpdateContentData, UpdateContentError, UpdateContentResponse, UpdateContentTitleData, UpdateContentTitleError, UpdateContentTitleResponse, UpdateMultipleContentsData, UpdateMultipleContentsError, UpdateMultipleContentsResponse, UpdateTemplateData, UpdateTemplateError, UpdateTemplateResponse } from '../types.gen';
+import { changeDisplayName, changeEmail, changePassword, continueConversation, createApiKey, createComment, createItem, deleteComment, deleteContent, deleteConversation, deleteTemplate, exportLlmUsage, generateSplunkConfig, getAdminHealth, getAdminUsage, getAvailableModels, getContent, getConversationThread, getCsrfToken, getLlmUsageSummary, getLogConfig, getLogsProcessingStatus, getMediaConfig, getMediaProcessingStatus, getTemplate, getUserCredits, getUserProfile, getUserUsage, getWebProcessingStatus, healthCheck, healthDb, healthRedis, listApiKeys, listComments, listContentConversations, listContents, listTemplates, login, logout, type Options, processLogs, processMedia, processWeb, readItem, readUsersMe, refreshToken, register, revokeApiKey, saveContent, saveTemplate, updateComment, updateContent, updateContentTitle, updateMultipleContents, updateTemplate } from '../sdk.gen';
+import type { ChangeDisplayNameData, ChangeDisplayNameError, ChangeDisplayNameResponse, ChangeEmailData, ChangeEmailError, ChangeEmailResponse, ChangePasswordData, ChangePasswordError, ChangePasswordResponse, ContinueConversationData, ContinueConversationError, ContinueConversationResponse, CreateApiKeyData, CreateApiKeyError, CreateApiKeyResponse, CreateCommentData, CreateCommentError, CreateCommentResponse, CreateItemData, CreateItemError, CreateItemResponse, DeleteCommentData, DeleteCommentError, DeleteCommentResponse, DeleteContentData, DeleteContentError, DeleteContentResponse, DeleteConversationData, DeleteConversationError, DeleteConversationResponse, DeleteTemplateData, DeleteTemplateError, DeleteTemplateResponse, ExportLlmUsageData, ExportLlmUsageError, GenerateSplunkConfigData, GenerateSplunkConfigError, GenerateSplunkConfigResponse, GetAdminHealthData, GetAdminHealthResponse, GetAdminUsageData, GetAdminUsageResponse, GetAvailableModelsData, GetAvailableModelsResponse, GetContentData, GetContentError, GetContentResponse, GetConversationThreadData, GetConversationThreadError, GetConversationThreadResponse, GetCsrfTokenData, GetCsrfTokenResponse, GetLlmUsageSummaryData, GetLlmUsageSummaryError, GetLlmUsageSummaryResponse, GetLogConfigData, GetLogConfigResponse, GetLogsProcessingStatusData, GetLogsProcessingStatusError, GetLogsProcessingStatusResponse, GetMediaConfigData, GetMediaConfigResponse, GetMediaProcessingStatusData, GetMediaProcessingStatusError, GetMediaProcessingStatusResponse, GetTemplateData, GetTemplateError, GetTemplateResponse, GetUserCreditsData, GetUserCreditsResponse, GetUserProfileData, GetUserProfileResponse, GetUserUsageData, GetUserUsageResponse, GetWebProcessingStatusData, GetWebProcessingStatusError, GetWebProcessingStatusResponse, HealthCheckData, HealthCheckResponse, HealthDbData, HealthDbResponse, HealthRedisData, HealthRedisResponse, ListApiKeysData, ListApiKeysResponse, ListCommentsData, ListCommentsError, ListCommentsResponse, ListContentConversationsData, ListContentConversationsError, ListContentConversationsResponse, ListContentsData, ListContentsError, ListContentsResponse, ListTemplatesData, ListTemplatesResponse, LoginData, LoginError, LoginResponse, LogoutData, LogoutResponse, ProcessLogsData, ProcessLogsError, ProcessLogsResponse, ProcessMediaData, ProcessMediaError, ProcessMediaResponse, ProcessWebData, ProcessWebError, ProcessWebResponse, ReadItemData, ReadItemError, ReadUsersMeData, RefreshTokenData, RefreshTokenResponse, RegisterData, RegisterError, RegisterResponse, RevokeApiKeyData, RevokeApiKeyError, RevokeApiKeyResponse, SaveContentData, SaveContentError, SaveContentResponse, SaveTemplateData, SaveTemplateError, SaveTemplateResponse, UpdateCommentData, UpdateCommentError, UpdateCommentResponse, UpdateContentData, UpdateContentError, UpdateContentResponse, UpdateContentTitleData, UpdateContentTitleError, UpdateContentTitleResponse, UpdateMultipleContentsData, UpdateMultipleContentsError, UpdateMultipleContentsResponse, UpdateTemplateData, UpdateTemplateError, UpdateTemplateResponse } from '../types.gen';
 
 /**
  * Login
@@ -632,7 +632,7 @@ export const getUserCreditsQueryKey = (options?: Options<GetUserCreditsData>) =>
 /**
  * Get User Credits
  *
- * Get summary of user's credit usage for the current billing period.
+ * Get summary of a user's credit usage for the current monthly period.
  */
 export const getUserCreditsOptions = (options?: Options<GetUserCreditsData>) => queryOptions<GetUserCreditsResponse, DefaultError, GetUserCreditsResponse, ReturnType<typeof getUserCreditsQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
@@ -866,30 +866,12 @@ export const getAdminUsageOptions = (options?: Options<GetAdminUsageData>) => qu
     queryKey: getAdminUsageQueryKey(options)
 });
 
-export const getSubscriptionsQueryKey = (options?: Options<GetSubscriptionsData>) => createQueryKey('getSubscriptions', options);
-
-/**
- * Get Subscriptions
- */
-export const getSubscriptionsOptions = (options?: Options<GetSubscriptionsData>) => queryOptions<GetSubscriptionsResponse, DefaultError, GetSubscriptionsResponse, ReturnType<typeof getSubscriptionsQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getSubscriptions({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: getSubscriptionsQueryKey(options)
-});
-
 export const exportLlmUsageQueryKey = (options?: Options<ExportLlmUsageData>) => createQueryKey('exportLlmUsage', options);
 
 /**
  * Export Llm Usage
  *
- * Export LLM usage records as CSV for billing and analytics.
+ * Export LLM usage records as CSV for operational analytics.
  *
  * Aggregates usage by date, user, provider, and model.
  * Returns: date, user_id, user_email, provider, model, total_tokens, estimated_cost
@@ -912,7 +894,7 @@ export const exportLlmUsageInfiniteQueryKey = (options?: Options<ExportLlmUsageD
 /**
  * Export Llm Usage
  *
- * Export LLM usage records as CSV for billing and analytics.
+ * Export LLM usage records as CSV for operational analytics.
  *
  * Aggregates usage by date, user, provider, and model.
  * Returns: date, user_id, user_email, provider, model, total_tokens, estimated_cost
@@ -1005,48 +987,6 @@ export const getAdminHealthOptions = (options?: Options<GetAdminHealthData>) => 
     },
     queryKey: getAdminHealthQueryKey(options)
 });
-
-/**
- * Create Checkout Session
- *
- * Create a Stripe Checkout Session for upgrading to a paid plan.
- *
- * Returns a URL to redirect the user to Stripe's hosted checkout page.
- */
-export const createCheckoutSessionMutation = (options?: Partial<Options<CreateCheckoutSessionData>>): UseMutationOptions<CreateCheckoutSessionResponse, CreateCheckoutSessionError, Options<CreateCheckoutSessionData>> => {
-    const mutationOptions: UseMutationOptions<CreateCheckoutSessionResponse, CreateCheckoutSessionError, Options<CreateCheckoutSessionData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await createCheckoutSession({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-/**
- * Create Portal Session
- *
- * Create a Stripe Customer Portal session for managing subscriptions.
- *
- * Returns a URL to redirect the user to Stripe's billing portal.
- */
-export const createPortalSessionMutation = (options?: Partial<Options<CreatePortalSessionData>>): UseMutationOptions<CreatePortalSessionResponse, DefaultError, Options<CreatePortalSessionData>> => {
-    const mutationOptions: UseMutationOptions<CreatePortalSessionResponse, DefaultError, Options<CreatePortalSessionData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await createPortalSession({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
 
 export const listApiKeysQueryKey = (options?: Options<ListApiKeysData>) => createQueryKey('listApiKeys', options);
 

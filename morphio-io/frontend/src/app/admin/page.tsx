@@ -1,13 +1,16 @@
+/**
+ * Purpose: Render the administrator control panel.
+ * Responsibilities: Show system health, usage analytics, and export tools for maintainers.
+ * Scope: Client-side admin dashboard for authenticated admin users.
+ * Usage: Mounted on `/admin` for users with the admin role.
+ * Invariants/Assumptions: Public portfolio builds should focus this page on operational visibility, not monetization management.
+ */
+
 "use client";
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import {
-	getAdminUsage,
-	getLlmUsageSummary,
-	getSubscriptions,
-	type SubscriptionOut,
-} from "@/client";
+import { getAdminUsage, getLlmUsageSummary } from "@/client";
 import { Skeleton } from "@/components/common/Skeleton";
 import { SystemHealthPanel } from "@/components/features/admin/SystemHealthPanel";
 import { useAuth } from "@/contexts/AuthContext";
@@ -45,8 +48,6 @@ export default function AdminPage() {
 	const router = useRouter();
 	const [usageData, setUsageData] = useState<UsageStat[]>([]);
 	const [isLoadingUsage, setIsLoadingUsage] = useState(true);
-	const [subscriptions, setSubscriptions] = useState<SubscriptionOut[]>([]);
-	const [isLoadingSubs, setIsLoadingSubs] = useState(true);
 	const [llmSummary, setLLMSummary] = useState<LLMUsageSummary | null>(null);
 	const [isLoadingLLM, setIsLoadingLLM] = useState(true);
 	const [exportStartDate, setExportStartDate] = useState<string>("");
@@ -148,31 +149,6 @@ export default function AdminPage() {
 			}
 		};
 
-		const fetchSubsData = async () => {
-			if (!userData || userData.role?.toLowerCase() !== "admin") return;
-			try {
-				setIsLoadingSubs(true);
-				const { data, error } = await getSubscriptions();
-				if (error) {
-					throw new Error(
-						(error as { detail?: string }).detail ||
-							"Failed to retrieve subscriptions",
-					);
-				}
-				if (data?.status === "success" && data.data) {
-					setSubscriptions(data.data);
-				} else {
-					throw new Error(data?.message || "Failed to retrieve subscriptions");
-				}
-			} catch (err) {
-				const message = toUserMessage(err, "Failed to retrieve subscriptions");
-				logger.warn("Subscriptions fetch failed", { error: message });
-				notifyError(message);
-			} finally {
-				setIsLoadingSubs(false);
-			}
-		};
-
 		const fetchLLMSummary = async () => {
 			if (!userData || userData.role?.toLowerCase() !== "admin") return;
 			try {
@@ -204,7 +180,6 @@ export default function AdminPage() {
 		};
 
 		fetchUsageStats();
-		fetchSubsData();
 		fetchLLMSummary();
 	}, [userData, toUserMessage]);
 
@@ -357,112 +332,47 @@ export default function AdminPage() {
 				)}
 			</section>
 
-			<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-				{/* Usage Stats */}
-				<section className="morphio-card p-6">
-					<h2 className="morphio-h3 mb-6">Usage Stats</h2>
+			<section className="morphio-card p-6">
+				<h2 className="morphio-h3 mb-6">Usage Stats</h2>
 
-					{isLoadingUsage ? (
-						<div className="py-8 text-center">
-							<p className="morphio-body-sm">Loading usage data...</p>
-						</div>
-					) : usageData.length === 0 ? (
-						<div className="py-8 text-center">
-							<p className="morphio-body-sm">No usage data available.</p>
-						</div>
-					) : (
-						<div className="overflow-x-auto">
-							<table className="min-w-full text-sm">
-								<thead className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-									<tr>
-										<th className="p-3 text-left font-medium">User ID</th>
-										<th className="p-3 text-left font-medium">Email</th>
-										<th className="p-3 text-left font-medium">Display Name</th>
-										<th className="p-3 text-left font-medium">Usage Type</th>
-										<th className="p-3 text-right font-medium">Calls</th>
+				{isLoadingUsage ? (
+					<div className="py-8 text-center">
+						<p className="morphio-body-sm">Loading usage data...</p>
+					</div>
+				) : usageData.length === 0 ? (
+					<div className="py-8 text-center">
+						<p className="morphio-body-sm">No usage data available.</p>
+					</div>
+				) : (
+					<div className="overflow-x-auto">
+						<table className="min-w-full text-sm">
+							<thead className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+								<tr>
+									<th className="p-3 text-left font-medium">User ID</th>
+									<th className="p-3 text-left font-medium">Email</th>
+									<th className="p-3 text-left font-medium">Display Name</th>
+									<th className="p-3 text-left font-medium">Usage Type</th>
+									<th className="p-3 text-right font-medium">Calls</th>
+								</tr>
+							</thead>
+							<tbody>
+								{usageData.map((u) => (
+									<tr
+										key={u.usage_id}
+										className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50/50 dark:hover:bg-gray-700/50"
+									>
+										<td className="p-3">{u.user_id}</td>
+										<td className="p-3">{u.user_email || "N/A"}</td>
+										<td className="p-3">{u.display_name || "N/A"}</td>
+										<td className="p-3">{u.usage_type}</td>
+										<td className="p-3 text-right">{u.usage_calls}</td>
 									</tr>
-								</thead>
-								<tbody>
-									{usageData.map((u) => (
-										<tr
-											key={u.usage_id}
-											className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50/50 dark:hover:bg-gray-700/50"
-										>
-											<td className="p-3">{u.user_id}</td>
-											<td className="p-3">{u.user_email || "N/A"}</td>
-											<td className="p-3">{u.display_name || "N/A"}</td>
-											<td className="p-3">{u.usage_type}</td>
-											<td className="p-3 text-right">{u.usage_calls}</td>
-										</tr>
-									))}
-								</tbody>
-							</table>
-						</div>
-					)}
-				</section>
-
-				{/* Subscription Data */}
-				<section className="morphio-card p-6">
-					<h2 className="morphio-h3 mb-6">Subscription Data</h2>
-
-					{isLoadingSubs ? (
-						<div className="py-8 text-center">
-							<p className="morphio-body-sm">Loading subscription data...</p>
-						</div>
-					) : subscriptions.length === 0 ? (
-						<div className="py-8 text-center">
-							<p className="morphio-body-sm mb-2">
-								No active subscriptions available.
-							</p>
-							<p className="morphio-caption">
-								When users subscribe to paid plans, they will appear here.
-							</p>
-						</div>
-					) : (
-						<div className="overflow-x-auto">
-							<table className="min-w-full text-sm">
-								<thead className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-									<tr>
-										<th className="p-3 text-left font-medium">
-											Subscription ID
-										</th>
-										<th className="p-3 text-left font-medium">User ID</th>
-										<th className="p-3 text-left font-medium">User Email</th>
-										<th className="p-3 text-left font-medium">Plan</th>
-										<th className="p-3 text-left font-medium">Status</th>
-										<th className="p-3 text-left font-medium">Created</th>
-										<th className="p-3 text-left font-medium">Updated</th>
-									</tr>
-								</thead>
-								<tbody>
-									{subscriptions.map((sub) => (
-										<tr
-											key={sub.id}
-											className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50/50 dark:hover:bg-gray-700/50"
-										>
-											<td className="p-3">{sub.id}</td>
-											<td className="p-3">{sub.user_id}</td>
-											<td className="p-3">{sub.user?.email ?? "N/A"}</td>
-											<td className="p-3">{sub.plan}</td>
-											<td className="p-3">{sub.status}</td>
-											<td className="p-3">
-												{sub.created_at
-													? new Date(sub.created_at).toLocaleString()
-													: "N/A"}
-											</td>
-											<td className="p-3">
-												{sub.updated_at
-													? new Date(sub.updated_at).toLocaleString()
-													: "N/A"}
-											</td>
-										</tr>
-									))}
-								</tbody>
-							</table>
-						</div>
-					)}
-				</section>
-			</div>
+								))}
+							</tbody>
+						</table>
+					</div>
+				)}
+			</section>
 		</div>
 	);
 }

@@ -272,16 +272,6 @@ class Settings(BaseSettings):
         json_schema_extra={"env": "ALLOWED_AUDIO_EXTENSIONS"},
     )
 
-    STRIPE_SECRET_KEY: SecretStr = Field(
-        default=SecretStr(""), json_schema_extra={"env": "STRIPE_SECRET_KEY"}
-    )
-    STRIPE_WEBHOOK_SECRET: SecretStr = Field(
-        default=SecretStr(""), json_schema_extra={"env": "STRIPE_WEBHOOK_SECRET"}
-    )
-    STRIPE_PRO_PRICE_ID: str = Field(default="", json_schema_extra={"env": "STRIPE_PRO_PRICE_ID"})
-    STRIPE_ENTERPRISE_PRICE_ID: str = Field(
-        default="", json_schema_extra={"env": "STRIPE_ENTERPRISE_PRICE_ID"}
-    )
     FRONTEND_URL: str = Field(
         default="http://localhost:3005", json_schema_extra={"env": "FRONTEND_URL"}
     )
@@ -423,8 +413,6 @@ class Settings(BaseSettings):
 
         _apply_file_override("SECRET_KEY", is_secretstr=True)
         _apply_file_override("JWT_SECRET_KEY")
-        _apply_file_override("STRIPE_SECRET_KEY", is_secretstr=True)
-        _apply_file_override("STRIPE_WEBHOOK_SECRET", is_secretstr=True)
         _apply_file_override("OPENAI_API_KEY", is_secretstr=True)
         _apply_file_override("ANTHROPIC_API_KEY", is_secretstr=True)
         _apply_file_override("GEMINI_API_KEY", is_secretstr=True)

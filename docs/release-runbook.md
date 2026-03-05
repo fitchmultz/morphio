@@ -27,5 +27,4 @@ This runbook covers staging, deployment, rollback, and verification.
 ## Verification
 - Check logs for error spikes, auth failures, and queue backlogs.
 - Inspect Prometheus metrics for request rate/latency regressions.
-- Confirm Stripe checkout + billing portal flows.
 - Monitor Redis and database health.

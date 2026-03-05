@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape, urlSearchParamsBodySerializer } from './client';
 import { client } from './client.gen';
-import type { ChangeDisplayNameData, ChangeDisplayNameErrors, ChangeDisplayNameResponses, ChangeEmailData, ChangeEmailErrors, ChangeEmailResponses, ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, ContinueConversationData, ContinueConversationErrors, ContinueConversationResponses, CreateApiKeyData, CreateApiKeyErrors, CreateApiKeyResponses, CreateCheckoutSessionData, CreateCheckoutSessionErrors, CreateCheckoutSessionResponses, CreateCommentData, CreateCommentErrors, CreateCommentResponses, CreateItemData, CreateItemErrors, CreateItemResponses, CreatePortalSessionData, CreatePortalSessionErrors, CreatePortalSessionResponses, DeleteCommentData, DeleteCommentErrors, DeleteCommentResponses, DeleteContentData, DeleteContentErrors, DeleteContentResponses, DeleteConversationData, DeleteConversationErrors, DeleteConversationResponses, DeleteTemplateData, DeleteTemplateErrors, DeleteTemplateResponses, ExportLlmUsageData, ExportLlmUsageErrors, ExportLlmUsageResponses, GenerateSplunkConfigData, GenerateSplunkConfigErrors, GenerateSplunkConfigResponses, GetAdminHealthData, GetAdminHealthErrors, GetAdminHealthResponses, GetAdminUsageData, GetAdminUsageErrors, GetAdminUsageResponses, GetAvailableModelsData, GetAvailableModelsErrors, GetAvailableModelsResponses, GetContentData, GetContentErrors, GetContentResponses, GetConversationThreadData, GetConversationThreadErrors, GetConversationThreadResponses, GetCsrfTokenData, GetCsrfTokenErrors, GetCsrfTokenResponses, GetLlmUsageSummaryData, GetLlmUsageSummaryErrors, GetLlmUsageSummaryResponses, GetLogConfigData, GetLogConfigErrors, GetLogConfigResponses, GetLogsProcessingStatusData, GetLogsProcessingStatusErrors, GetLogsProcessingStatusResponses, GetMediaConfigData, GetMediaConfigErrors, GetMediaConfigResponses, GetMediaProcessingStatusData, GetMediaProcessingStatusErrors, GetMediaProcessingStatusResponses, GetSubscriptionsData, GetSubscriptionsErrors, GetSubscriptionsResponses, GetTemplateData, GetTemplateErrors, GetTemplateResponses, GetUserCreditsData, GetUserCreditsErrors, GetUserCreditsResponses, GetUserProfileData, GetUserProfileErrors, GetUserProfileResponses, GetUserUsageData, GetUserUsageErrors, GetUserUsageResponses, GetWebProcessingStatusData, GetWebProcessingStatusErrors, GetWebProcessingStatusResponses, HealthCheckData, HealthCheckResponses, HealthDbData, HealthDbResponses, HealthRedisData, HealthRedisResponses, ListApiKeysData, ListApiKeysErrors, ListApiKeysResponses, ListCommentsData, ListCommentsErrors, ListCommentsResponses, ListContentConversationsData, ListContentConversationsErrors, ListContentConversationsResponses, ListContentsData, ListContentsErrors, ListContentsResponses, ListTemplatesData, ListTemplatesResponses, LoginData, LoginErrors, LoginResponses, LogoutData, LogoutErrors, LogoutResponses, ProcessLogsData, ProcessLogsErrors, ProcessLogsResponses, ProcessMediaData, ProcessMediaErrors, ProcessMediaResponses, ProcessWebData, ProcessWebErrors, ProcessWebResponses, ReadItemData, ReadItemErrors, ReadItemResponses, ReadUsersMeData, ReadUsersMeResponses, RefreshTokenData, RefreshTokenErrors, RefreshTokenResponses, RegisterData, RegisterErrors, RegisterResponses, RevokeApiKeyData, RevokeApiKeyErrors, RevokeApiKeyResponses, SaveContentData, SaveContentErrors, SaveContentResponses, SaveTemplateData, SaveTemplateErrors, SaveTemplateResponses, UpdateCommentData, UpdateCommentErrors, UpdateCommentResponses, UpdateContentData, UpdateContentErrors, UpdateContentResponses, UpdateContentTitleData, UpdateContentTitleErrors, UpdateContentTitleResponses, UpdateMultipleContentsData, UpdateMultipleContentsErrors, UpdateMultipleContentsResponses, UpdateTemplateData, UpdateTemplateErrors, UpdateTemplateResponses } from './types.gen';
+import type { ChangeDisplayNameData, ChangeDisplayNameErrors, ChangeDisplayNameResponses, ChangeEmailData, ChangeEmailErrors, ChangeEmailResponses, ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, ContinueConversationData, ContinueConversationErrors, ContinueConversationResponses, CreateApiKeyData, CreateApiKeyErrors, CreateApiKeyResponses, CreateCommentData, CreateCommentErrors, CreateCommentResponses, CreateItemData, CreateItemErrors, CreateItemResponses, DeleteCommentData, DeleteCommentErrors, DeleteCommentResponses, DeleteContentData, DeleteContentErrors, DeleteContentResponses, DeleteConversationData, DeleteConversationErrors, DeleteConversationResponses, DeleteTemplateData, DeleteTemplateErrors, DeleteTemplateResponses, ExportLlmUsageData, ExportLlmUsageErrors, ExportLlmUsageResponses, GenerateSplunkConfigData, GenerateSplunkConfigErrors, GenerateSplunkConfigResponses, GetAdminHealthData, GetAdminHealthErrors, GetAdminHealthResponses, GetAdminUsageData, GetAdminUsageErrors, GetAdminUsageResponses, GetAvailableModelsData, GetAvailableModelsErrors, GetAvailableModelsResponses, GetContentData, GetContentErrors, GetContentResponses, GetConversationThreadData, GetConversationThreadErrors, GetConversationThreadResponses, GetCsrfTokenData, GetCsrfTokenErrors, GetCsrfTokenResponses, GetLlmUsageSummaryData, GetLlmUsageSummaryErrors, GetLlmUsageSummaryResponses, GetLogConfigData, GetLogConfigErrors, GetLogConfigResponses, GetLogsProcessingStatusData, GetLogsProcessingStatusErrors, GetLogsProcessingStatusResponses, GetMediaConfigData, GetMediaConfigErrors, GetMediaConfigResponses, GetMediaProcessingStatusData, GetMediaProcessingStatusErrors, GetMediaProcessingStatusResponses, GetTemplateData, GetTemplateErrors, GetTemplateResponses, GetUserCreditsData, GetUserCreditsErrors, GetUserCreditsResponses, GetUserProfileData, GetUserProfileErrors, GetUserProfileResponses, GetUserUsageData, GetUserUsageErrors, GetUserUsageResponses, GetWebProcessingStatusData, GetWebProcessingStatusErrors, GetWebProcessingStatusResponses, HealthCheckData, HealthCheckResponses, HealthDbData, HealthDbResponses, HealthRedisData, HealthRedisResponses, ListApiKeysData, ListApiKeysErrors, ListApiKeysResponses, ListCommentsData, ListCommentsErrors, ListCommentsResponses, ListContentConversationsData, ListContentConversationsErrors, ListContentConversationsResponses, ListContentsData, ListContentsErrors, ListContentsResponses, ListTemplatesData, ListTemplatesResponses, LoginData, LoginErrors, LoginResponses, LogoutData, LogoutErrors, LogoutResponses, ProcessLogsData, ProcessLogsErrors, ProcessLogsResponses, ProcessMediaData, ProcessMediaErrors, ProcessMediaResponses, ProcessWebData, ProcessWebErrors, ProcessWebResponses, ReadItemData, ReadItemErrors, ReadItemResponses, ReadUsersMeData, ReadUsersMeResponses, RefreshTokenData, RefreshTokenErrors, RefreshTokenResponses, RegisterData, RegisterErrors, RegisterResponses, RevokeApiKeyData, RevokeApiKeyErrors, RevokeApiKeyResponses, SaveContentData, SaveContentErrors, SaveContentResponses, SaveTemplateData, SaveTemplateErrors, SaveTemplateResponses, UpdateCommentData, UpdateCommentErrors, UpdateCommentResponses, UpdateContentData, UpdateContentErrors, UpdateContentResponses, UpdateContentTitleData, UpdateContentTitleErrors, UpdateContentTitleResponses, UpdateMultipleContentsData, UpdateMultipleContentsErrors, UpdateMultipleContentsResponses, UpdateTemplateData, UpdateTemplateErrors, UpdateTemplateResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -331,7 +331,7 @@ export const changeEmail = <ThrowOnError extends boolean = false>(options: Optio
 /**
  * Get User Credits
  *
- * Get summary of user's credit usage for the current billing period.
+ * Get summary of a user's credit usage for the current monthly period.
  */
 export const getUserCredits = <ThrowOnError extends boolean = false>(options?: Options<GetUserCreditsData, ThrowOnError>) => (options?.client ?? client).get<GetUserCreditsResponses, GetUserCreditsErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -464,18 +464,9 @@ export const getAdminUsage = <ThrowOnError extends boolean = false>(options?: Op
 });
 
 /**
- * Get Subscriptions
- */
-export const getSubscriptions = <ThrowOnError extends boolean = false>(options?: Options<GetSubscriptionsData, ThrowOnError>) => (options?.client ?? client).get<GetSubscriptionsResponses, GetSubscriptionsErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/admin/get-subscriptions',
-    ...options
-});
-
-/**
  * Export Llm Usage
  *
- * Export LLM usage records as CSV for billing and analytics.
+ * Export LLM usage records as CSV for operational analytics.
  *
  * Aggregates usage by date, user, provider, and model.
  * Returns: date, user_id, user_email, provider, model, total_tokens, estimated_cost
@@ -503,32 +494,6 @@ export const getLlmUsageSummary = <ThrowOnError extends boolean = false>(options
 export const getAdminHealth = <ThrowOnError extends boolean = false>(options?: Options<GetAdminHealthData, ThrowOnError>) => (options?.client ?? client).get<GetAdminHealthResponses, GetAdminHealthErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/admin/health',
-    ...options
-});
-
-/**
- * Create Checkout Session
- *
- * Create a Stripe Checkout Session for upgrading to a paid plan.
- *
- * Returns a URL to redirect the user to Stripe's hosted checkout page.
- */
-export const createCheckoutSession = <ThrowOnError extends boolean = false>(options: Options<CreateCheckoutSessionData, ThrowOnError>) => (options.client ?? client).post<CreateCheckoutSessionResponses, CreateCheckoutSessionErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/billing/checkout-session',
-    ...options
-});
-
-/**
- * Create Portal Session
- *
- * Create a Stripe Customer Portal session for managing subscriptions.
- *
- * Returns a URL to redirect the user to Stripe's billing portal.
- */
-export const createPortalSession = <ThrowOnError extends boolean = false>(options?: Options<CreatePortalSessionData, ThrowOnError>) => (options?.client ?? client).post<CreatePortalSessionResponses, CreatePortalSessionErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/billing/portal-session',
     ...options
 });
 

@@ -7,8 +7,6 @@ const mockUpdateUserData = jest.fn();
 
 jest.mock("@/client/sdk.gen", () => ({
 	createApiKey: jest.fn(),
-	createCheckoutSession: jest.fn(),
-	createPortalSession: jest.fn(),
 	getUserCredits: jest.fn(),
 	getUserProfile: jest.fn(),
 	listApiKeys: jest.fn(),

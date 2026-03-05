@@ -165,11 +165,6 @@ from .routes.admin import usage_router as admin_usage_router
 app.include_router(admin_usage_router, prefix="/admin", tags=["Admin"])
 app.include_router(admin_health_router, prefix="/admin", tags=["Admin"])
 
-# Billing routes (Stripe integration)
-from .routes import billing
-
-app.include_router(billing.router, tags=["Billing"])
-
 # API Keys routes
 from .routes import api_keys
 

@@ -34,6 +34,5 @@ export const queryKeys = {
 	// Admin related queries
 	admin: {
 		usageStats: ["admin", "usageStats"] as const,
-		subscriptions: ["admin", "subscriptions"] as const,
 	},
 };

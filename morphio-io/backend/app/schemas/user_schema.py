@@ -72,7 +72,7 @@ class UserOut(UserBase):
 
 
 class UserCredits(BaseModel):
-    """Summary of user's credit usage for the current billing period."""
+    """Summary of a user's credit usage for the current monthly period."""
 
     plan: str = Field(..., description="Current subscription plan")
     limit: int = Field(..., description="Total credits available in this plan")

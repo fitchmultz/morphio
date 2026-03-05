@@ -24,7 +24,7 @@ ProviderName = Literal["openai", "anthropic", "gemini"]
 
 
 class GenerationWithUsage(TokenUsage):
-    """Generation result with token usage for tracking/billing.
+    """Generation result with token usage for tracking and usage analytics.
 
     Inherits token tracking fields from TokenUsage and adds content.
     Use this when you need to track token consumption for monetization.
@@ -334,7 +334,7 @@ async def generate_completion_with_usage(
     temperature: float | None = None,
 ) -> GenerationWithUsage:
     """
-    Generate a completion and return token usage for tracking/billing.
+    Generate a completion and return token usage for tracking and usage analytics.
 
     This function is preferred when you need to:
     - Track token consumption for monetization

@@ -127,22 +127,6 @@ export type ApiResponseAuthTokenPayload = {
 };
 
 /**
- * ApiResponse[CheckoutSessionData]
- */
-export type ApiResponseCheckoutSessionData = {
-    status: ResponseStatus;
-    /**
-     * Message
-     */
-    message: string;
-    data?: CheckoutSessionData | null;
-    /**
-     * Timestamp
-     */
-    timestamp?: string | null;
-};
-
-/**
  * ApiResponse[CommentOut]
  */
 export type ApiResponseCommentOut = {
@@ -398,22 +382,6 @@ export type ApiResponsePaginatedResponseContentOut = {
 };
 
 /**
- * ApiResponse[PortalSessionData]
- */
-export type ApiResponsePortalSessionData = {
-    status: ResponseStatus;
-    /**
-     * Message
-     */
-    message: string;
-    data?: PortalSessionData | null;
-    /**
-     * Timestamp
-     */
-    timestamp?: string | null;
-};
-
-/**
  * ApiResponse[SystemHealthOut]
  */
 export type ApiResponseSystemHealthOut = {
@@ -530,25 +498,6 @@ export type ApiResponseListApiKeyOut = {
      * Data
      */
     data?: Array<ApiKeyOut> | null;
-    /**
-     * Timestamp
-     */
-    timestamp?: string | null;
-};
-
-/**
- * ApiResponse[list[SubscriptionOut]]
- */
-export type ApiResponseListSubscriptionOut = {
-    status: ResponseStatus;
-    /**
-     * Message
-     */
-    message: string;
-    /**
-     * Data
-     */
-    data?: Array<SubscriptionOut> | null;
     /**
      * Timestamp
      */
@@ -687,26 +636,6 @@ export type ChangePasswordRequest = {
      * New Password
      */
     new_password: string;
-};
-
-/**
- * CheckoutSessionData
- *
- * Data returned from checkout session creation.
- */
-export type CheckoutSessionData = {
-    /**
-     * Checkout Url
-     *
-     * URL to redirect user to Stripe checkout
-     */
-    checkout_url: string;
-    /**
-     * Session Id
-     *
-     * Stripe session ID
-     */
-    session_id: string;
 };
 
 /**
@@ -1265,20 +1194,6 @@ export type PaginatedResponseContentOut = {
 };
 
 /**
- * PortalSessionData
- *
- * Data returned from portal session creation.
- */
-export type PortalSessionData = {
-    /**
-     * Portal Url
-     *
-     * URL to redirect user to Stripe billing portal
-     */
-    portal_url: string;
-};
-
-/**
  * ProcessingStage
  *
  * Detailed processing stages for progress reporting.
@@ -1298,45 +1213,6 @@ export type ProcessingStage = 'queued' | 'downloading' | 'chunking' | 'transcrib
  * ResponseStatus
  */
 export type ResponseStatus = 'success' | 'error' | 'warning' | 'info';
-
-/**
- * SubscriptionOut
- */
-export type SubscriptionOut = {
-    /**
-     * Id
-     */
-    id: number;
-    /**
-     * User Id
-     */
-    user_id: number;
-    /**
-     * Plan
-     */
-    plan: string;
-    /**
-     * Status
-     */
-    status: string;
-    /**
-     * Stripe Customer Id
-     */
-    stripe_customer_id?: string | null;
-    /**
-     * Stripe Subscription Id
-     */
-    stripe_subscription_id?: string | null;
-    /**
-     * Created At
-     */
-    created_at: string;
-    /**
-     * Updated At
-     */
-    updated_at?: string | null;
-    user?: UserBasicOut | null;
-};
 
 /**
  * SystemHealthOut
@@ -1432,24 +1308,6 @@ export type TemplateUpdate = {
 };
 
 /**
- * UserBasicOut
- */
-export type UserBasicOut = {
-    /**
-     * Id
-     */
-    id: number;
-    /**
-     * Email
-     */
-    email: string;
-    /**
-     * Display Name
-     */
-    display_name: string;
-};
-
-/**
  * UserCreate
  */
 export type UserCreate = {
@@ -1473,7 +1331,7 @@ export type UserCreate = {
 /**
  * UserCredits
  *
- * Summary of user's credit usage for the current billing period.
+ * Summary of a user's credit usage for the current monthly period.
  */
 export type UserCredits = {
     /**
@@ -3220,41 +3078,6 @@ export type GetAdminUsageResponses = {
 
 export type GetAdminUsageResponse = GetAdminUsageResponses[keyof GetAdminUsageResponses];
 
-export type GetSubscriptionsData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/admin/get-subscriptions';
-};
-
-export type GetSubscriptionsErrors = {
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-    /**
-     * Not authorized
-     */
-    403: unknown;
-    /**
-     * Too Many Requests
-     */
-    429: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: unknown;
-};
-
-export type GetSubscriptionsResponses = {
-    /**
-     * Successful Response
-     */
-    200: ApiResponseListSubscriptionOut;
-};
-
-export type GetSubscriptionsResponse = GetSubscriptionsResponses[keyof GetSubscriptionsResponses];
-
 export type ExportLlmUsageData = {
     body?: never;
     path?: never;
@@ -3401,95 +3224,6 @@ export type GetAdminHealthResponses = {
 };
 
 export type GetAdminHealthResponse = GetAdminHealthResponses[keyof GetAdminHealthResponses];
-
-export type CreateCheckoutSessionData = {
-    body?: never;
-    path?: never;
-    query: {
-        /**
-         * Plan
-         */
-        plan: string;
-    };
-    url: '/billing/checkout-session';
-};
-
-export type CreateCheckoutSessionErrors = {
-    /**
-     * Invalid plan
-     */
-    400: unknown;
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-    /**
-     * Too Many Requests
-     */
-    429: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: unknown;
-    /**
-     * Stripe not configured
-     */
-    503: unknown;
-};
-
-export type CreateCheckoutSessionError = CreateCheckoutSessionErrors[keyof CreateCheckoutSessionErrors];
-
-export type CreateCheckoutSessionResponses = {
-    /**
-     * Checkout session created
-     */
-    200: ApiResponseCheckoutSessionData;
-};
-
-export type CreateCheckoutSessionResponse = CreateCheckoutSessionResponses[keyof CreateCheckoutSessionResponses];
-
-export type CreatePortalSessionData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/billing/portal-session';
-};
-
-export type CreatePortalSessionErrors = {
-    /**
-     * No Stripe customer found
-     */
-    400: unknown;
-    /**
-     * Unauthorized
-     */
-    401: unknown;
-    /**
-     * Too Many Requests
-     */
-    429: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: unknown;
-    /**
-     * Stripe not configured
-     */
-    503: unknown;
-};
-
-export type CreatePortalSessionResponses = {
-    /**
-     * Portal session created
-     */
-    200: ApiResponsePortalSessionData;
-};
-
-export type CreatePortalSessionResponse = CreatePortalSessionResponses[keyof CreatePortalSessionResponses];
 
 export type ListApiKeysData = {
     body?: never;

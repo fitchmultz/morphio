@@ -62,7 +62,7 @@ Morphio follows a client-server architecture with a clear separation of concerns
 
 - **Database**:
 
-  - Relational structure with tables for users, content, comments, templates, subscriptions, and usage tracking
+  - Relational structure with tables for users, content, comments, templates, quota tiers, and usage tracking
   - Supports soft deletion for data recovery
 
 - **Infrastructure**:
@@ -76,7 +76,7 @@ Morphio follows a client-server architecture with a clear separation of concerns
 - **Template System**: Predefined and user-created templates for content generation (e.g., blog posts, social media posts)
 - **Media Processing**: Asynchronous processing of uploaded files or URLs (YouTube, web content)
 - **Comment System**: Hierarchical comments on content with soft deletion
-- **Admin Panel**: Usage stats and subscription management for administrators
+- **Admin Panel**: Usage stats and operational visibility for administrators
 - **Rate Limiting & Caching**: Performance optimization and abuse prevention
 - **Log Analysis**: Advanced log processing capabilities with intelligent pattern recognition
 - **Data Anonymization**: Robust anonymization features for sensitive data in logs and content
@@ -110,7 +110,7 @@ While the exact AI models aren't specified in the codebase, the structure sugges
 - **Content**: Save, retrieve, update, and delete content with tags and comments
 - **Templates**: Create and manage reusable content templates
 - **Media Processing**: Upload files or provide URLs for AI-driven content generation
-- **Admin**: Monitor usage and subscriptions (admin-only routes)
+- **Admin**: Monitor usage and system health (admin-only routes)
 - **Log Analysis**: Process and analyze log files with AI-powered pattern detection
 - **Anonymization**: Automatically detect and anonymize sensitive information in logs and content
 
@@ -179,11 +179,11 @@ While the exact AI models aren't specified in the codebase, the structure sugges
 
 - Required in production (`APP_ENV=production`):
   - `SECRET_KEY` and `JWT_SECRET_KEY` must be strong, non-default values. The API refuses to start if either is empty or still set to dev defaults.
-  - Other sensitive vars should be set via env or Docker secrets (e.g., `OPENAI_API_KEY`, `STRIPE_SECRET_KEY`).
+  - Other sensitive vars should be set via env or Docker secrets (e.g., `OPENAI_API_KEY`).
 
 - Docker secrets support:
   - Provide file-based secrets using `*_FILE` env vars or by mounting `/run/secrets/<NAME>`.
-  - Supported names: `SECRET_KEY`, `JWT_SECRET_KEY`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `DB_PASSWORD`, `REDIS_PASSWORD`.
+  - Supported names: `SECRET_KEY`, `JWT_SECRET_KEY`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `DB_PASSWORD`, `REDIS_PASSWORD`.
 
 - Example (Compose):
 
