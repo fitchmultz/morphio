@@ -5,6 +5,15 @@
 repos:
   - repo: local
     hooks:
+      # Env layout audit - only root /.env and /.env.example are allowed
+      - id: audit-env-layout
+        name: Audit env layout
+        entry: bash scripts/audit_env_layout.sh
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-commit]
+
       # Env template audit - ensures .env.example has all config keys
       - id: audit-env-template
         name: Audit env template
@@ -53,7 +62,7 @@ repos:
       # Biome check for frontend
       - id: biome-check
         name: Biome check (TypeScript/JS)
-        entry: bash -c 'cd morphio-io/frontend && pnpm biome check .'
+        entry: bash -c 'cd morphio-io/frontend && corepack enable && corepack prepare "$(node -p "require(\"./package.json\").packageManager")" --activate && pnpm biome check .'
         language: system
         pass_filenames: false
         files: '\.(js|jsx|ts|tsx)$'

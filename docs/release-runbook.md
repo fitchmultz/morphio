@@ -11,7 +11,8 @@ This runbook covers staging, deployment, rollback, and verification.
 - Confirm OpenSearch Dashboards is reachable on port 5601.
 
 ## Deploy
-- Run `make ci` from the repo root (local CI is the release gate; Actions are disabled).
+- Run `make ci` from the repo root (full local release gate).
+- Ensure the PR fast gate (`.github/workflows/ci-cd.yml`) is green.
 - Build and push the release images locally (backend API, worker-ml, crawler, frontend) to GHCR.
 - Capture the pushed image digests and generate a pinned `docker-compose.release.yml`.
 - Create and push a release tag (e.g. `v1.2.3`), then publish a GitHub Release with the pinned compose + SBOMs attached.

@@ -8,11 +8,10 @@ Before starting, ensure you have:
 
 - **macOS or Linux** (Windows WSL2 works but is untested)
 - **Docker Desktop** running
-- **Node.js 20+** (use `fnm` or `nvm`)
+- **Node.js 24+** (use `fnm` or `nvm`)
 - **pnpm** (`corepack enable && corepack prepare pnpm@latest --activate`)
 - **Rust toolchain** (`curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`)
 - **uv** (`curl -LsSf https://astral.sh/uv/install.sh | sh`)
-- **ripgrep** (`brew install ripgrep` or `apt install ripgrep`)
 - **GitHub CLI** (`brew install gh` then `gh auth login`)
 
 ## First Hour Setup
@@ -24,25 +23,33 @@ git clone https://github.com/fitchmultz/morphio-all.git
 cd morphio-all
 ```
 
-### 2. Copy environment template
+### 2. Bootstrap local environment
 
 ```bash
-cp .env.example .env
+make env
 ```
 
-Edit `.env` to add required secrets (API keys, etc.). See [Configuration Guide](./configuration.md) for details.
+This creates `/.env` from `/.env.example` (if missing) and generates strong local values for `SECRET_KEY` and `JWT_SECRET_KEY`.
 
-### 3. Install all dependencies
+Edit `.env` to add provider/API credentials as needed. See [Configuration Guide](./configuration.md) for details.
+
+### 3. Install baseline dependencies
 
 ```bash
 make install
 ```
 
-This installs:
-- Python dependencies (all workspace members via uv)
+This installs the public-safe baseline:
+- Python workspace dependencies required for backend/core/native development
 - Frontend dependencies (pnpm)
-- Native Rust extension (morphio-native)
 
+Optional heavy stacks are explicit opt-in:
+
+```bash
+make install-full      # all optional groups/extras
+make install-ml        # backend ML stack
+make install-ml-apple  # Apple-specific ML extras
+```
 ### 4. Install git hooks
 
 ```bash
@@ -62,8 +69,9 @@ make ci
 This runs the complete local CI pipeline:
 - Doctor checks (dependencies, tools)
 - Native build (Rust extension)
-- Backend checks (ruff, pytest)
-- Frontend checks (biome, tsc)
+- morphio-core checks (ruff, pytest)
+- Backend checks (ruff, ty, targeted integration tests)
+- Frontend checks (biome, tsc, jest)
 - OpenAPI drift detection
 - Docker builds and smoke tests
 - Guardrails (env audit, import boundary checks)
@@ -85,8 +93,11 @@ This starts:
 
 | Task | Command |
 |------|---------|
-| Install all deps | `make install` |
+| Create/refresh env | `make env` |
+| Install baseline deps | `make install` |
+| Install all optional deps | `make install-full` |
 | Start dev servers | `make dev` |
+| Fast PR-parity checks | `make ci-fast` |
 | Run full CI | `make ci` |
 | Run tests only | `make test` |
 | Fast backend checks | `bash scripts/ci/jobs/backend-checks.sh` |
@@ -113,6 +124,7 @@ morphio-all/
 git checkout -b feat/my-feature
 
 # Make changes, then validate
+make ci-fast
 make ci
 
 # Commit and push

@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Morphio FastAPI backend"
 readme = "README.md"
 requires-python = ">=3.13"
-license = { text = "Proprietary" }
+license = { text = "MIT" }
 authors = [{ name = "Morphio Team" }]
 # Minimal core dependencies - each service adds what it needs via dependency-groups
 dependencies = [

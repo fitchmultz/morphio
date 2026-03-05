@@ -17,3 +17,12 @@ can understand why choices were made and when to revisit them.
 2. Move to **Accepted** once the decision is implemented or approved.
 3. Use **Deprecated** if no longer recommended.
 4. Use **Superseded** when replaced by a newer ADR and link to it.
+
+## Current ADRs
+
+- [0001-uv-workspace-single-venv.md](./0001-uv-workspace-single-venv.md)
+- [0002-provider-sdk-boundary-adapters.md](./0002-provider-sdk-boundary-adapters.md)
+- [0003-make-ci-required-gate.md](./0003-make-ci-required-gate.md)
+- [0004-openapi-client-generation.md](./0004-openapi-client-generation.md)
+- [0005-credits-gating-usage-tracking.md](./0005-credits-gating-usage-tracking.md)
+- [0006-two-tier-ci-gates.md](./0006-two-tier-ci-gates.md)

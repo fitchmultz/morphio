@@ -9,7 +9,8 @@
 # Do NOT use `-include .env` + `export` as it breaks JSON-formatted values.
 
 .PHONY: help \
-	install install-backend install-frontend update update-backend update-frontend \
+	env install install-backend install-frontend install-full install-crawler install-ml install-ml-apple install-core-video install-core-whisper-cpu install-core-whisper-mlx \
+	update update-backend update-frontend \
 	dev dev-full dev-docker \
 	staging-secrets staging-up staging-down staging-logs staging-smoke \
 	test test-native test-core test-io \
@@ -17,7 +18,7 @@
 	type-check type-check-native type-check-core type-check-io \
 	format format-native format-core format-io \
 	generate build build-native build-frontend \
-	ci check check-native check-core check-io audit-imports \
+	ci ci-fast check check-native check-core check-io audit-imports secrets-scan secrets-scan-history \
 	clean check-rust rmds
 
 # Default target
@@ -26,11 +27,14 @@ help: ## Show this help message
 	@echo "===================================="
 	@echo ""
 	@echo "Quick Start:"
-	@echo "  make install  - Install all dependencies (dev + optional)"
+	@echo "  make env      - Create/refresh .env with strong local secrets"
+	@echo "  make install  - Install baseline dependencies (public-safe defaults)"
+	@echo "  make install-full - Install all optional heavy dependencies"
 	@echo "  make update   - Update all dependencies to latest"
 	@echo "  make dev      - Start morphio-io dev servers"
+	@echo "  make ci-fast  - Fast local checks (PR parity)"
+	@echo "  make ci       - Full local CI gate (required before PRs)"
 	@echo "  make test     - Run all tests (native + core + io)"
-	@echo "  make ci       - Full CI gate (required before PRs)"
 	@echo ""
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
 
@@ -45,20 +49,52 @@ check-rust: ## Verify Rust toolchain is installed
 	@command -v rustc >/dev/null 2>&1 || (echo "❌ ERROR: Rust not found. Install from https://rustup.rs" && exit 1)
 	@echo "✅ Rust toolchain found: $$(rustc --version)"
 
+env: ## Create/refresh root .env with strong local secrets
+	@bash scripts/bootstrap_env.sh
+
 # ============================================================================
 # Installation (uses uv workspaces - single .venv at root)
 # ============================================================================
 
-install: check-rust install-backend install-frontend ## Install all dependencies (dev + optional)
-	@echo "✅ All dependencies installed!"
+install: check-rust install-backend install-frontend ## Install baseline dependencies (public-safe defaults)
+	@echo "✅ Baseline dependencies installed."
+	@echo "ℹ️  Optional heavy stacks are opt-in (see: make install-full / make install-ml)."
 
-install-backend: ## Install Python + Rust dependencies (morphio-native + morphio-core + morphio-io/backend)
-	@echo "📦 Installing Python dependencies (workspace)..."
-	@uv sync --package morphio-core --package morphio-backend --package morphio-native --all-groups --all-extras
+install-backend: ## Install baseline Python/Rust dependencies (no heavy optional ML groups)
+	@echo "📦 Installing baseline Python dependencies (workspace)..."
+	@uv sync --frozen --dev
 
 install-frontend: ## Install frontend dependencies
 	@echo "📦 Installing frontend dependencies..."
-	@cd morphio-io/frontend && corepack enable && pnpm install
+	@cd morphio-io/frontend && corepack enable && pnpm install --frozen-lockfile
+
+install-full: check-rust install-frontend ## Install all optional dependency groups/extras (heavy)
+	@echo "📦 Installing full Python dependency surface (includes heavy optional groups)..."
+	@uv sync --package morphio-core --package morphio-backend --package morphio-native --all-groups --all-extras --frozen
+
+install-crawler: ## Install crawler-specific backend dependencies
+	@echo "📦 Installing crawler dependency group..."
+	@uv sync --project morphio-io/backend --group crawler --frozen
+
+install-ml: ## Install Linux/CUDA-oriented ML dependency group (heavy)
+	@echo "📦 Installing backend ML dependency group..."
+	@uv sync --project morphio-io/backend --group ml --frozen
+
+install-ml-apple: ## Install Apple-Silicon ML dependency group
+	@echo "📦 Installing backend Apple ML dependency group..."
+	@uv sync --project morphio-io/backend --group ml-apple --frozen
+
+install-core-video: ## Install morphio-core video extra
+	@echo "📦 Installing morphio-core video extra..."
+	@uv sync --package morphio-core --extra video --frozen
+
+install-core-whisper-cpu: ## Install morphio-core faster-whisper CPU extra
+	@echo "📦 Installing morphio-core whisper CPU extra..."
+	@uv sync --package morphio-core --extra whisper-cpu --frozen
+
+install-core-whisper-mlx: ## Install morphio-core whisper MLX extra (Apple Silicon)
+	@echo "📦 Installing morphio-core whisper MLX extra..."
+	@uv sync --package morphio-core --extra whisper-mlx --frozen
 
 update: update-backend update-frontend ## Update all dependencies to latest versions
 	@echo "✅ All dependencies updated!"
@@ -186,7 +222,7 @@ type-check: type-check-core type-check-io ## Type check everything
 
 type-check-core: ## Type check morphio-core (ty check)
 	@echo "🔷 Type checking morphio-core..."
-	@cd morphio-core && uv run ty check || true
+	@cd morphio-core && uv run ty check
 	@echo "✅ morphio-core type check complete!"
 
 type-check-io: ## Type check morphio-io (backend + frontend)
@@ -236,17 +272,26 @@ build-frontend: ## Build morphio-io frontend
 	@cd morphio-io/frontend && pnpm build
 
 # ============================================================================
-# CI Gate (Required for PRs)
+# CI Gates
 # ============================================================================
 
-ci: generate format type-check lint build test ## Full CI gate: generate → format → type-check → lint → build → test (required for PRs)
+ci-fast: ## Fast CI parity gate: backend checks + frontend checks + guardrails
+	@echo "🚦 Running fast CI gate..."
+	@$(MAKE) env
+	@bash scripts/ci/jobs/backend-checks.sh
+	@bash scripts/ci/jobs/frontend-checks.sh
+	@bash scripts/ci/jobs/guardrails.sh
+	@echo "✅ Fast CI gate passed."
+
+ci: ## Full local CI gate (required before PRs)
+	@bash scripts/ci/run.sh
 	@echo ""
 	@echo "============================================"
-	@echo "✅ CI passed - ready for PR!"
+	@echo "✅ Full CI passed - ready for PR!"
 	@echo "============================================"
 
-# Compatibility alias (use 'make ci' instead)
-check: ci ## Alias for 'make ci' (deprecated - use 'make ci')
+# Compatibility alias
+check: ci ## Alias for 'make ci'
 
 # ============================================================================
 # Sub-project checks (for targeted validation)
@@ -273,6 +318,12 @@ check-io: ## Full check for morphio-io (lint + type-check + tests)
 audit-imports: ## Verify no direct provider SDK imports in morphio-io/backend/app
 	@echo "🔍 Auditing provider SDK imports..."
 	@./scripts/audit_imports.sh
+
+secrets-scan: ## Scan working tree for potential secrets
+	@bash scripts/ci/jobs/secrets-scan.sh --working-tree
+
+secrets-scan-history: ## Scan git history for potential secrets (release readiness)
+	@bash scripts/ci/jobs/secrets-scan.sh --history
 
 # ============================================================================
 # Cleanup

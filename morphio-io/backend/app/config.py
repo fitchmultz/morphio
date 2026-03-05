@@ -1,3 +1,10 @@
+"""Purpose: Centralized runtime configuration for the Morphio backend.
+Responsibilities: Load settings from canonical env sources and enforce safety invariants.
+Scope: Environment parsing, secret-file overrides, and production guardrails.
+Usage: Imported by backend startup and services via `get_settings()`.
+Invariants/Assumptions: Only root .env/.env.example are canonical and production secrets must be non-default.
+"""
+
 import os
 from functools import lru_cache
 from pathlib import Path
@@ -32,6 +39,15 @@ def _apply_env(path: Path, override: bool) -> None:
 
 
 _apply_env(root_env, override=False)
+
+# Values that are explicitly invalid for production secrets.
+_INVALID_PRODUCTION_SECRET_VALUES = {
+    "",
+    "dev_secret_key",
+    "dev_jwt_secret_key",
+    "__GENERATE_SECURE_VALUE__",
+    "__CHANGE_ME__",
+}
 
 
 class Settings(BaseSettings):
@@ -371,15 +387,15 @@ class Settings(BaseSettings):
         _apply_file_override("DB_PASSWORD")
         _apply_file_override("DATABASE_URL", is_secretstr=True)
 
-        # Enforce non-default secrets in production
+        # Enforce non-default, non-placeholder secrets in production.
         if str(self.APP_ENV).lower() == "production":
             secret_key_val = (self.SECRET_KEY.get_secret_value() or "").strip()
             jwt_secret_val = (self.JWT_SECRET_KEY or "").strip()
-            if secret_key_val in ("", "dev_secret_key"):
+            if secret_key_val in _INVALID_PRODUCTION_SECRET_VALUES:
                 raise RuntimeError(
                     "SECURITY: SECRET_KEY must be set to a strong, non-default value in production."
                 )
-            if jwt_secret_val in ("", "dev_jwt_secret_key"):
+            if jwt_secret_val in _INVALID_PRODUCTION_SECRET_VALUES:
                 raise RuntimeError(
                     "SECURITY: JWT_SECRET_KEY must be set to a strong, non-default value in production."
                 )

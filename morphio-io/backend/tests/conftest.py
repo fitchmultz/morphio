@@ -122,12 +122,10 @@ def pytest_sessionfinish(session, exitstatus):
 
         await app_engine.dispose()
 
-    # Run cleanup in event loop
+    # Run cleanup without deprecated implicit event-loop access.
     try:
-        loop = asyncio.get_event_loop()
-        if loop.is_running():
-            loop.create_task(cleanup())
-        else:
-            loop.run_until_complete(cleanup())
+        loop = asyncio.get_running_loop()
     except RuntimeError:
         asyncio.run(cleanup())
+    else:
+        loop.create_task(cleanup())

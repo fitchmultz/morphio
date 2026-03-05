@@ -3,15 +3,19 @@ name: GitHub Actions Version Updater
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   update-versions:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.2.2
         with:
-          token: ${{ secrets.GHCR_PAT }}
+          token: ${{ github.token }}
 
       - name: Update GitHub Actions versions
         uses: saadmk11/github-actions-version-updater@v0.8.1
         with:
-          token: ${{ secrets.GHCR_PAT }}
+          token: ${{ github.token }}

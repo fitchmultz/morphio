@@ -6,7 +6,8 @@ This project is part of the `morphio-all` monorepo using **uv workspaces**. The 
 
 ```bash
 # From monorepo root (recommended)
-make install    # Install all deps
+make install    # Install baseline deps (safe defaults)
+make install-full  # Optional heavy dependency groups/extras
 make dev        # Start backend + frontend
 make ci         # Full CI gate (required for PRs)
 ```
@@ -83,10 +84,9 @@ make openapi  # From project root, no server needed
 
 ## Docker Builds
 
-Docker images pull from GHCR and require authentication:
+Default local compose/build paths use local Dockerfiles and do not require GHCR auth. GHCR image pulls are reserved for release/production workflows.
 
 ```bash
-source ~/.secrets  # Export GITHUB_TOKEN for GHCR access
 docker build -f backend/Dockerfile.dev ..
 ```
 

@@ -1,111 +1,86 @@
-# Disabled by design; run locally via scripts/ci/run.sh
-name: CI / CD – Backend + Frontend + Images
+name: CI • Fast PR Gate
 
 on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-fast-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_OWNER: ${{ github.repository_owner }}
+permissions:
+  contents: read
 
 jobs:
-  native-build:
-    name: Native • Rust Build
+  backend-checks:
+    name: Fast Gate • backend
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Rust 1.75
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          uv-version: "0.9.18"
+          enable-cache: true
+
+      - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: "1.75"
-          components: clippy, rustfmt
 
       - name: Cache Cargo
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: morphio-native
 
-      - name: Set up Python 3.13
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
+      - name: Prepare env file for audits
+        run: make env
 
-      - name: Set up uv
-        uses: astral-sh/setup-uv@v5
-        with:
-          uv-version: "0.9.18"
-
-      - name: Install Python dev headers
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-dev
-
-      - name: Native build (local CI script)
-        run: bash scripts/ci/jobs/native-build.sh
-
-  backend-checks:
-    name: Backend • Ruff + ty + Lock drift
-    needs: [native-build]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Python 3.13
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-
-      - name: Set up uv
-        uses: astral-sh/setup-uv@v5
-        with:
-          uv-version: "0.9.18"
-
-      - name: Backend checks (local CI script)
+      - name: Backend checks
         run: bash scripts/ci/jobs/backend-checks.sh
 
   frontend-checks:
-    name: Frontend • Biome + TypeScript
+    name: Fast Gate • frontend
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 24
+      - name: Set up Node.js 24
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: "24"
+          cache: "pnpm"
+          cache-dependency-path: "morphio-io/frontend/pnpm-lock.yaml"
 
-      - name: Frontend checks (local CI script)
+      - name: Frontend checks
         run: bash scripts/ci/jobs/frontend-checks.sh
 
-  docker-build-push:
-    name: Docker • Build and (conditionally) Push
-    needs: [ backend-checks, frontend-checks ]
+  guardrails:
+    name: Fast Gate • guardrails
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Prepare env file for audits
+        run: make env
 
-      - name: Docker build (local CI script)
-        run: bash scripts/ci/jobs/docker-build.sh
-
-  docker-smoke:
-    name: Docker • Smoke (Compose)
-    needs: [ backend-checks, frontend-checks ]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Docker smoke (local CI script)
-        run: bash scripts/ci/jobs/docker-smoke.sh
+      - name: Guardrails
+        run: bash scripts/ci/jobs/guardrails.sh

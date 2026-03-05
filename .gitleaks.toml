@@ -1,0 +1,14 @@
+title = "morphio-all gitleaks config"
+
+[allowlist]
+description = "Allow deterministic placeholders and local-only env file"
+paths = [
+  '''(^|/)\.env$''',
+  '''(^|/)\.venv/''',
+  '''(^|/)\.venv-ci/''',
+  '''(^|/)morphio-io/frontend/openapi\.json$''',
+]
+regexes = [
+  '''__GENERATE_SECURE_VALUE__''',
+  '''__CHANGE_ME__''',
+]

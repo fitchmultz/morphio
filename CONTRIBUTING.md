@@ -5,11 +5,12 @@
 - Only `/.env` and `/.env.example` are allowed. No nested `.env*` files anywhere.
 - Non-standard ports only: frontend 3005, backend 8005, redis 6384 (never introduce 3000/8000/6379).
 - No PR without `make ci` passing locally.
-
+- Fast PR-parity checks are required during iteration via `make ci-fast`.
+- Baseline install is `make install`; heavy optional stacks are explicit (`make install-full`, `make install-ml`).
 ## One-time setup
 
 ```bash
-cp .env.example .env
+make env
 bash scripts/install-git-hooks.sh
 bash scripts/ci/doctor.sh
 ```
@@ -19,6 +20,7 @@ bash scripts/ci/doctor.sh
 ```bash
 git checkout -b <type>/<slug>
 # make changes
+make ci-fast
 make ci
 ```
 
@@ -42,7 +44,7 @@ git status --porcelain=v1 -b
 ```bash
 bash scripts/ci/jobs/backend-checks.sh
 bash scripts/ci/jobs/frontend-checks.sh
-bash morphio-io/scripts/smoke_docker.sh
+bash scripts/ci/jobs/guardrails.sh
 ```
 
 ## Changing env vars (required steps, in order)

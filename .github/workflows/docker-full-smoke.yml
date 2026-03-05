@@ -1,19 +1,29 @@
 name: Docker • Full Stack Smoke
 
 on:
+  schedule:
+    - cron: "30 6 * * *"
   workflow_dispatch:
 
 concurrency:
   group: docker-full-smoke-${{ github.ref }}
   cancel-in-progress: false
 
+permissions:
+  contents: read
+
 jobs:
   full-smoke:
     name: Full stack smoke
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Prepare env file
+        run: make env
 
       - name: Full stack smoke
         run: bash scripts/ci/jobs/docker-full-smoke.sh

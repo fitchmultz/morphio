@@ -3,8 +3,8 @@ name = "morphio-all"
 version = "0.0.0"
 description = "Morphio monorepo workspace"
 requires-python = ">=3.13"
+license = "MIT"
 dependencies = [
-    "morphio-core",
     "morphio-backend",
 ]
 
@@ -26,6 +26,6 @@ dev = [
 members = ["morphio-core", "morphio-io/backend", "morphio-native"]
 
 [tool.uv.sources]
-morphio-core = { workspace = true }
 morphio-backend = { workspace = true }
 morphio-native = { workspace = true }
+morphio-core = { workspace = true }

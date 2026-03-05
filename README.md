@@ -14,15 +14,25 @@ This monorepo contains related Morphio projects for AI-powered content generatio
 
 - **[Contributing](./CONTRIBUTING.md)** - Onboarding, workflow, and PR protocol
 - **[Shared Docs](./docs/)** - Cross-cutting guides
+- **[Architecture Overview](./docs/architecture-overview.md)** - Reviewer-friendly 1–2 page system overview
 - **[Using morphio-core](./docs/using-morphio-core.md)** - How to use morphio-core in your own projects
 - **[Architecture](./docs/architecture.md)** - How morphio-io uses morphio-core via adapters
+- **[Validation Commands](./docs/validation-commands.md)** - Local commands matching CI gates
+- **[Current State](./docs/current-state.md)** - One-page baseline snapshot
+- **[Takeover Backlog](./docs/takeover-backlog.md)** - Prioritized remediation plan
+- **[CI Strategy](./docs/ci-strategy.md)** - PR required vs nightly/manual checks
+- **[Release Readiness Report](./docs/release-readiness-report.md)** - Portfolio hardening outcomes and residual risk
+- **[Reviewer Checklist](./docs/reviewer-checklist.md)** - Exact skeptic validation sequence
+- **[Role Evidence Pack](./docs/role-evidence/)** - Evidence map + demo/workshop/cookbook/ops checklist
 - **[Troubleshooting](./docs/troubleshooting.md)** - Common setup and CI fixes
+- **[Security Policy](./SECURITY.md)** and **[Code of Conduct](./CODE_OF_CONDUCT.md)**
 
 ## Quick Start
 
 ```bash
-cp .env.example .env
-make install
+make env
+make install            # baseline, public-safe dependency footprint
+make ci-fast
 make ci
 make dev
 ```
@@ -57,10 +67,15 @@ morphio-core/
 
 | Command | Description |
 |---------|-------------|
+| `make env` | Create/refresh root `.env` with strong local secrets |
+| `make install` | Install baseline dependencies (safe default) |
+| `make install-full` | Install all optional heavy dependency groups/extras |
+| `make install-ml` | Install backend ML dependency group (heavy opt-in) |
 | `make dev` | Start morphio-io dev servers |
+| `make ci-fast` | Fast local checks (same scope as PR gate) |
+| `make ci` | Full local CI gate (required before commits) |
 | `make test` | Run all tests (morphio-core + morphio-io) |
 | `make lint` | Lint everything |
-| `make ci` | Local CI runner (required before commits) |
 | `make clean` | Clean all build artifacts |
 
 ### morphio-io Commands (from `morphio-io/`)
@@ -147,7 +162,11 @@ morphio-io uses thin adapters (`app/adapters/`) that:
 1. Create a feature branch
 2. Make changes
 3. Run `bash scripts/install-git-hooks.sh` once
-4. Run `make ci` from monorepo root
+4. Run `make ci-fast` while iterating, then `make ci` before PR
 5. Create a Pull Request
 
-For bugs or feature requests, open an issue.
+For bugs or feature requests, open an issue using the repository templates.
+
+## License
+
+MIT (see [LICENSE](./LICENSE)).

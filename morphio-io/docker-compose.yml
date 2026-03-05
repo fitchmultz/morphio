@@ -33,7 +33,11 @@ services:
       start_period: 20s
 
   frontend:
-    image: ghcr.io/fitchmultz/morphio-io-frontend:latest
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8005}
     container_name: morphio-io-frontend
     ports:
       - '3500:3005'

@@ -1,5 +1,30 @@
 #!/usr/bin/env bash
+# Purpose: Run deterministic backend checks used by fast CI and local inner-loop validation.
+# Responsibilities: Sync backend deps in pinned env, run lint/format/type checks, run smoke-critical tests.
+# Scope: morphio-io/backend static checks and selected regression/integration tests.
+# Usage: bash scripts/ci/jobs/backend-checks.sh
+# Invariants/Assumptions: Uses Python 3.13 in .venv-ci and uv lockfile for reproducibility.
+
 set -euo pipefail
+
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+  cat <<'EOF'
+Usage: bash scripts/ci/jobs/backend-checks.sh
+
+Runs the backend fast-gate checks:
+  1) sync backend dependencies into .venv-ci (Python 3.13)
+  2) env-template audit
+  3) ruff lint/format check
+  4) ty type check
+  5) targeted unit/integration regression tests
+
+Exit codes:
+  0 success
+  1 runtime failure
+  2 invalid usage
+EOF
+  exit 0
+fi
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 
@@ -27,5 +52,6 @@ UV_PROJECT_ENVIRONMENT=.venv-ci uv run --project morphio-io/backend ruff format 
 cd "${ROOT_DIR}/morphio-io/backend"
 UV_PROJECT_ENVIRONMENT=../../.venv-ci uv run ty check --exclude "worker_ml/" --exclude "crawler/" --exclude "app/services/diarization/" --exclude "tests/performance/"
 UV_PROJECT_ENVIRONMENT=../../.venv-ci uv run pytest -q tests/unit/test_stage_progression.py
+UV_PROJECT_ENVIRONMENT=../../.venv-ci uv run pytest -q tests/unit/test_config_production_secrets.py
 UV_PROJECT_ENVIRONMENT=../../.venv-ci uv run pytest -q tests/integration/test_user_credits_flow.py
 UV_PROJECT_ENVIRONMENT=../../.venv-ci uv run pytest -q tests/integration/test_logs_stage_progress_updates.py

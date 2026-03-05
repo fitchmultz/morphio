@@ -1,6 +1,6 @@
 # Morphio Project Status
 
-> **Last Updated:** 2025-12-31
+> **Last Updated:** 2026-03-05
 
 ## Overview
 
@@ -28,11 +28,20 @@ Morphio is a monorepo containing three main projects:
 
 ```bash
 # From monorepo root
-make install      # Install all dependencies
+make env          # Create/refresh local .env
+make install      # Install baseline dependencies (safe defaults)
+make ci-fast      # Fast PR-parity checks
+make ci           # Full local release gate (required for PRs)
 make dev          # Start backend + frontend
-make ci           # Full CI gate (required for PRs)
 make test         # Run all tests
 ```
+
+## CI Strategy Snapshot
+
+- **PR required gate (fast):** `.github/workflows/ci-cd.yml` runs backend, frontend, and guardrails in parallel.
+- **Heavy smoke checks:** `.github/workflows/docker-full-smoke.yml` runs nightly and on manual dispatch.
+- **Local release gate:** `make ci` runs `scripts/ci/run.sh` for full parity validation.
+- **Security guardrail:** fast gate guardrails include working-tree secret scanning (`secrets-scan.sh`).
 
 ## Infrastructure Updates
 

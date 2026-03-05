@@ -21,10 +21,11 @@ __pycache__/
 dist/
 build/
 
-# Environment
-.env
-.env.local
-.env.*.local
+# Environment (only root /.env and /.env.example are allowed)
+/.env
+/.env.local
+/.env.*.local
+.scratchpad.md
 .venv/
 .venv-ci/
 
@@ -33,3 +34,6 @@ node_modules/
 
 # Rust build artifacts
 morphio-native/target/
+
+# Security scan outputs
+.gitleaks-report.json

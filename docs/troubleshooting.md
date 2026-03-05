@@ -16,7 +16,6 @@ This script checks for all required tools. If it fails, it will tell you exactly
 |------|---------|
 | uv | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
 | pnpm | `corepack enable && corepack prepare pnpm@latest --activate` |
-| ripgrep | `brew install ripgrep` (macOS) or `apt install ripgrep` (Linux) |
 | cargo/rustc | `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \| sh` |
 | gh | `brew install gh` (macOS) or see [GitHub CLI docs](https://cli.github.com/) |
 | docker | Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) |
@@ -55,18 +54,16 @@ Wait 30-60 seconds for Docker to fully initialize before running `make ci`.
 
 ### GHCR authentication failed
 
-Docker images pull from GitHub Container Registry (ghcr.io). You need to authenticate:
+The default local compose/build path now uses local Dockerfiles and should not require GHCR auth.
+
+If you are running release/publish flows that push or pull GHCR images, authenticate first:
 
 ```bash
 # Option 1: Use gh CLI token
 echo $(gh auth token) | docker login ghcr.io -u $(gh api user -q .login) --password-stdin
 
-# Option 2: Create a PAT with read:packages scope
-# Then add to ~/.secrets:
+# Option 2: Use a PAT with read/write packages as required
 export GITHUB_TOKEN=ghp_xxxx
-
-# Source it before Docker builds
-source ~/.secrets
 echo $GITHUB_TOKEN | docker login ghcr.io -u YOUR_USERNAME --password-stdin
 ```
 
