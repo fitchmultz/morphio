@@ -8,10 +8,7 @@
 	"paths": {
 		"/auth/login": {
 			"post": {
-				"tags": [
-					"auth",
-					"Authentication"
-				],
+				"tags": ["auth", "Authentication"],
 				"summary": "Login",
 				"operationId": "login",
 				"requestBody": {
@@ -109,10 +106,7 @@
 		},
 		"/auth/logout": {
 			"post": {
-				"tags": [
-					"auth",
-					"Authentication"
-				],
+				"tags": ["auth", "Authentication"],
 				"summary": "Logout",
 				"operationId": "logout",
 				"responses": {
@@ -170,10 +164,7 @@
 		},
 		"/auth/register": {
 			"post": {
-				"tags": [
-					"auth",
-					"Authentication"
-				],
+				"tags": ["auth", "Authentication"],
 				"summary": "Register",
 				"operationId": "register",
 				"requestBody": {
@@ -296,10 +287,7 @@
 		},
 		"/auth/change-password": {
 			"post": {
-				"tags": [
-					"auth",
-					"Authentication"
-				],
+				"tags": ["auth", "Authentication"],
 				"summary": "Change Password",
 				"operationId": "change_password",
 				"requestBody": {
@@ -387,10 +375,7 @@
 		},
 		"/auth/refresh-token": {
 			"post": {
-				"tags": [
-					"auth",
-					"Authentication"
-				],
+				"tags": ["auth", "Authentication"],
 				"summary": "Refresh Token",
 				"operationId": "refresh_token",
 				"responses": {
@@ -473,10 +458,7 @@
 		},
 		"/auth/csrf-token": {
 			"get": {
-				"tags": [
-					"auth",
-					"Authentication"
-				],
+				"tags": ["auth", "Authentication"],
 				"summary": "Get Csrf Token",
 				"description": "Generate a CSRF token and set it in a cookie.\nReturns the token in the response body for AJAX requests.",
 				"operationId": "get_csrf_token",
@@ -533,10 +515,7 @@
 		},
 		"/content/save-content": {
 			"post": {
-				"tags": [
-					"Content",
-					"Content"
-				],
+				"tags": ["Content", "Content"],
 				"summary": "Save Content",
 				"operationId": "save_content",
 				"requestBody": {
@@ -624,10 +603,7 @@
 		},
 		"/content/get-contents": {
 			"get": {
-				"tags": [
-					"Content",
-					"Content"
-				],
+				"tags": ["Content", "Content"],
 				"summary": "Get Contents",
 				"operationId": "list_contents",
 				"security": [
@@ -752,10 +728,7 @@
 		},
 		"/content/get-content/{content_id}": {
 			"get": {
-				"tags": [
-					"Content",
-					"Content"
-				],
+				"tags": ["Content", "Content"],
 				"summary": "Get Content",
 				"operationId": "get_content",
 				"security": [
@@ -833,10 +806,7 @@
 		},
 		"/content/update-content/{content_id}": {
 			"put": {
-				"tags": [
-					"Content",
-					"Content"
-				],
+				"tags": ["Content", "Content"],
 				"summary": "Update Content",
 				"operationId": "update_content",
 				"security": [
@@ -927,10 +897,7 @@
 		},
 		"/content/update-multiple-contents": {
 			"put": {
-				"tags": [
-					"Content",
-					"Content"
-				],
+				"tags": ["Content", "Content"],
 				"summary": "Update Multiple Contents",
 				"operationId": "update_multiple_contents",
 				"requestBody": {
@@ -1011,10 +978,7 @@
 		},
 		"/content/update-title/{content_id}": {
 			"put": {
-				"tags": [
-					"Content",
-					"Content"
-				],
+				"tags": ["Content", "Content"],
 				"summary": "Update Content Title Route",
 				"operationId": "update_content_title",
 				"security": [
@@ -1105,10 +1069,7 @@
 		},
 		"/content/delete-content/{content_id}": {
 			"delete": {
-				"tags": [
-					"Content",
-					"Content"
-				],
+				"tags": ["Content", "Content"],
 				"summary": "Delete Content",
 				"operationId": "delete_content",
 				"security": [
@@ -1193,10 +1154,7 @@
 		},
 		"/content/{content_id}/comments": {
 			"post": {
-				"tags": [
-					"Content",
-					"Content"
-				],
+				"tags": ["Content", "Content"],
 				"summary": "Create Comment Route",
 				"operationId": "create_comment",
 				"security": [
@@ -1297,10 +1255,7 @@
 				}
 			},
 			"get": {
-				"tags": [
-					"Content",
-					"Content"
-				],
+				"tags": ["Content", "Content"],
 				"summary": "Get Comments",
 				"operationId": "list_comments",
 				"security": [
@@ -1415,10 +1370,7 @@
 		},
 		"/content/comments/{comment_id}": {
 			"put": {
-				"tags": [
-					"Content",
-					"Content"
-				],
+				"tags": ["Content", "Content"],
 				"summary": "Update Comment Route",
 				"operationId": "update_comment",
 				"security": [
@@ -1520,10 +1472,7 @@
 				}
 			},
 			"delete": {
-				"tags": [
-					"Content",
-					"Content"
-				],
+				"tags": ["Content", "Content"],
 				"summary": "Delete Comment Route",
 				"operationId": "delete_comment",
 				"security": [
@@ -1605,10 +1554,7 @@
 		},
 		"/content/{content_id}/conversations": {
 			"get": {
-				"tags": [
-					"Content",
-					"Content"
-				],
+				"tags": ["Content", "Content"],
 				"summary": "List Content Conversations",
 				"operationId": "list_content_conversations",
 				"security": [
@@ -1686,10 +1632,7 @@
 		},
 		"/content/{content_id}/conversations/{conversation_id}": {
 			"get": {
-				"tags": [
-					"Content",
-					"Content"
-				],
+				"tags": ["Content", "Content"],
 				"summary": "Get Conversation Thread",
 				"operationId": "get_conversation_thread",
 				"security": [
@@ -1774,10 +1717,7 @@
 				}
 			},
 			"delete": {
-				"tags": [
-					"Content",
-					"Content"
-				],
+				"tags": ["Content", "Content"],
 				"summary": "Delete Conversation Route",
 				"operationId": "delete_conversation",
 				"security": [
@@ -1868,10 +1808,7 @@
 		},
 		"/content/{content_id}/conversation": {
 			"post": {
-				"tags": [
-					"Content",
-					"Content"
-				],
+				"tags": ["Content", "Content"],
 				"summary": "Continue Content Conversation Route",
 				"operationId": "continue_conversation",
 				"security": [
@@ -1962,9 +1899,7 @@
 		},
 		"/template/get-templates": {
 			"get": {
-				"tags": [
-					"Template"
-				],
+				"tags": ["Template"],
 				"summary": "Get Templates",
 				"operationId": "list_templates",
 				"responses": {
@@ -1988,9 +1923,7 @@
 		},
 		"/template/save-template": {
 			"post": {
-				"tags": [
-					"Template"
-				],
+				"tags": ["Template"],
 				"summary": "Save Template",
 				"operationId": "save_template",
 				"requestBody": {
@@ -2037,9 +1970,7 @@
 		},
 		"/template/get-template/{template_id}": {
 			"get": {
-				"tags": [
-					"Template"
-				],
+				"tags": ["Template"],
 				"summary": "Get Template",
 				"operationId": "get_template",
 				"security": [
@@ -2087,9 +2018,7 @@
 		},
 		"/template/update-template/{template_id}": {
 			"put": {
-				"tags": [
-					"Template"
-				],
+				"tags": ["Template"],
 				"summary": "Update Template Route",
 				"operationId": "update_template",
 				"security": [
@@ -2150,9 +2079,7 @@
 		},
 		"/template/delete-template/{template_id}": {
 			"delete": {
-				"tags": [
-					"Template"
-				],
+				"tags": ["Template"],
 				"summary": "Delete Template Route",
 				"operationId": "delete_template",
 				"security": [
@@ -2200,10 +2127,7 @@
 		},
 		"/user/profile": {
 			"get": {
-				"tags": [
-					"User",
-					"User"
-				],
+				"tags": ["User", "User"],
 				"summary": "Get User Profile",
 				"operationId": "get_user_profile",
 				"responses": {
@@ -2257,10 +2181,7 @@
 		},
 		"/user/change-display-name": {
 			"post": {
-				"tags": [
-					"User",
-					"User"
-				],
+				"tags": ["User", "User"],
 				"summary": "Change Display Name",
 				"operationId": "change_display_name",
 				"requestBody": {
@@ -2334,10 +2255,7 @@
 		},
 		"/user/change-email": {
 			"post": {
-				"tags": [
-					"User",
-					"User"
-				],
+				"tags": ["User", "User"],
 				"summary": "Change Email",
 				"operationId": "change_email",
 				"requestBody": {
@@ -2411,10 +2329,7 @@
 		},
 		"/user/credits": {
 			"get": {
-				"tags": [
-					"User",
-					"User"
-				],
+				"tags": ["User", "User"],
 				"summary": "Get User Credits",
 				"description": "Get summary of user's credit usage for the current billing period.",
 				"operationId": "get_user_credits",
@@ -2488,10 +2403,7 @@
 		},
 		"/user/usage": {
 			"get": {
-				"tags": [
-					"User",
-					"User"
-				],
+				"tags": ["User", "User"],
 				"summary": "Get Current User Usage",
 				"operationId": "get_user_usage",
 				"responses": {
@@ -2545,9 +2457,7 @@
 		},
 		"/media/config": {
 			"get": {
-				"tags": [
-					"Media Processing"
-				],
+				"tags": ["Media Processing"],
 				"summary": "Get Media File Configuration",
 				"description": "Get media file configuration including allowed extensions.",
 				"operationId": "get_media_config",
@@ -2563,18 +2473,8 @@
 									"status": "success",
 									"message": "Media file configuration",
 									"data": {
-										"video_extensions": [
-											"mp4",
-											"webm",
-											"mov",
-											"avi"
-										],
-										"audio_extensions": [
-											"mp3",
-											"wav",
-											"aac",
-											"flac"
-										],
+										"video_extensions": ["mp4", "webm", "mov", "avi"],
+										"audio_extensions": ["mp3", "wav", "aac", "flac"],
 										"max_upload_size": 3221225472
 									}
 								}
@@ -2616,9 +2516,7 @@
 		},
 		"/media/models": {
 			"get": {
-				"tags": [
-					"Media Processing"
-				],
+				"tags": ["Media Processing"],
 				"summary": "Get Available Models",
 				"description": "Get available AI models for content generation.",
 				"operationId": "get_available_models",
@@ -2682,9 +2580,7 @@
 		},
 		"/media/process-media": {
 			"post": {
-				"tags": [
-					"Media Processing"
-				],
+				"tags": ["Media Processing"],
 				"summary": "Process Media Route",
 				"operationId": "process_media",
 				"requestBody": {
@@ -2812,9 +2708,7 @@
 		},
 		"/media/media-processing-status/{job_id}": {
 			"get": {
-				"tags": [
-					"Media Processing"
-				],
+				"tags": ["Media Processing"],
 				"summary": "Get Media Processing Status Route",
 				"operationId": "get_media_processing_status",
 				"security": [
@@ -2830,9 +2724,7 @@
 						"schema": {
 							"type": "string",
 							"description": "Media processing job ID",
-							"examples": [
-								"video_123e4567-e89b-12d3-a456-426614174000"
-							],
+							"examples": ["video_123e4567-e89b-12d3-a456-426614174000"],
 							"title": "Job Id"
 						},
 						"description": "Media processing job ID"
@@ -2924,9 +2816,7 @@
 		},
 		"/items/": {
 			"post": {
-				"tags": [
-					"Documentation"
-				],
+				"tags": ["Documentation"],
 				"summary": "Create Item",
 				"description": "Create a new item.\n\n- **name**: The name of the item.\n- **price**: The price of the item.",
 				"operationId": "create_item",
@@ -2966,9 +2856,7 @@
 		},
 		"/items/{item_id}": {
 			"get": {
-				"tags": [
-					"Documentation"
-				],
+				"tags": ["Documentation"],
 				"summary": "Read Item",
 				"description": "Retrieve an item by its ID.\n\n- **item_id**: The ID of the item. Must be 1 or greater.\n- **q**: Optional query string for searching. Max 50 characters.",
 				"operationId": "read_item",
@@ -3025,9 +2913,7 @@
 		},
 		"/users/me": {
 			"get": {
-				"tags": [
-					"Documentation"
-				],
+				"tags": ["Documentation"],
 				"summary": "Read Users Me",
 				"description": "Get info about the current authenticated user.",
 				"operationId": "read_users_me",
@@ -3050,9 +2936,7 @@
 		},
 		"/web/process-web": {
 			"post": {
-				"tags": [
-					"Web Scraping"
-				],
+				"tags": ["Web Scraping"],
 				"summary": "Enqueue Web Scraping Route",
 				"description": "Scrape a webpage at `input_url` and run the text through the LLM+template pipeline.\nReturns a `job_id` that can be polled for status updates.",
 				"operationId": "process_web",
@@ -3103,9 +2987,7 @@
 		},
 		"/web/web-processing-status/{job_id}": {
 			"get": {
-				"tags": [
-					"Web Scraping"
-				],
+				"tags": ["Web Scraping"],
 				"summary": "Get Web Processing Status Route",
 				"description": "Poll the status of the web-scraping job by job_id.",
 				"operationId": "get_web_processing_status",
@@ -3157,10 +3039,7 @@
 		},
 		"/admin/get-usage": {
 			"get": {
-				"tags": [
-					"Admin",
-					"Admin"
-				],
+				"tags": ["Admin", "Admin"],
 				"summary": "Get Usage",
 				"description": "Return a list of usage stats (per user + usage_type).\nIncludes the user's email & display name for better tracking.",
 				"operationId": "get_admin_usage",
@@ -3218,10 +3097,7 @@
 		},
 		"/admin/get-subscriptions": {
 			"get": {
-				"tags": [
-					"Admin",
-					"Admin"
-				],
+				"tags": ["Admin", "Admin"],
 				"summary": "Get Subscriptions",
 				"operationId": "get_subscriptions",
 				"responses": {
@@ -3278,10 +3154,7 @@
 		},
 		"/admin/usage/export": {
 			"get": {
-				"tags": [
-					"Admin",
-					"Admin"
-				],
+				"tags": ["Admin", "Admin"],
 				"summary": "Export Llm Usage",
 				"description": "Export LLM usage records as CSV for billing and analytics.\n\nAggregates usage by date, user, provider, and model.\nReturns: date, user_id, user_email, provider, model, total_tokens, estimated_cost",
 				"operationId": "export_llm_usage",
@@ -3399,10 +3272,7 @@
 		},
 		"/admin/usage/summary": {
 			"get": {
-				"tags": [
-					"Admin",
-					"Admin"
-				],
+				"tags": ["Admin", "Admin"],
 				"summary": "Get Llm Usage Summary",
 				"description": "Get summary statistics of LLM usage for display in admin dashboard.",
 				"operationId": "get_llm_usage_summary",
@@ -3510,10 +3380,7 @@
 		},
 		"/admin/health": {
 			"get": {
-				"tags": [
-					"Admin",
-					"Admin"
-				],
+				"tags": ["Admin", "Admin"],
 				"summary": "Get Admin Health",
 				"operationId": "get_admin_health",
 				"responses": {
@@ -3570,10 +3437,7 @@
 		},
 		"/billing/checkout-session": {
 			"post": {
-				"tags": [
-					"Billing",
-					"Billing"
-				],
+				"tags": ["Billing", "Billing"],
 				"summary": "Create Checkout Session",
 				"description": "Create a Stripe Checkout Session for upgrading to a paid plan.\n\nReturns a URL to redirect the user to Stripe's hosted checkout page.",
 				"operationId": "create_checkout_session",
@@ -3655,10 +3519,7 @@
 		},
 		"/billing/portal-session": {
 			"post": {
-				"tags": [
-					"Billing",
-					"Billing"
-				],
+				"tags": ["Billing", "Billing"],
 				"summary": "Create Portal Session",
 				"description": "Create a Stripe Customer Portal session for managing subscriptions.\n\nReturns a URL to redirect the user to Stripe's billing portal.",
 				"operationId": "create_portal_session",
@@ -3719,10 +3580,7 @@
 		},
 		"/user/api-keys": {
 			"get": {
-				"tags": [
-					"API Keys",
-					"API Keys"
-				],
+				"tags": ["API Keys", "API Keys"],
 				"summary": "List Api Keys",
 				"description": "List all API keys for the current user.\n\nThe plaintext key is not returned - only the prefix for identification.",
 				"operationId": "list_api_keys",
@@ -3742,10 +3600,7 @@
 											"id": 42,
 											"name": "CI Key",
 											"key_prefix": "mk_live_",
-											"scopes": [
-												"logs:write",
-												"media:read"
-											],
+											"scopes": ["logs:write", "media:read"],
 											"last_used_at": "2025-01-20T09:00:00Z",
 											"created_at": "2025-01-15T10:00:00Z"
 										},
@@ -3804,10 +3659,7 @@
 				]
 			},
 			"post": {
-				"tags": [
-					"API Keys",
-					"API Keys"
-				],
+				"tags": ["API Keys", "API Keys"],
 				"summary": "Create Api Key",
 				"description": "Create a new API key for the current user.\n\nThe plaintext key is only returned once at creation time.\nStore it securely - it cannot be retrieved later.",
 				"operationId": "create_api_key",
@@ -3819,10 +3671,7 @@
 								"examples": [
 									{
 										"name": "CI Key",
-										"scopes": [
-											"logs:write",
-											"media:read"
-										]
+										"scopes": ["logs:write", "media:read"]
 									}
 								]
 							}
@@ -3845,10 +3694,7 @@
 										"id": 42,
 										"name": "CI Key",
 										"key_prefix": "mk_live_",
-										"scopes": [
-											"logs:write",
-											"media:read"
-										],
+										"scopes": ["logs:write", "media:read"],
 										"created_at": "2025-01-15T10:00:00Z",
 										"key": "mk_live_abcdefghijklmnopqrstuvwxyz"
 									}
@@ -3921,10 +3767,7 @@
 		},
 		"/user/api-keys/{key_id}": {
 			"delete": {
-				"tags": [
-					"API Keys",
-					"API Keys"
-				],
+				"tags": ["API Keys", "API Keys"],
 				"summary": "Revoke Api Key",
 				"description": "Revoke (delete) an API key.\n\nThe key will immediately stop working for authentication.",
 				"operationId": "revoke_api_key",
@@ -3941,9 +3784,7 @@
 						"schema": {
 							"type": "integer",
 							"description": "API key ID",
-							"examples": [
-								42
-							],
+							"examples": [42],
 							"title": "Key Id"
 						},
 						"description": "API key ID"
@@ -4027,10 +3868,7 @@
 		},
 		"/health/": {
 			"get": {
-				"tags": [
-					"Health",
-					"Health"
-				],
+				"tags": ["Health", "Health"],
 				"summary": "Health Check",
 				"operationId": "health_check",
 				"responses": {
@@ -4049,10 +3887,7 @@
 		},
 		"/health/db": {
 			"get": {
-				"tags": [
-					"Health",
-					"Health"
-				],
+				"tags": ["Health", "Health"],
 				"summary": "Health Db",
 				"operationId": "health_db",
 				"responses": {
@@ -4071,10 +3906,7 @@
 		},
 		"/health/redis": {
 			"get": {
-				"tags": [
-					"Health",
-					"Health"
-				],
+				"tags": ["Health", "Health"],
 				"summary": "Health Redis",
 				"operationId": "health_redis",
 				"responses": {
@@ -4093,10 +3925,7 @@
 		},
 		"/logs/process-logs": {
 			"post": {
-				"tags": [
-					"Logs",
-					"Logs"
-				],
+				"tags": ["Logs", "Logs"],
 				"summary": "Process Logs",
 				"description": "Enqueue a log file for processing and return a job ID.",
 				"operationId": "process_logs",
@@ -4113,9 +3942,7 @@
 						"schema": {
 							"type": "boolean",
 							"description": "Anonymize sensitive data before processing",
-							"examples": [
-								false
-							],
+							"examples": [false],
 							"default": false,
 							"title": "Anonymize"
 						},
@@ -4232,10 +4059,7 @@
 		},
 		"/logs/logs-processing-status/{job_id}": {
 			"get": {
-				"tags": [
-					"Logs",
-					"Logs"
-				],
+				"tags": ["Logs", "Logs"],
 				"summary": "Get Logs Processing Status Route",
 				"description": "Retrieve the status of a log processing job.",
 				"operationId": "get_logs_processing_status",
@@ -4252,9 +4076,7 @@
 						"schema": {
 							"type": "string",
 							"description": "Log processing job ID",
-							"examples": [
-								"123e4567-e89b-12d3-a456-426614174000"
-							],
+							"examples": ["123e4567-e89b-12d3-a456-426614174000"],
 							"title": "Job Id"
 						},
 						"description": "Log processing job ID"
@@ -4354,10 +4176,7 @@
 		},
 		"/logs/generate-splunk-config": {
 			"post": {
-				"tags": [
-					"Logs",
-					"Logs"
-				],
+				"tags": ["Logs", "Logs"],
 				"summary": "Generate Splunk Config",
 				"description": "Enqueue a log file sample for Splunk config generation and return a job ID.",
 				"operationId": "generate_splunk_config",
@@ -4458,10 +4277,7 @@
 		},
 		"/logs/config": {
 			"get": {
-				"tags": [
-					"Logs",
-					"Logs"
-				],
+				"tags": ["Logs", "Logs"],
 				"summary": "Get Log File Configuration",
 				"description": "Get log file configuration including allowed extensions.",
 				"operationId": "get_log_config",
@@ -4477,13 +4293,7 @@
 									"status": "success",
 									"message": "Log file configuration",
 									"data": {
-										"allowed_extensions": [
-											"csv",
-											"json",
-											"log",
-											"md",
-											"txt"
-										],
+										"allowed_extensions": ["csv", "json", "log", "md", "txt"],
 										"max_upload_size": 3221225472
 									}
 								}
@@ -4552,9 +4362,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"name"
-				],
+				"required": ["name"],
 				"title": "APIKeyCreate",
 				"description": "Request body for creating an API key."
 			},
@@ -4699,10 +4507,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status",
-					"message"
-				],
+				"required": ["status", "message"],
 				"title": "ApiResponse[APIKeyCreatedOut]"
 			},
 			"ApiResponse_AuthTokenPayload_": {
@@ -4738,10 +4543,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status",
-					"message"
-				],
+				"required": ["status", "message"],
 				"title": "ApiResponse[AuthTokenPayload]"
 			},
 			"ApiResponse_CheckoutSessionData_": {
@@ -4777,10 +4579,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status",
-					"message"
-				],
+				"required": ["status", "message"],
 				"title": "ApiResponse[CheckoutSessionData]"
 			},
 			"ApiResponse_CommentOut_": {
@@ -4816,10 +4615,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status",
-					"message"
-				],
+				"required": ["status", "message"],
 				"title": "ApiResponse[CommentOut]"
 			},
 			"ApiResponse_ContentOut_": {
@@ -4855,10 +4651,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status",
-					"message"
-				],
+				"required": ["status", "message"],
 				"title": "ApiResponse[ContentOut]"
 			},
 			"ApiResponse_ConversationResponse_": {
@@ -4894,10 +4687,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status",
-					"message"
-				],
+				"required": ["status", "message"],
 				"title": "ApiResponse[ConversationResponse]"
 			},
 			"ApiResponse_ConversationThreadOut_": {
@@ -4933,10 +4723,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status",
-					"message"
-				],
+				"required": ["status", "message"],
 				"title": "ApiResponse[ConversationThreadOut]"
 			},
 			"ApiResponse_CsrfTokenPayload_": {
@@ -4972,10 +4759,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status",
-					"message"
-				],
+				"required": ["status", "message"],
 				"title": "ApiResponse[CsrfTokenPayload]"
 			},
 			"ApiResponse_List_CommentOut__": {
@@ -5015,10 +4799,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status",
-					"message"
-				],
+				"required": ["status", "message"],
 				"title": "ApiResponse[List[CommentOut]]"
 			},
 			"ApiResponse_List_ContentOut__": {
@@ -5058,10 +4839,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status",
-					"message"
-				],
+				"required": ["status", "message"],
 				"title": "ApiResponse[List[ContentOut]]"
 			},
 			"ApiResponse_List_ConversationSummary__": {
@@ -5101,10 +4879,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status",
-					"message"
-				],
+				"required": ["status", "message"],
 				"title": "ApiResponse[List[ConversationSummary]]"
 			},
 			"ApiResponse_List_TemplateOut__": {
@@ -5144,10 +4919,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status",
-					"message"
-				],
+				"required": ["status", "message"],
 				"title": "ApiResponse[List[TemplateOut]]"
 			},
 			"ApiResponse_LogsProcessingResponse_": {
@@ -5183,10 +4955,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status",
-					"message"
-				],
+				"required": ["status", "message"],
 				"title": "ApiResponse[LogsProcessingResponse]"
 			},
 			"ApiResponse_LogsProcessingStatusResponse_": {
@@ -5222,10 +4991,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status",
-					"message"
-				],
+				"required": ["status", "message"],
 				"title": "ApiResponse[LogsProcessingStatusResponse]"
 			},
 			"ApiResponse_MediaProcessingResponse_": {
@@ -5261,10 +5027,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status",
-					"message"
-				],
+				"required": ["status", "message"],
 				"title": "ApiResponse[MediaProcessingResponse]"
 			},
 			"ApiResponse_MediaProcessingStatusResponse_": {
@@ -5300,10 +5063,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status",
-					"message"
-				],
+				"required": ["status", "message"],
 				"title": "ApiResponse[MediaProcessingStatusResponse]"
 			},
 			"ApiResponse_NoneType_": {
@@ -5333,10 +5093,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status",
-					"message"
-				],
+				"required": ["status", "message"],
 				"title": "ApiResponse[NoneType]"
 			},
 			"ApiResponse_PaginatedResponse_ContentOut__": {
@@ -5372,10 +5129,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status",
-					"message"
-				],
+				"required": ["status", "message"],
 				"title": "ApiResponse[PaginatedResponse[ContentOut]]"
 			},
 			"ApiResponse_PortalSessionData_": {
@@ -5411,10 +5165,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status",
-					"message"
-				],
+				"required": ["status", "message"],
 				"title": "ApiResponse[PortalSessionData]"
 			},
 			"ApiResponse_SystemHealthOut_": {
@@ -5450,10 +5201,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status",
-					"message"
-				],
+				"required": ["status", "message"],
 				"title": "ApiResponse[SystemHealthOut]"
 			},
 			"ApiResponse_TemplateOut_": {
@@ -5489,10 +5237,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status",
-					"message"
-				],
+				"required": ["status", "message"],
 				"title": "ApiResponse[TemplateOut]"
 			},
 			"ApiResponse_UserCredits_": {
@@ -5528,10 +5273,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status",
-					"message"
-				],
+				"required": ["status", "message"],
 				"title": "ApiResponse[UserCredits]"
 			},
 			"ApiResponse_UserOut_": {
@@ -5567,10 +5309,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status",
-					"message"
-				],
+				"required": ["status", "message"],
 				"title": "ApiResponse[UserOut]"
 			},
 			"ApiResponse_dict_": {
@@ -5608,10 +5347,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status",
-					"message"
-				],
+				"required": ["status", "message"],
 				"title": "ApiResponse[dict]"
 			},
 			"ApiResponse_list_": {
@@ -5649,10 +5385,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status",
-					"message"
-				],
+				"required": ["status", "message"],
 				"title": "ApiResponse[list]"
 			},
 			"ApiResponse_list_APIKeyOut__": {
@@ -5692,10 +5425,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status",
-					"message"
-				],
+				"required": ["status", "message"],
 				"title": "ApiResponse[list[APIKeyOut]]"
 			},
 			"ApiResponse_list_SubscriptionOut__": {
@@ -5735,10 +5465,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status",
-					"message"
-				],
+				"required": ["status", "message"],
 				"title": "ApiResponse[list[SubscriptionOut]]"
 			},
 			"ApiResponse_list_dict__": {
@@ -5779,10 +5506,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status",
-					"message"
-				],
+				"required": ["status", "message"],
 				"title": "ApiResponse[list[dict]]"
 			},
 			"AuthTokenPayload": {
@@ -5801,10 +5525,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"access_token",
-					"user"
-				],
+				"required": ["access_token", "user"],
 				"title": "AuthTokenPayload",
 				"description": "Payload for auth token responses (login, register, refresh)."
 			},
@@ -5817,9 +5538,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"log_file"
-				],
+				"required": ["log_file"],
 				"title": "Body_generate_splunk_config"
 			},
 			"Body_process_logs": {
@@ -5829,15 +5548,11 @@
 						"contentMediaType": "application/octet-stream",
 						"title": "Log File",
 						"description": "Log file to process",
-						"examples": [
-							"app.log"
-						]
+						"examples": ["app.log"]
 					}
 				},
 				"type": "object",
-				"required": [
-					"log_file"
-				],
+				"required": ["log_file"],
 				"title": "Body_process_logs"
 			},
 			"Body_process_media": {
@@ -5846,17 +5561,12 @@
 						"type": "string",
 						"title": "Input Url",
 						"description": "Optional media URL (YouTube, Rumble, X.com, TikTok)",
-						"examples": [
-							"https://www.youtube.com/watch?v=example"
-						]
+						"examples": ["https://www.youtube.com/watch?v=example"]
 					},
 					"template_id": {
 						"type": "string",
 						"title": "Template Id",
-						"examples": [
-							"12",
-							"log-summary"
-						]
+						"examples": ["12", "log-summary"]
 					},
 					"input_file": {
 						"anyOf": [
@@ -5870,23 +5580,17 @@
 						],
 						"title": "Input File",
 						"description": "Media file upload (video or audio)",
-						"examples": [
-							"meeting.mp4"
-						]
+						"examples": ["meeting.mp4"]
 					},
 					"model": {
 						"type": "string",
 						"title": "Model",
-						"examples": [
-							"gpt-5.1"
-						]
+						"examples": ["gpt-5.1"]
 					},
 					"media_type": {
 						"type": "string",
 						"title": "Media Type",
-						"examples": [
-							"video"
-						]
+						"examples": ["video"]
 					},
 					"enable_diarization": {
 						"type": "boolean",
@@ -5917,10 +5621,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"template_id",
-					"media_type"
-				],
+				"required": ["template_id", "media_type"],
 				"title": "Body_process_media"
 			},
 			"Body_process_web": {
@@ -5946,10 +5647,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"input_url",
-					"template_id"
-				],
+				"required": ["input_url", "template_id"],
 				"title": "Body_process_web"
 			},
 			"ChangePasswordRequest": {
@@ -5964,10 +5662,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"current_password",
-					"new_password"
-				],
+				"required": ["current_password", "new_password"],
 				"title": "ChangePasswordRequest"
 			},
 			"CheckoutSessionData": {
@@ -5984,10 +5679,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"checkout_url",
-					"session_id"
-				],
+				"required": ["checkout_url", "session_id"],
 				"title": "CheckoutSessionData",
 				"description": "Data returned from checkout session creation."
 			},
@@ -6012,9 +5704,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"text"
-				],
+				"required": ["text"],
 				"title": "CommentCreate"
 			},
 			"CommentOut": {
@@ -6091,9 +5781,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"text"
-				],
+				"required": ["text"],
 				"title": "CommentUpdate"
 			},
 			"ContentCreate": {
@@ -6138,10 +5826,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"title",
-					"content"
-				],
+				"required": ["title", "content"],
 				"title": "ContentCreate"
 			},
 			"ContentOut": {
@@ -6246,9 +5931,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"title"
-				],
+				"required": ["title"],
 				"title": "ContentTitleUpdate"
 			},
 			"ContentUpdate": {
@@ -6341,12 +6024,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"role",
-					"content",
-					"id",
-					"created_at"
-				],
+				"required": ["role", "content", "id", "created_at"],
 				"title": "ConversationMessageOut"
 			},
 			"ConversationRequest": {
@@ -6414,9 +6092,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"message"
-				],
+				"required": ["message"],
 				"title": "ConversationRequest"
 			},
 			"ConversationResponse": {
@@ -6672,9 +6348,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"csrf_token"
-				],
+				"required": ["csrf_token"],
 				"title": "CsrfTokenPayload",
 				"description": "Payload for CSRF token response."
 			},
@@ -6722,18 +6396,12 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"status"
-				],
+				"required": ["status"],
 				"title": "HealthComponentOut"
 			},
 			"HealthComponentStatus": {
 				"type": "string",
-				"enum": [
-					"ok",
-					"error",
-					"skipped"
-				],
+				"enum": ["ok", "error", "skipped"],
 				"title": "HealthComponentStatus"
 			},
 			"Item": {
@@ -6748,10 +6416,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"name",
-					"price"
-				],
+				"required": ["name", "price"],
 				"title": "Item",
 				"env": "item"
 			},
@@ -6790,10 +6455,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"job_id",
-					"status"
-				],
+				"required": ["job_id", "status"],
 				"title": "LogsProcessingResponse"
 			},
 			"LogsProcessingStatusResponse": {
@@ -6856,10 +6518,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"job_id",
-					"status"
-				],
+				"required": ["job_id", "status"],
 				"title": "LogsProcessingStatusResponse"
 			},
 			"MediaProcessingResponse": {
@@ -6884,20 +6543,12 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"job_id",
-					"status"
-				],
+				"required": ["job_id", "status"],
 				"title": "MediaProcessingResponse"
 			},
 			"MediaProcessingStatus": {
 				"type": "string",
-				"enum": [
-					"pending",
-					"processing",
-					"completed",
-					"failed"
-				],
+				"enum": ["pending", "processing", "completed", "failed"],
 				"title": "MediaProcessingStatus"
 			},
 			"MediaProcessingStatusResponse": {
@@ -6965,10 +6616,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"job_id",
-					"status"
-				],
+				"required": ["job_id", "status"],
 				"title": "MediaProcessingStatusResponse"
 			},
 			"PaginatedResponse_ContentOut_": {
@@ -6994,12 +6642,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"items",
-					"total",
-					"page",
-					"per_page"
-				],
+				"required": ["items", "total", "page", "per_page"],
 				"title": "PaginatedResponse[ContentOut]"
 			},
 			"PortalSessionData": {
@@ -7011,9 +6654,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"portal_url"
-				],
+				"required": ["portal_url"],
 				"title": "PortalSessionData",
 				"description": "Data returned from portal session creation."
 			},
@@ -7035,12 +6676,7 @@
 			},
 			"ResponseStatus": {
 				"type": "string",
-				"enum": [
-					"success",
-					"error",
-					"warning",
-					"info"
-				],
+				"enum": ["success", "error", "warning", "info"],
 				"title": "ResponseStatus"
 			},
 			"SubscriptionOut": {
@@ -7110,13 +6746,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"id",
-					"user_id",
-					"plan",
-					"status",
-					"created_at"
-				],
+				"required": ["id", "user_id", "plan", "status", "created_at"],
 				"title": "SubscriptionOut"
 			},
 			"SystemHealthOut": {
@@ -7133,19 +6763,12 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"overall_status",
-					"components"
-				],
+				"required": ["overall_status", "components"],
 				"title": "SystemHealthOut"
 			},
 			"SystemHealthStatus": {
 				"type": "string",
-				"enum": [
-					"ok",
-					"degraded",
-					"down"
-				],
+				"enum": ["ok", "degraded", "down"],
 				"title": "SystemHealthStatus"
 			},
 			"TemplateCreate": {
@@ -7179,10 +6802,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"name",
-					"template_content"
-				],
+				"required": ["name", "template_content"],
 				"title": "TemplateCreate"
 			},
 			"TemplateOut": {
@@ -7301,11 +6921,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"id",
-					"email",
-					"display_name"
-				],
+				"required": ["id", "email", "display_name"],
 				"title": "UserBasicOut"
 			},
 			"UserCreate": {
@@ -7332,11 +6948,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"email",
-					"display_name",
-					"password"
-				],
+				"required": ["email", "display_name", "password"],
 				"title": "UserCreate"
 			},
 			"UserCredits": {
@@ -7392,13 +7004,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"plan",
-					"limit",
-					"used",
-					"remaining",
-					"remaining_pct"
-				],
+				"required": ["plan", "limit", "used", "remaining", "remaining_pct"],
 				"title": "UserCredits",
 				"description": "Summary of user's credit usage for the current billing period."
 			},
@@ -7415,10 +7021,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"email",
-					"password"
-				],
+				"required": ["email", "password"],
 				"title": "UserLogin"
 			},
 			"UserOut": {
@@ -7470,24 +7073,12 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"email",
-					"display_name",
-					"id",
-					"created_at",
-					"is_active"
-				],
+				"required": ["email", "display_name", "id", "created_at", "is_active"],
 				"title": "UserOut"
 			},
 			"UserRole": {
 				"type": "string",
-				"enum": [
-					"USER",
-					"ADMIN",
-					"POWER",
-					"MODERATOR",
-					"GUEST"
-				],
+				"enum": ["USER", "ADMIN", "POWER", "MODERATOR", "GUEST"],
 				"title": "UserRole"
 			},
 			"UserUpdate": {
@@ -7564,11 +7155,7 @@
 					}
 				},
 				"type": "object",
-				"required": [
-					"loc",
-					"msg",
-					"type"
-				],
+				"required": ["loc", "msg", "type"],
 				"title": "ValidationError"
 			}
 		},
