@@ -42,16 +42,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
  && rm -rf /var/lib/apt/lists/*
 
-# Copy venv and app from builder
-COPY --from=builder /app/.venv /app/.venv
-COPY --from=builder /app/morphio-io/backend /app
+# Create non-root runtime user first so file ownership is applied at copy time
+RUN adduser --disabled-password --gecos '' appuser
+
+# Copy venv and app from builder with final ownership (avoids expensive recursive chown)
+COPY --from=builder --chown=appuser:appuser /app/.venv /app/.venv
+COPY --from=builder --chown=appuser:appuser /app/morphio-io/backend /app
 
 ENV PATH="/app/.venv/bin:$PATH"
 
-# Setup entrypoint and user
-RUN chmod +x /app/docker-entrypoint.sh \
- && adduser --disabled-password --gecos '' appuser \
- && chown -R appuser:appuser /app
+# Setup entrypoint
+RUN chmod +x /app/docker-entrypoint.sh
 
 USER appuser
 
