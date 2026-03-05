@@ -1,3 +1,10 @@
+"""Purpose: Exercise CSRF and browser-origin security boundaries.
+Responsibilities: Verify refresh-token CSRF enforcement and local-dev origin handling.
+Scope: Integration coverage for auth boundary middleware and rate limiting behavior.
+Usage: Executed by pytest in the backend integration suite.
+Invariants/Assumptions: Production keeps strict CSRF checks while non-production must support loopback origins on non-standard local ports.
+"""
+
 import uuid
 
 import pytest
@@ -119,3 +126,22 @@ async def test_rate_limit_exceeded(client: AsyncClient, monkeypatch):
         json={"email": "nobody@example.com", "password": "bad"},
     )
     assert resp.status_code == 429, f"Expected 429, got {resp.status_code}. Response: {resp.json()}"
+
+
+@pytest.mark.asyncio
+async def test_non_standard_local_origin_preflight_is_allowed_in_dev(
+    client: AsyncClient, monkeypatch
+):
+    monkeypatch.setattr(settings, "APP_ENV", "development", raising=False)
+
+    response = await client.options(
+        "/auth/login",
+        headers={
+            "Origin": "http://127.0.0.1:3015",
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "content-type",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == "http://127.0.0.1:3015"

@@ -18,7 +18,7 @@ from ...schemas.content_schema import (
     ContentUpdate,
 )
 from ...schemas.response_schema import ApiResponse, PaginatedResponse
-from ...services.content import sanitize_content, validate_content
+from ...services.content import resolve_content_tags, sanitize_content, validate_content
 from ...services.generation import update_content_title
 from ...services.security import get_current_user
 from ...utils.decorators import cache, rate_limit, require_auth
@@ -72,7 +72,9 @@ async def save_content(
     validate_content(content)
     sanitized_content = sanitize_content(content)
     sanitized_content.user_id = current_user.id
-    db_content = Content(**sanitized_content.model_dump())
+    payload = sanitized_content.model_dump(exclude={"tags"})
+    db_content = Content(**payload)
+    db_content.tags = await resolve_content_tags(db, sanitized_content.tags)
     db.add(db_content)
     await db.commit()
     await db.refresh(db_content)
@@ -211,23 +213,28 @@ async def update_content(
     validate_content(content_update)
     sanitized_content = sanitize_content(content_update)
 
-    async with db.begin():
-        query = select(Content).where(
-            Content.id == content_id,
-            Content.user_id == current_user.id,
-            Content.deleted_at.is_(None),
+    query = select(Content).where(
+        Content.id == content_id,
+        Content.user_id == current_user.id,
+        Content.deleted_at.is_(None),
+    )
+    result = await db.execute(query)
+    content = result.unique().scalar_one_or_none()
+
+    if not content:
+        raise ApplicationException(
+            message="Content not found or unauthorized",
+            status_code=status.HTTP_404_NOT_FOUND,
         )
-        result = await db.execute(query)
-        content = result.scalar_one_or_none()
 
-        if not content:
-            raise ApplicationException(
-                message="Content not found or unauthorized",
-                status_code=status.HTTP_404_NOT_FOUND,
-            )
+    update_payload = sanitized_content.model_dump(exclude_unset=True, exclude={"tags"})
+    for field, value in update_payload.items():
+        setattr(content, field, value)
+    if sanitized_content.tags is not None:
+        content.tags = await resolve_content_tags(db, sanitized_content.tags)
 
-        for field, value in sanitized_content.model_dump(exclude_unset=True).items():
-            setattr(content, field, value)
+    await db.commit()
+    await db.refresh(content)
 
     logger.info(f"Content updated: {content_id} by user {current_user.id}")
     return create_response(
@@ -267,19 +274,25 @@ async def update_multiple_contents(
         Content.deleted_at.is_(None),
     )
     result = await db.execute(query)
-    existing_contents: dict[int, Content] = {int(c.id): c for c in result.scalars().all()}
+    existing_contents: dict[int, Content] = {int(c.id): c for c in result.unique().scalars().all()}
 
     updated_contents = []
-    async with db.begin():
-        for content_update in contents:
-            validate_content(content_update)
-            sanitized_content = sanitize_content(content_update)
-            cid = content_update.id
-            if cid is not None and cid in existing_contents:
-                content_obj = existing_contents[cid]
-                for field, value in sanitized_content.model_dump(exclude_unset=True).items():
-                    setattr(content_obj, field, value)
-                updated_contents.append(content_obj)
+    for content_update in contents:
+        validate_content(content_update)
+        sanitized_content = sanitize_content(content_update)
+        cid = content_update.id
+        if cid is not None and cid in existing_contents:
+            content_obj = existing_contents[cid]
+            update_payload = sanitized_content.model_dump(exclude_unset=True, exclude={"tags"})
+            for field, value in update_payload.items():
+                setattr(content_obj, field, value)
+            if sanitized_content.tags is not None:
+                content_obj.tags = await resolve_content_tags(db, sanitized_content.tags)
+            updated_contents.append(content_obj)
+
+    await db.commit()
+    for content_obj in updated_contents:
+        await db.refresh(content_obj)
 
     logger.info(f"Updated {len(updated_contents)} contents for user {current_user.id}")
     return create_response(

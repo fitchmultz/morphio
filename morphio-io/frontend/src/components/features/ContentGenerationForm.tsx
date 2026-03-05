@@ -209,6 +209,9 @@ const ContentGenerationFormComponent: FC<ContentGenerationFormProps> = ({
 		}
 	};
 
+	const isSubmitDisabled =
+		isLoading || !selectedTemplate || (!inputUrl && !inputFile);
+
 	return (
 		<div className="w-full">
 			<form onSubmit={handleSubmit} className="space-y-4">
@@ -277,9 +280,9 @@ const ContentGenerationFormComponent: FC<ContentGenerationFormProps> = ({
 				<button
 					type="submit"
 					className={`morphio-button w-full px-5 py-3.5 flex items-center justify-center space-x-2 ${
-						isLoading ? "opacity-50 cursor-not-allowed" : ""
+						isSubmitDisabled ? "opacity-50 cursor-not-allowed" : ""
 					}`}
-					disabled={isLoading || (!inputUrl && !inputFile)}
+					disabled={isSubmitDisabled}
 				>
 					{isLoading ? "Processing..." : "Generate Content"}
 				</button>

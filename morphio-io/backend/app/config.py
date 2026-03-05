@@ -9,6 +9,7 @@ import os
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+from urllib.parse import urlparse
 
 from dotenv import dotenv_values
 from pydantic import AliasChoices, Field, SecretStr
@@ -49,6 +50,54 @@ _INVALID_PRODUCTION_SECRET_VALUES = {
     "__CHANGE_ME__",
 }
 
+_LOCAL_DEV_LOOPBACK_HOSTS = {"localhost", "127.0.0.1"}
+_LOCAL_DEV_ORIGIN_REGEX = r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$"
+
+
+def _normalized_origin(origin: str) -> str | None:
+    """Normalize an origin string to scheme://host[:port] for safe comparisons."""
+    try:
+        parsed = urlparse(origin)
+    except ValueError:
+        return None
+    if parsed.scheme not in {"http", "https"} or not parsed.hostname:
+        return None
+    port = f":{parsed.port}" if parsed.port is not None else ""
+    return f"{parsed.scheme}://{parsed.hostname}{port}"
+
+
+def _origin_variants(origin: str) -> list[str]:
+    """Expand loopback origins so localhost and 127.0.0.1 behave consistently in dev."""
+    normalized = _normalized_origin(origin)
+    if normalized is None:
+        return []
+
+    parsed = urlparse(normalized)
+    if parsed.hostname not in _LOCAL_DEV_LOOPBACK_HOSTS:
+        return [normalized]
+
+    port = f":{parsed.port}" if parsed.port is not None else ""
+    return [f"{parsed.scheme}://{host}{port}" for host in sorted(_LOCAL_DEV_LOOPBACK_HOSTS)]
+
+
+def _default_cors_origins(frontend_url: str) -> list[str]:
+    """Provide stable public origins and dev loopback variants without duplicating ports."""
+    origins: list[str] = [
+        "http://localhost:3005",
+        "http://localhost:3500",
+        "http://frontend:3005",
+        "https://morphio.io",
+        "http://morphio.io",
+        "https://www.morphio.io",
+        "https://api.morphio.io",
+        "http://api.morphio.io",
+    ]
+    for candidate in [frontend_url, *origins]:
+        for variant in _origin_variants(candidate):
+            if variant not in origins:
+                origins.append(variant)
+    return origins
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_ignore_empty=True)
@@ -80,16 +129,7 @@ class Settings(BaseSettings):
     ADMIN_NAME: str = Field(default="Administrator", json_schema_extra={"env": "ADMIN_NAME"})
 
     CORS_ORIGINS: List[str] = Field(
-        default=[
-            "http://localhost:3005",
-            "http://localhost:3500",
-            "http://frontend:3005",
-            "https://morphio.io",
-            "http://morphio.io",
-            "https://www.morphio.io",
-            "https://api.morphio.io",
-            "http://api.morphio.io",
-        ],
+        default_factory=lambda: _default_cors_origins("http://localhost:3005"),
         json_schema_extra={"env": "CORS_ORIGINS"},
     )
     REDIS_URL: str = Field(
@@ -245,6 +285,13 @@ class Settings(BaseSettings):
     FRONTEND_URL: str = Field(
         default="http://localhost:3005", json_schema_extra={"env": "FRONTEND_URL"}
     )
+
+    @property
+    def local_dev_origin_regex(self) -> str | None:
+        """Allow flexible loopback ports in non-production only."""
+        if str(self.APP_ENV).lower() == "production":
+            return None
+        return _LOCAL_DEV_ORIGIN_REGEX
 
     # Usage weighting and plan-limits
     USAGE_WEIGHTS: Dict[str, int] = Field(

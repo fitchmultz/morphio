@@ -19,7 +19,12 @@ from ..services.security import get_current_user
 from ..utils.decorators import rate_limit, require_auth
 from ..utils.enums import JobStatus, ResponseStatus
 from ..utils.error_handlers import ApplicationException
-from ..utils.file_utils import get_file_extension, is_allowed_file, sanitize_filename
+from ..utils.file_utils import (
+    get_file_extension,
+    get_unique_filename,
+    is_allowed_file,
+    sanitize_filename,
+)
 from ..utils.response_utils import create_response
 from ..utils.route_helpers import common_responses, handle_route_errors
 
@@ -134,7 +139,7 @@ async def process_logs(
 
     upload_dir = Path(settings.UPLOAD_DIR)
     upload_dir.mkdir(parents=True, exist_ok=True)
-    file_path = upload_dir / sanitized_filename
+    file_path = Path(get_unique_filename(str(upload_dir), sanitized_filename))
 
     max_upload_size = settings.MAX_UPLOAD_SIZE
     total_size = 0
@@ -344,7 +349,7 @@ async def generate_splunk_config(
 
     upload_dir = Path(settings.UPLOAD_DIR)
     upload_dir.mkdir(parents=True, exist_ok=True)
-    file_path = upload_dir / sanitized_filename
+    file_path = Path(get_unique_filename(str(upload_dir), sanitized_filename))
 
     max_upload_size = settings.MAX_UPLOAD_SIZE
     total_size = 0

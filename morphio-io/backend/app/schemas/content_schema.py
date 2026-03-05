@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -54,6 +54,18 @@ class ContentOut(ContentInDB):
         if not value or not value.strip():
             return "Untitled"
         return value
+
+    @field_validator("tags", mode="before")
+    @classmethod
+    def normalize_tag_names(cls, value: list[Any]) -> list[str]:
+        """Convert ORM tag objects into plain string names for API responses."""
+        tag_names: list[str] = []
+        for item in value:
+            if isinstance(item, str):
+                tag_names.append(item)
+            elif hasattr(item, "name"):
+                tag_names.append(str(getattr(item, "name")))
+        return tag_names
 
 
 class ContentGenerationResult(BaseModel):

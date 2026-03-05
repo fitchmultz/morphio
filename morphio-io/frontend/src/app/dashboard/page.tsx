@@ -180,12 +180,12 @@ function Dashboard() {
 		<div className="min-h-screen">
 			<div className="max-w-7xl mx-auto space-y-8">
 				<section className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-2xl shadow-xl rounded-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden transform transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
-					<div className="px-8 py-6 border-b border-gray-200/50 dark:border-gray-700/50 bg-linear-to-r from-transparent via-blue-50/30 dark:via-blue-900/20 to-transparent">
-						<h2 className="text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
+					<div className="px-5 py-5 sm:px-8 sm:py-6 border-b border-gray-200/50 dark:border-gray-700/50 bg-linear-to-r from-transparent via-blue-50/30 dark:via-blue-900/20 to-transparent">
+						<h2 className="text-2xl sm:text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
 							Generate Content
 						</h2>
 					</div>
-					<div className="p-8">
+					<div className="p-5 sm:p-8">
 						<ContentGenerationForm
 							onSubmit={handleSubmit}
 							templates={{
@@ -218,30 +218,30 @@ function Dashboard() {
 				)}
 
 				<section className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-2xl shadow-xl rounded-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden transform transition-all duration-300 hover:shadow-2xl">
-					<div className="px-8 py-6 border-b border-gray-200/50 dark:border-gray-700/50 bg-linear-to-r from-transparent via-purple-50/30 dark:via-purple-900/20 to-transparent">
-						<div className="flex justify-between items-center">
-							<h2 className="text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400">
+					<div className="px-5 py-5 sm:px-8 sm:py-6 border-b border-gray-200/50 dark:border-gray-700/50 bg-linear-to-r from-transparent via-purple-50/30 dark:via-purple-900/20 to-transparent">
+						<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+							<h2 className="text-2xl sm:text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400">
 								Saved Content
 							</h2>
-							<div className="flex items-center gap-4">
+							<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
 								<button
 									type="button"
 									onClick={() => setShowManageTemplatesModal(true)}
-									className="morphio-button"
+									className="morphio-button w-full sm:w-auto"
 								>
 									Edit Templates
 								</button>
 								<button
 									type="button"
 									onClick={() => setShowCreateTemplateModal(true)}
-									className="morphio-button"
+									className="morphio-button w-full sm:w-auto"
 								>
 									Create Template
 								</button>
 							</div>
 						</div>
 					</div>
-					<div className="p-8">
+					<div className="p-5 sm:p-8">
 						<SavedContentsList
 							contents={savedContents?.items || []}
 							isLoading={isLoadingContents}

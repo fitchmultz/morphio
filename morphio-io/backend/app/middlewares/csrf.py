@@ -147,6 +147,7 @@ class CSRFMiddleware(BaseHTTPMiddleware):
         try:
             parsed_origin = urlparse(origin)
             origin_host = parsed_origin.netloc.lower()
+            origin_hostname = (parsed_origin.hostname or "").lower()
         except (TypeError, AttributeError) as e:
             logger.warning(f"Could not parse origin '{origin}': {e}")
             return False
@@ -160,6 +161,12 @@ class CSRFMiddleware(BaseHTTPMiddleware):
             except (TypeError, AttributeError) as e:
                 logger.warning(f"Could not parse allowed_origin '{allowed_origin}': {e}")
                 continue
+
+        if str(settings.APP_ENV).lower() != "production" and origin_hostname in {
+            "localhost",
+            "127.0.0.1",
+        }:
+            return True
 
         return False
 

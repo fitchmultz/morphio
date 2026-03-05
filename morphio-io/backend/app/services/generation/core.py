@@ -40,6 +40,24 @@ __all__ = [
 ]
 
 
+def resolve_generation_model(chosen_model: str | None = None) -> str:
+    """Resolve a configured model alias to a currently supported stable model."""
+    if chosen_model and chosen_model in VALID_GENERATION_MODELS:
+        return chosen_model
+
+    configured_default = settings.CONTENT_MODEL
+    if configured_default in VALID_GENERATION_MODELS:
+        return configured_default
+
+    fallback_model = "gemini-3-flash-preview-minimal"
+    logger.warning(
+        "CONTENT_MODEL '%s' is invalid; falling back to '%s'",
+        configured_default,
+        fallback_model,
+    )
+    return fallback_model
+
+
 async def generate_content_title(content: str) -> str:
     """Generate a concise title for the content."""
     prompt_context = (
@@ -57,9 +75,19 @@ async def generate_content_title(content: str) -> str:
         {"role": "user", "content": f"Here is the content excerpt:\n{user_excerpt}"},
     ]
 
+    title_model = settings.TITLE_GENERATION_MODEL
+    if title_model not in VALID_GENERATION_MODELS:
+        fallback_model = resolve_generation_model()
+        logger.warning(
+            "TITLE_GENERATION_MODEL '%s' is invalid; falling back to '%s'",
+            title_model,
+            fallback_model,
+        )
+        title_model = fallback_model
+
     generated_title, _ = await generate_completion(
         messages=messages,
-        model=settings.TITLE_GENERATION_MODEL,
+        model=title_model,
         max_tokens=35,
     )
 
@@ -75,13 +103,8 @@ async def generate_content_from_transcript(
         f"(type: {type(chosen_model)})"
     )
 
-    # Validate model choice
-    if not chosen_model or chosen_model not in VALID_GENERATION_MODELS:
-        used_model = settings.CONTENT_MODEL
-        logger.debug(f"Using default model: {used_model}")
-    else:
-        used_model = chosen_model
-        logger.debug(f"Using provided model: {used_model}")
+    used_model = resolve_generation_model(chosen_model)
+    logger.debug(f"Using resolved model: {used_model}")
 
     messages = [
         {
@@ -140,11 +163,7 @@ async def generate_content_from_transcript_tracked(
 
     logger.debug(f"Generating content with tracking: model={chosen_model}, user={user_id}")
 
-    # Validate model choice
-    if not chosen_model or chosen_model not in VALID_GENERATION_MODELS:
-        used_model = settings.CONTENT_MODEL
-    else:
-        used_model = chosen_model
+    used_model = resolve_generation_model(chosen_model)
 
     messages = [
         {
@@ -200,9 +219,9 @@ async def generate_conversation_completion(
     """
     # Determine model to use
     if not chosen_model:
-        used_model = settings.CONTENT_MODEL
+        used_model = resolve_generation_model()
     else:
-        used_model = chosen_model
+        used_model = resolve_generation_model(chosen_model)
 
     # Calculate token budget
     model_token_limit = get_model_token_limit(used_model)

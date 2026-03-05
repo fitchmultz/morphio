@@ -30,6 +30,7 @@ loadEnvFile(envFiles[0]);
 
 const nextConfig: NextConfig = {
 	productionBrowserSourceMaps: false,
+	allowedDevOrigins: ["127.0.0.1", "localhost"],
 	webpack: (config, { isServer, dev }) => {
 		if (!isServer) {
 			config.resolve.fallback = {
