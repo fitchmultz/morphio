@@ -60,23 +60,21 @@ Date: 2026-03-05
 - Fast gate workflow split and timeout constraints applied in code.
 - Compose default path validated structurally through preflight integration in guardrails.
 
-### Verification receipts (2026-03-05)
+### Verification receipts (2026-03-05 final cutoff)
 
-- `make install` ✅ passed (baseline install completed; heavy ML stack packages removed from default env).
+- `make update` ✅ completed; Python/Node lock resolution reported no newer direct stable versions to apply.
+- Latest-stable registry checks ✅ completed for Python/Node/Rust direct tooling/dependencies (e.g., `ty`, `ruff`, `fastapi`, `next`, `react`, `@biomejs/biome`, `pyo3`).
 - `make ci-fast` ✅ passed (backend/frontend/guardrails + working-tree secret scan).
-- `bash scripts/ci/jobs/secrets-scan.sh --history` ✅ passed (`96 commits scanned`, `no leaks found`).
-- `make ci` ⚠️ all substantive stages passed; final `git diff --exit-code` cleanliness check failed because the working tree already contains unrelated pre-existing modifications in this branch context.
+- `make ci` ✅ passed end-to-end (native/core/backend/frontend/openapi/docker-build/docker-smoke/guardrails).
+- `bash scripts/ci/jobs/secrets-scan.sh --history` ✅ passed (`98 commits scanned`, `no leaks found`).
+- Runtime UI smoke ✅ passed on `http://localhost:3005` (`/`, `/login`, `/dashboard` redirect behavior) with no page errors; screenshots captured under `/tmp/morphio-ui-validate/`.
 
 ## Remaining Risks / Follow-ups
 
-1. **History-wide secret scan still required before public flip**
-   - Run: `bash scripts/ci/jobs/secrets-scan.sh --history`
-   - If findings exist, rotate and rewrite history before public release.
+1. **CI runtime target should continue to be monitored on hosted runners**
+   - Collect periodic warm-cache samples for `CI • Fast PR Gate` and keep target ≤10 minutes.
 
-2. **CI runtime target needs observation on hosted runners**
-   - Collect 3–5 run samples for `CI • Fast PR Gate` and confirm warm-cache ≤10 minutes.
-
-3. **Branch protection must require all fast-gate jobs**
+2. **Branch protection should require all fast-gate jobs**
    - Require backend, frontend, and guardrails checks for merge.
 
 ## Local Reproduction Commands

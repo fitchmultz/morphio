@@ -64,7 +64,7 @@ dev = [
   "pytest-asyncio",
   "pytest-cov",
   "ruff",
-  "ty>=0.0.4",
+  "ty>=0.0.20",
 ]
 
 # Crawler service - only needs playwright for web scraping

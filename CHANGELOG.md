@@ -21,6 +21,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - PR CI workflow now runs fast deterministic checks automatically on PRs and main pushes.
 - `.env.example` now uses generated secret sentinels instead of weak dev defaults.
 - Onboarding/contributing/status/docs index updated for env bootstrap and CI strategy clarity.
+- Standardized `ty` minimum version to `>=0.0.20` across workspace manifests (root, core, backend) to match validated latest stable toolchain.
 
 ### Security
 - Tightened root env ignore policy and automated detection of forbidden tracked/nested env files.
