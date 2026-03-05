@@ -1,3 +1,10 @@
+/**
+ * Purpose: Manage conversation thread state for content-centric chat flows.
+ * Responsibilities: Load thread data, refresh summaries, and coordinate optimistic UI state transitions.
+ * Scope: Frontend hook consumed by conversation-related client components.
+ * Usage: Imported by app routes and components that render conversation state.
+ * Invariants/Assumptions: Failures are surfaced through hook state and must not leak noisy production console errors.
+ */
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -141,7 +148,6 @@ export function useConversation({
 				}
 			}
 		} catch (err) {
-			console.error("Failed to refresh summaries:", err);
 			setError(
 				err instanceof Error ? err.message : "Failed to refresh conversations",
 			);

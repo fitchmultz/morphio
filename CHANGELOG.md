@@ -14,6 +14,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - `docs/release-readiness-report.md` release hardening report.
 - `SECURITY.md` and `CODE_OF_CONDUCT.md`.
 - Nightly schedule for full-stack Docker smoke workflow.
+- Backend regression coverage for Stripe webhook signature-header enforcement.
 
 ### Changed
 - Root `make ci` now runs the canonical full local CI runner (`scripts/ci/run.sh`).
@@ -22,6 +23,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - `.env.example` now uses generated secret sentinels instead of weak dev defaults.
 - Onboarding/contributing/status/docs index updated for env bootstrap and CI strategy clarity.
 - Standardized `ty` minimum version to `>=0.0.20` across workspace manifests (root, core, backend) to match validated latest stable toolchain.
+- Stripe webhook ingress now requires the `Stripe-Signature` header at request validation time.
+- OpenAPI client generation now uses `postProcess: ["biome:format"]`, removing the deprecated formatter config warning while keeping generated files formatter-clean.
+- Removed direct browser `console.error` logging from conversation refresh failures in favor of existing UI error state.
+- Secret scanning now prefers local `gitleaks`, falls back to Docker only when the daemon is available, and otherwise auto-downloads the pinned upstream release via `gh`.
+- Root Docker build context now excludes local uploads, logs, and large media artifacts so Docker smoke builds stay deterministic and do not exhaust disk on dirty worktrees.
 
 ### Security
 - Tightened root env ignore policy and automated detection of forbidden tracked/nested env files.

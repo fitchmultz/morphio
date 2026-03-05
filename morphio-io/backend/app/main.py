@@ -1,3 +1,10 @@
+"""Purpose: Initialize and configure the FastAPI application entrypoint.
+Responsibilities: Register middleware, routers, lifecycle hooks, and startup safety checks.
+Scope: Backend application assembly and process startup behavior.
+Usage: Imported by Uvicorn and ancillary tooling such as OpenAPI export flows.
+Invariants/Assumptions: Development startup should remain functional without optional services while reserving warning-level noise for production-significant degradations.
+"""
+
 import logging
 import os
 import uuid
@@ -64,9 +71,8 @@ async def lifespan(app: FastAPI):
             if admin_created:
                 logger.info("Admin user confirmed or created successfully")
             else:
-                logger.warning(
-                    "Admin user check completed but no admin was created - password may not be set"
-                )
+                log = logger.warning if settings.APP_ENV == "production" else logger.info
+                log("Admin user check completed but no admin was created - password may not be set")
         except Exception as e:
             logger.error(f"Error ensuring admin user exists: {str(e)}", exc_info=True)
 

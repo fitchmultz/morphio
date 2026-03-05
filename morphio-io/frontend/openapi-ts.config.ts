@@ -1,10 +1,17 @@
+/**
+ * Purpose: Configure frontend OpenAPI client generation from the backend schema.
+ * Responsibilities: Define generator input, output, and plugin behavior for typed client code.
+ * Scope: Source-of-truth generation settings for `pnpm openapi:generate`.
+ * Usage: Consumed by `@hey-api/openapi-ts` during local and CI regeneration.
+ * Invariants/Assumptions: Generated output must match repository Biome formatting rules without manual edits.
+ */
 import { defineConfig } from "@hey-api/openapi-ts";
 
 export default defineConfig({
 	input: "./openapi.json",
 	output: {
 		path: "src/client",
-		format: "prettier",
+		postProcess: ["biome:format"],
 	},
 	plugins: [
 		"@hey-api/typescript",

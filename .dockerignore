@@ -51,6 +51,25 @@
 **/*.db
 **/*.sqlite
 **/*.sqlite3
+**/uploads/
+**/output_files/
+**/upload_files/
+**/mlx_models/
+**/*.avi
+**/*.flac
+**/*.gif
+**/*.jpeg
+**/*.jpg
+**/*.m4a
+**/*.mkv
+**/*.mov
+**/*.mp3
+**/*.mp4
+**/*.ogg
+**/*.png
+**/*.svg
+**/*.wav
+**/*.webm
 
 # Build artifacts
 morphio-native/target/

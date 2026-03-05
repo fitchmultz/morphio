@@ -47,7 +47,7 @@ COPY --from=builder /app/morphio-io/backend /app
 ENV PATH="/app/.venv/bin:$PATH"
 
 # Install Playwright browser
-RUN playwright install chromium
+RUN NODE_NO_WARNINGS=1 playwright install chromium
 
 EXPOSE 8002
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \

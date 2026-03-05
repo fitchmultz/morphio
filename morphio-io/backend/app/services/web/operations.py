@@ -1,10 +1,8 @@
-"""
-Web operations including scraping and content generation.
-
-This module contains functions for web scraping and content generation,
-including:
-- scrape_webpage: Extract text content from a web page
-- scrape_and_generate_web: Process a web page and generate content from it
+"""Purpose: Implement web scraping and downstream content-generation workflows.
+Responsibilities: Fetch web content, normalize extracted text, and support generation-oriented web operations.
+Scope: Backend service-layer helpers used by higher-level web processing flows.
+Usage: Imported by route and service modules that orchestrate web content ingestion.
+Invariants/Assumptions: Optional browser dependencies remain explicitly typed and failures are surfaced through service errors.
 """
 
 import json
@@ -67,7 +65,7 @@ async def scrape_webpage(url: str) -> str:
     else:
         # Local fallback using Playwright (requires crawler deps)
         try:
-            from playwright.async_api import async_playwright  # type: ignore
+            from playwright.async_api import async_playwright  # type: ignore[import-untyped]
         except Exception as e:  # pragma: no cover
             logger.error(f"Playwright not available: {e}")
             raise ApplicationException("Crawler not available", 501)

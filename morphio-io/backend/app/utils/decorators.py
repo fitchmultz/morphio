@@ -1,3 +1,10 @@
+"""Purpose: Provide reusable request decorators and limiter setup for backend endpoints.
+Responsibilities: Configure rate limiting, auth-adjacent wrappers, and shared decorator behavior.
+Scope: Backend utility layer consumed by route modules that need rate limiting or response wrappers.
+Usage: Imported by route handlers and application startup to attach limiter behavior.
+Invariants/Assumptions: Development fallbacks may degrade to in-memory rate limiting without surfacing noisy warnings intended only for production incidents.
+"""
+
 import functools
 import json
 import logging
@@ -54,7 +61,8 @@ try:
     if hasattr(limiter, "ratelimit"):
         _ratelimit_func = getattr(limiter, "ratelimit")
 except (redis.ConnectionError, redis.exceptions.TimeoutError) as e:
-    logger.warning(f"Failed to connect to Redis ({e}). Using in-memory rate limiting.")
+    log = logger.warning if settings.APP_ENV == "production" else logger.info
+    log(f"Failed to connect to Redis ({e}). Using in-memory rate limiting.")
     limiter = Limiter(
         key_func=get_remote_address,
         storage_uri="memory://",

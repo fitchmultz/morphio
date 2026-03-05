@@ -31,7 +31,7 @@ install-native: ## Install all native dev dependencies (Apple Silicon)
 	@echo "📦 Installing native dependencies..."
 	@cd backend && uv sync --group ml-apple --group ml --group crawler --group dev
 	@echo "🎭 Installing Playwright browsers..."
-	@cd backend && uv run playwright install chromium
+	@cd backend && NODE_NO_WARNINGS=1 uv run playwright install chromium
 	@echo "✅ Native setup complete!"
 
 dev: ## Start native dev servers (backend + frontend + Redis via Docker)

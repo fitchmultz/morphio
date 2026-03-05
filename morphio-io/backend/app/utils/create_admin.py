@@ -1,4 +1,9 @@
-"""Utility to create an admin user if one doesn't exist."""
+"""Purpose: Ensure an initial admin account exists when explicit credentials are supplied.
+Responsibilities: Read admin bootstrap credentials, create or upgrade an admin user, and report bootstrap outcomes.
+Scope: Backend startup utility for optional admin initialization.
+Usage: Called during application startup or executed directly for local bootstrap flows.
+Invariants/Assumptions: Missing admin credentials are expected in development and should only warn in production-like environments.
+"""
 
 import asyncio
 import logging
@@ -27,7 +32,8 @@ async def ensure_admin_user_exists():
     logger.info(f"Checking for admin user with email: {admin_email}")
 
     if not admin_password:
-        logger.warning(
+        log = logger.warning if os.environ.get("APP_ENV") == "production" else logger.info
+        log(
             "ADMIN_PASSWORD environment variable not set. "
             "Cannot create admin user without a password."
         )

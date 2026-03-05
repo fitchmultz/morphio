@@ -1,6 +1,8 @@
-"""Stripe billing endpoints.
-
-Provides checkout session creation and webhook handling for subscription management.
+"""Purpose: Expose Stripe-backed billing endpoints for subscription workflows.
+Responsibilities: Create checkout sessions, expose subscription state, and validate webhook ingress.
+Scope: HTTP route layer for billing-related API interactions.
+Usage: Mounted by the FastAPI application under the billing router.
+Invariants/Assumptions: Public webhook ingress must enforce Stripe signature headers before processing events.
 """
 
 import logging
@@ -185,7 +187,7 @@ async def create_portal_session(
 )
 async def stripe_webhook(
     request: Request,
-    stripe_signature: str = Header(None, alias="Stripe-Signature"),
+    stripe_signature: str = Header(..., alias="Stripe-Signature"),
     db: AsyncSession = Depends(get_db),
 ):
     """

@@ -65,6 +65,7 @@ make ci         # Full CI gate (required for PRs)
 - **TypeScript/React**: Biome for lint/format.
   - PascalCase components, camelCase variables/hooks; co-locate component files in `src/components`.
   - Run: `pnpm lint` and `pnpm format`.
+  - OpenAPI client generation is source-of-truth driven by `frontend/openapi-ts.config.ts`; generated `src/client/**` output must stay Biome-formatted and should never be hand-edited.
 
 ## Testing Guidelines
 
@@ -84,6 +85,8 @@ make ci         # Full CI gate (required for PRs)
 make openapi  # From project root, no server needed
 ```
 
+**Secrets scan behavior**: `scripts/ci/jobs/secrets-scan.sh` prefers a local `gitleaks` binary, then Docker if the daemon is available, then a pinned `gh`-downloaded cache. Do not reintroduce an unconditional Docker daemon dependency for the fast gate.
+
 ## Docker Builds
 
 Default local compose/build paths use local Dockerfiles and do not require GHCR auth. GHCR image pulls are reserved for release/production workflows.
@@ -91,6 +94,8 @@ Default local compose/build paths use local Dockerfiles and do not require GHCR 
 ```bash
 docker build -f backend/Dockerfile.dev ..
 ```
+
+- Compose-backed backend/crawler/worker builds use the **monorepo root** as Docker context; when excluding local artifacts, update the root `.dockerignore`, not just `morphio-io/.dockerignore`.
 
 **Platform constraint**: `worker-ml` is amd64-only (torchcodec lacks ARM64 wheels). Docker Compose files include `platform: linux/amd64`. For manual builds on ARM64:
 

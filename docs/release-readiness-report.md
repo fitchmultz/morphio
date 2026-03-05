@@ -53,6 +53,14 @@ Date: 2026-03-05
 7. **Updater workflow token scope reduced**
    - `.github/workflows/updater.yml` now uses `github.token` with explicit minimal permissions.
 
+8. **Final public polish pass**
+   - Stripe webhook ingress now rejects missing `Stripe-Signature` before Stripe verification runs.
+   - Added route-level regression coverage in `morphio-io/backend/tests/integration/test_billing_webhook.py`.
+   - Removed direct browser console logging from conversation refresh failures.
+   - Updated OpenAPI generator config to `postProcess: ["biome:format"]` to remove the deprecated config warning while keeping generated output aligned with repository formatting.
+   - Updated secret scanning to prefer a local `gitleaks` binary, fall back to Docker only when available, and otherwise auto-download the pinned release via `gh`.
+   - Tightened the root Docker build context ignore rules so local uploads, logs, and media artifacts cannot break Docker smoke builds.
+
 ## Evidence (What Was Verified)
 
 - Code-level regression tests added for production secret guards.
@@ -67,7 +75,8 @@ Date: 2026-03-05
 - `make ci-fast` ✅ passed (backend/frontend/guardrails + working-tree secret scan).
 - `make ci` ✅ passed end-to-end (native/core/backend/frontend/openapi/docker-build/docker-smoke/guardrails).
 - `bash scripts/ci/jobs/secrets-scan.sh --history` ✅ passed (`100 commits scanned`, `no leaks found`).
-- Runtime UI smoke ✅ passed on `http://localhost:3005` (`/`, `/login`, `/dashboard` redirect behavior) with no page errors; screenshots captured under `/tmp/morphio-ui-validate/`.
+- Runtime UI smoke ✅ passed on `http://localhost:3005` (`/`, `/login`, invalid-login error feedback, `/dashboard` redirect behavior) via live browser validation.
+- Targeted regression checks ✅ passed for Stripe webhook request validation and frontend client regeneration/type-check after the final polish pass.
 
 ## Remaining Risks / Follow-ups
 

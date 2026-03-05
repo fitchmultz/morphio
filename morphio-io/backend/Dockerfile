@@ -48,7 +48,7 @@ RUN python -m pip install --upgrade pip \
  && echo "Installing backend project dependencies with uv..." \
  && uv venv /opt/venv \
  && UV_PROJECT_ENVIRONMENT=/opt/venv uv sync --no-dev --frozen \
- && playwright install chromium
+ && NODE_NO_WARNINGS=1 playwright install chromium
 
 # Final stage
 FROM python:3.13-slim
