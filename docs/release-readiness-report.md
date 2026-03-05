@@ -66,7 +66,7 @@ Date: 2026-03-05
 - Latest-stable registry checks ✅ completed for Python/Node/Rust direct tooling/dependencies (e.g., `ty`, `ruff`, `fastapi`, `next`, `react`, `@biomejs/biome`, `pyo3`).
 - `make ci-fast` ✅ passed (backend/frontend/guardrails + working-tree secret scan).
 - `make ci` ✅ passed end-to-end (native/core/backend/frontend/openapi/docker-build/docker-smoke/guardrails).
-- `bash scripts/ci/jobs/secrets-scan.sh --history` ✅ passed (`98 commits scanned`, `no leaks found`).
+- `bash scripts/ci/jobs/secrets-scan.sh --history` ✅ passed (`100 commits scanned`, `no leaks found`).
 - Runtime UI smoke ✅ passed on `http://localhost:3005` (`/`, `/login`, `/dashboard` redirect behavior) with no page errors; screenshots captured under `/tmp/morphio-ui-validate/`.
 
 ## Remaining Risks / Follow-ups
