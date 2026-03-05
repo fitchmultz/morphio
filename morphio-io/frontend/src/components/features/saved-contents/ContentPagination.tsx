@@ -56,6 +56,9 @@ const ContentPagination: React.FC<ContentPaginationProps> = ({
 		return pageNumbers;
 	};
 
+	const pageNumbers = getPageNumbers();
+	let ellipsisCount = 0;
+
 	return (
 		<div className="flex justify-center items-center space-x-2 mt-6">
 			<button
@@ -69,12 +72,13 @@ const ContentPagination: React.FC<ContentPaginationProps> = ({
 				Previous
 			</button>
 
-			{getPageNumbers().map((page, index) => {
+			{pageNumbers.map((page) => {
 				if (typeof page === "string") {
+					ellipsisCount += 1;
 					// Render ellipsis
 					return (
 						<span
-							key={`ellipsis-${page === "..." ? "left" : "right"}-${index}`}
+							key={`ellipsis-${ellipsisCount}`}
 							className="morphio-body-sm px-3 py-1 text-gray-500 dark:text-gray-400"
 						>
 							{page}

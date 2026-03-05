@@ -1,7 +1,7 @@
 import logging
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Form, HTTPException, status
+from fastapi import APIRouter, Depends, Form, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..database import get_db
@@ -36,6 +36,7 @@ router = APIRouter()
 @require_auth
 @handle_route_errors
 async def enqueue_web_scraping_route(
+    request: Request,
     input_url: str = Form(...),
     template_id: str = Form(...),
     model: Optional[str] = Form(None),

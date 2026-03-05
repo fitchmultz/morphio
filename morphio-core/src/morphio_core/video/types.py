@@ -1,13 +1,13 @@
 """Video processing types and configuration models."""
 
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class OutputMode(str, Enum):
+class OutputMode(StrEnum):
     """yt-dlp output verbosity mode."""
 
     QUIET = "quiet"

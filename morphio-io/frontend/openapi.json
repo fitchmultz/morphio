@@ -5533,7 +5533,7 @@
 				"properties": {
 					"log_file": {
 						"type": "string",
-						"format": "binary",
+						"contentMediaType": "application/octet-stream",
 						"title": "Log File"
 					}
 				},
@@ -5545,7 +5545,7 @@
 				"properties": {
 					"log_file": {
 						"type": "string",
-						"format": "binary",
+						"contentMediaType": "application/octet-stream",
 						"title": "Log File",
 						"description": "Log file to process",
 						"examples": ["app.log"]
@@ -5572,7 +5572,7 @@
 						"anyOf": [
 							{
 								"type": "string",
-								"format": "binary"
+								"contentMediaType": "application/octet-stream"
 							},
 							{
 								"type": "null"
@@ -7145,6 +7145,13 @@
 					"type": {
 						"type": "string",
 						"title": "Error Type"
+					},
+					"input": {
+						"title": "Input"
+					},
+					"ctx": {
+						"type": "object",
+						"title": "Context"
 					}
 				},
 				"type": "object",

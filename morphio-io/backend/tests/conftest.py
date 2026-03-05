@@ -8,7 +8,8 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 
 os.environ["APP_ENV"] = "development"  # Ensure relaxed settings during tests
-os.environ["JWT_SECRET_KEY"] = "test_secret_key"  # Set before imports
+os.environ["SECRET_KEY"] = "test_secret_key_for_ci_at_least_32_bytes_long"
+os.environ["JWT_SECRET_KEY"] = "test_jwt_secret_key_for_ci_at_least_32_bytes_long"
 os.environ["RATE_LIMITING_ENABLED"] = "False"  # Disable rate limiting for tests
 
 from app.database import get_db
@@ -95,8 +96,8 @@ def pytest_configure(config):
 @pytest.fixture
 def mock_rate_limit():
     with patch("app.utils.decorators.rate_limit") as mock:
-        mock.side_effect = (
-            lambda limit: lambda f: f
+        mock.side_effect = lambda limit: (
+            lambda f: f
         )  # Disable rate limiting for tests except specific ones
         yield mock
 

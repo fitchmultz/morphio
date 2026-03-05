@@ -3,7 +3,7 @@
 import logging
 from typing import Annotated, List, Optional
 
-from fastapi import APIRouter, Body, Depends, Query, status
+from fastapi import APIRouter, Body, Depends, Query, Request, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -172,6 +172,7 @@ async def get_contents(
 @handle_route_errors
 async def get_content(
     content_id: int,
+    request: Request,
     current_user: Annotated[User, Depends(get_current_user)],
     content: Content = Depends(get_user_content),
 ):
@@ -202,6 +203,7 @@ async def get_content(
 @handle_route_errors
 async def update_content(
     content_id: int,
+    request: Request,
     content_update: ContentUpdate,
     current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
@@ -252,6 +254,7 @@ async def update_content(
 @rate_limit("100/minute")
 @handle_route_errors
 async def update_multiple_contents(
+    request: Request,
     contents: List[ContentUpdate],
     current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
@@ -305,6 +308,7 @@ async def update_multiple_contents(
 @handle_route_errors
 async def update_content_title_route(
     content_id: int,
+    request: Request,
     title_update: ContentTitleUpdate,
     current_user: Annotated[User, Depends(get_current_user)],
 ):
@@ -345,6 +349,7 @@ async def update_content_title_route(
 @handle_route_errors
 async def delete_content(
     content_id: int,
+    request: Request,
     current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
     content: Content = Depends(get_user_content),

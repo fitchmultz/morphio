@@ -56,6 +56,8 @@ make ci         # Full CI gate (required for PRs)
 
 ## Coding Style & Naming Conventions
 
+- **Rate-limited FastAPI routes**: Any endpoint using `@rate_limit(...)` must include `request: Request` in the function signature so decorator enforcement has request context.
+
 - **Python**: Ruff for lint/format; ty for type-check. Line length 100, Python 3.13+.
   - snake_case modules/functions, PascalCase classes; include type hints.
   - Run: `uv run ruff check . && uv run ty check` (from `backend/`).

@@ -7,7 +7,7 @@ Commands:
 - info: Show system information and available backends
 """
 
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Annotated
 
@@ -23,7 +23,7 @@ app = typer.Typer(
 console = Console()
 
 
-class WhisperBackend(str, Enum):
+class WhisperBackend(StrEnum):
     """Available Whisper transcription backends."""
 
     auto = "auto"

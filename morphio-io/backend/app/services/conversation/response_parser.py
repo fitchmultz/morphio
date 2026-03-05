@@ -56,7 +56,7 @@ def parse_model_response(
     summary = data.get("change_summary") or []
     notes = data.get("notes")
 
-    if not isinstance(summary, list):  # type: ignore[unreachable]
+    if not isinstance(summary, list):
         summary = [str(summary)]
     summary = [str(item).strip() for item in summary if str(item).strip()]
 

@@ -76,7 +76,7 @@ async def process_online_video(
 
             # Try to fetch YouTube transcript if library available; otherwise skip
             try:
-                from youtube_transcript_api import (  # type: ignore[reportMissingImports]
+                from youtube_transcript_api import (
                     NoTranscriptFound,
                     YouTubeTranscriptApi,
                 )
@@ -86,7 +86,7 @@ async def process_online_video(
 
                 entries: list[TranscriptEntry]
                 if hasattr(YouTubeTranscriptApi, "list_transcripts"):
-                    transcript_list_any = YouTubeTranscriptApi.list_transcripts(video_id)  # type: ignore[attr-defined]
+                    transcript_list_any = YouTubeTranscriptApi.list_transcripts(video_id)
                     transcript_list = cast(TranscriptList, transcript_list_any)
                     try:
                         transcript = transcript_list.find_manually_created_transcript(
@@ -104,7 +104,7 @@ async def process_online_video(
                     get_tx = getattr(YouTubeTranscriptApi, "get_transcript")
                     entries = cast(
                         list[TranscriptEntry],
-                        get_tx(video_id, languages=["en", "en-US"]),  # type: ignore[misc]
+                        get_tx(video_id, languages=["en", "en-US"]),
                     )
 
                 full_text = " ".join(e.get("text", "") for e in entries)

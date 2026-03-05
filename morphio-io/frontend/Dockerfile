@@ -1,16 +1,14 @@
 # Stage 1: Build the Next.js application
 FROM node:24-alpine AS builder
 
-# Set working directory
 WORKDIR /app
-
-# Install pnpm
-RUN npm install -g pnpm@latest
 
 # Install dependencies first (better layer caching)
 COPY frontend/package.json frontend/pnpm-lock.yaml ./
-RUN apk add --no-cache python3 make g++ && \
-    pnpm install --frozen-lockfile
+RUN corepack enable \
+ && corepack prepare "$(node -p "require('./package.json').packageManager")" --activate
+RUN apk add --no-cache python3 make g++ \
+ && pnpm install --frozen-lockfile
 
 # Set build env vars
 ENV NODE_ENV=production
@@ -26,17 +24,14 @@ FROM node:24-alpine
 
 WORKDIR /app
 
-# Install pnpm
-RUN npm install -g pnpm@latest
-
 # Set runtime env vars
 ENV NODE_ENV=production
 
 # Create non-root user first
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs && \
-    mkdir -p /app/.next/cache && \
-    chown -R nextjs:nodejs /app
+RUN addgroup --system --gid 1001 nodejs \
+ && adduser --system --uid 1001 nextjs \
+ && mkdir -p /app/.next/cache \
+ && chown -R nextjs:nodejs /app
 
 # Copy only necessary files
 COPY --from=builder --chown=nextjs:nodejs /app/package.json ./
@@ -46,6 +41,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/next.config.ts ./
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/src ./src
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
+
+# Keep pnpm version aligned with packageManager from package.json
+RUN corepack enable \
+ && corepack prepare "$(node -p "require('./package.json').packageManager")" --activate
 
 USER nextjs
 

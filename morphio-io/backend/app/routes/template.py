@@ -2,7 +2,7 @@ import json
 import logging
 from typing import Annotated, List
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..config import settings
@@ -60,6 +60,7 @@ async def _invalidate_template_cache(template_id: int | None = None) -> None:
 )
 @rate_limit("100/minute")
 async def get_templates(
+    request: Request,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -99,6 +100,7 @@ async def get_templates(
 )
 @rate_limit("60/minute")
 async def save_template(
+    request: Request,
     template: TemplateCreate,
     current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
@@ -132,6 +134,7 @@ async def save_template(
 @rate_limit("60/minute")
 async def get_template(
     template_id: int,
+    request: Request,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -170,6 +173,7 @@ async def get_template(
 @rate_limit("60/minute")
 async def update_template_route(
     template_id: int,
+    request: Request,
     template_update: TemplateUpdate,
     current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
@@ -208,6 +212,7 @@ async def update_template_route(
 @rate_limit("60/minute")
 async def delete_template_route(
     template_id: int,
+    request: Request,
     current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ):

@@ -5,8 +5,8 @@ WORKDIR /app
 # Install Rust for morphio-native and uv
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl build-essential \
- && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain 1.75 \
- && pip install --no-cache-dir uv==0.9.18 \
+ && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain 1.93.1 \
+ && pip install --no-cache-dir uv==0.10.8 \
  && rm -rf /var/lib/apt/lists/*
 
 ENV PATH="/root/.cargo/bin:${PATH}" \

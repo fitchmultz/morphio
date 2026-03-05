@@ -15,7 +15,7 @@ This script checks for all required tools. If it fails, it will tell you exactly
 | Tool | Install |
 |------|---------|
 | uv | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
-| pnpm | `corepack enable && corepack prepare pnpm@latest --activate` |
+| pnpm | `corepack enable && corepack use pnpm@10.30.3` |
 | cargo/rustc | `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \| sh` |
 | gh | `brew install gh` (macOS) or see [GitHub CLI docs](https://cli.github.com/) |
 | docker | Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) |
@@ -121,7 +121,7 @@ If you see "Python newer than supported" PyO3 errors, the build script sets `PYO
 
 ```bash
 corepack enable
-corepack prepare pnpm@latest --activate
+corepack use pnpm@10.30.3
 ```
 
 ### TypeScript errors after backend changes

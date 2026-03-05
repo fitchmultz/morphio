@@ -1,7 +1,7 @@
 use pyo3::prelude::*;
 use std::collections::HashMap;
 
-#[pyclass]
+#[pyclass(from_py_object)]
 #[derive(Clone)]
 pub struct AnonymizationResult {
     #[pyo3(get)]
@@ -79,7 +79,7 @@ pub struct TranscriptionSpeakerSegmentInput {
 
 // Output structs (returned from functions)
 
-#[pyclass]
+#[pyclass(from_py_object)]
 #[derive(Clone)]
 pub struct SpeakerSegment {
     #[pyo3(get)]
@@ -111,7 +111,7 @@ impl SpeakerSegment {
     }
 }
 
-#[pyclass]
+#[pyclass(from_py_object)]
 #[derive(Clone)]
 pub struct WordTiming {
     #[pyo3(get)]
@@ -138,7 +138,7 @@ impl WordTiming {
     }
 }
 
-#[pyclass]
+#[pyclass(from_py_object)]
 #[derive(Clone)]
 pub struct SpeakerUtterance {
     #[pyo3(get)]
@@ -173,7 +173,7 @@ impl SpeakerUtterance {
     }
 }
 
-#[pyclass]
+#[pyclass(from_py_object)]
 #[derive(Clone)]
 pub struct TranscriptionSpeakerSegment {
     #[pyo3(get)]

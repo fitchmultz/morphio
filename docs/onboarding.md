@@ -9,7 +9,7 @@ Before starting, ensure you have:
 - **macOS or Linux** (Windows WSL2 works but is untested)
 - **Docker Desktop** running
 - **Node.js 24+** (use `fnm` or `nvm`)
-- **pnpm** (`corepack enable && corepack prepare pnpm@latest --activate`)
+- **pnpm** (`corepack enable && corepack use pnpm@10.30.3`) (or run `pnpm` in repo to use the pinned `packageManager`)
 - **Rust toolchain** (`curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`)
 - **uv** (`curl -LsSf https://astral.sh/uv/install.sh | sh`)
 - **GitHub CLI** (`brew install gh` then `gh auth login`)
@@ -147,7 +147,7 @@ Common first-time issues:
 - **Doctor fails**: Run `bash scripts/ci/doctor.sh` to see which tool is missing
 - **Docker not found**: Start Docker Desktop and wait for it to initialize
 - **Python 3.13 missing**: Run `uv python install 3.13`
-- **pnpm not found**: Run `corepack enable && corepack prepare pnpm@latest --activate`
+- **pnpm not found**: Run `corepack enable && corepack use pnpm@10.30.3`
 
 ## Next Steps
 

@@ -14,7 +14,9 @@ export default defineConfig({
 		},
 		{
 			name: "@hey-api/sdk",
-			asClass: false,
+			operations: {
+				strategy: "flat",
+			},
 		},
 		{
 			name: "@tanstack/react-query",

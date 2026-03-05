@@ -91,8 +91,8 @@ async def test_continue_conversation_creates_new_thread(client, db_session):
     try:
         with patch(
             "app.services.conversation.manager.generate_conversation_completion",
-            AsyncMock(return_value=(llm_payload, "gpt-5.1")),
-        ):  # type: ignore[arg-type]
+            new=AsyncMock(return_value=(llm_payload, "gpt-5.1")),
+        ):
             response = await client.post(
                 f"/content/{content.id}/conversation",
                 json={"message": "Please make this more concise"},

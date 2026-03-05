@@ -9,7 +9,7 @@ from .log_context import get_correlation_id
 
 
 class CorrelationIdFilter(logging.Filter):
-    def filter(self, record: logging.LogRecord) -> bool:  # type: ignore[override]
+    def filter(self, record: logging.LogRecord) -> bool:
         # Preserve explicit correlation_id if provided, else from ContextVar
         corr = getattr(record, "correlation_id", None) or get_correlation_id()
         setattr(record, "correlation_id", corr or "-")
@@ -17,7 +17,7 @@ class CorrelationIdFilter(logging.Filter):
 
 
 class JSONFormatter(logging.Formatter):
-    def format(self, record: logging.LogRecord) -> str:  # type: ignore[override]
+    def format(self, record: logging.LogRecord) -> str:
         base: Dict[str, Any] = {
             "timestamp": datetime.fromtimestamp(record.created, tz=timezone.utc).isoformat(),
             "level": record.levelname,

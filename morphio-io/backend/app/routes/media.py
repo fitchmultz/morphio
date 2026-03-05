@@ -5,7 +5,7 @@ from typing import Annotated, Optional
 
 
 import aiofiles
-from fastapi import APIRouter, Depends, File, Form, Path as PathParam, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, Path as PathParam, Request, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..config import settings
@@ -63,7 +63,7 @@ router = APIRouter()
 )
 @rate_limit("200/minute")
 @handle_route_errors
-async def get_media_file_configuration():
+async def get_media_file_configuration(request: Request):
     """Get media file configuration including allowed extensions."""
     logger.info("Retrieving media file configuration")
 
@@ -106,7 +106,7 @@ async def get_media_file_configuration():
 )
 @rate_limit("200/minute")
 @handle_route_errors
-async def get_available_models():
+async def get_available_models(request: Request):
     """Get available AI models for content generation."""
     logger.info("Retrieving available models")
 
@@ -182,6 +182,7 @@ async def get_available_models():
 @require_auth
 @handle_route_errors
 async def process_media_route(
+    request: Request,
     input_url: str = Form(
         None,
         description="Optional media URL (YouTube, Rumble, X.com, TikTok)",
@@ -412,6 +413,7 @@ async def process_media_route(
 @rate_limit("150/minute")
 @handle_route_errors
 async def get_media_processing_status_route(
+    request: Request,
     current_user: Annotated[User, Depends(get_current_user)],
     job_id: str = PathParam(
         ...,

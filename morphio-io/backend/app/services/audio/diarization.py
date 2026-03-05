@@ -8,6 +8,7 @@ compete with MLX for Metal GPU memory.
 """
 
 import asyncio
+import importlib
 import json
 import logging
 import subprocess
@@ -51,10 +52,15 @@ def _load_pipeline():
                 raise RuntimeError("Pipeline.from_pretrained returned None")
 
             # Move to MPS if available (Apple Silicon)
-            import torch  # type: ignore[import-untyped]
+            torch = importlib.import_module("torch")
 
-            if torch.backends.mps.is_available():  # type: ignore[attr-defined]
-                loaded_pipeline = loaded_pipeline.to(torch.device("mps"))  # type: ignore[attr-defined]
+            torch_backends = getattr(torch, "backends", None)
+            mps_backend = getattr(torch_backends, "mps", None) if torch_backends else None
+            mps_available = getattr(mps_backend, "is_available", None)
+            torch_device = getattr(torch, "device", None)
+
+            if callable(mps_available) and mps_available() and callable(torch_device):
+                loaded_pipeline = loaded_pipeline.to(torch_device("mps"))
                 logger.info("Diarization pipeline loaded on MPS (Apple Silicon GPU)")
             else:
                 logger.info("Diarization pipeline loaded on CPU")

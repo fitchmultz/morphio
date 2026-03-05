@@ -264,8 +264,8 @@ def cache(
 
             cached_result = await get_redis_data(cache_key)
             if cached_result:
-                # Note: Cached result is deserialized JSON, type is R at runtime
-                return json.loads(cached_result)  # type: ignore[return-value]
+                # Cached result is JSON-serialized output from this decorator.
+                return json.loads(cached_result)
 
             result = await func(*args, **kwargs)
             await set_redis_data(cache_key, json.dumps(result), config.expire)

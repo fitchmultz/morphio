@@ -282,11 +282,18 @@ async def handle_checkout_completed(session: dict, db: AsyncSession):
 
 async def handle_subscription_updated(subscription: dict, db: AsyncSession):
     """Handle subscription status changes."""
-    customer_id = subscription.get("customer")
-    status_val = subscription.get("status")
+    customer_id_raw = subscription.get("customer")
+    status_val_raw = subscription.get("status")
 
-    if not customer_id:
+    if not isinstance(customer_id_raw, str):
+        logger.warning("Subscription update webhook missing valid customer id")
         return
+    if not isinstance(status_val_raw, str):
+        logger.warning("Subscription update webhook missing valid status")
+        return
+
+    customer_id = customer_id_raw
+    status_val = status_val_raw
 
     result = await db.execute(select(User).where(User.stripe_customer_id == customer_id))
     user = result.scalar_one_or_none()

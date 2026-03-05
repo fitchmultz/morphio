@@ -234,7 +234,9 @@ def audit(
                 formatted_message = message
                 if message:
                     if result is not None and isinstance(result, dict):
-                        context.update(dict(result))  # type: ignore[arg-type]
+                        for key, value in result.items():
+                            if isinstance(key, str):
+                                context[key] = value
                     formatted_message = _format_audit_message(message, context)
 
                 # Log successful execution

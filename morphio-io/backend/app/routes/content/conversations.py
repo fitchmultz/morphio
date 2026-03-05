@@ -3,7 +3,7 @@
 import logging
 from typing import Annotated, List
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...database import get_db
@@ -122,6 +122,7 @@ async def get_conversation_thread(
 async def delete_conversation_route(
     content_id: int,
     conversation_id: str,
+    request: Request,
     current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ):

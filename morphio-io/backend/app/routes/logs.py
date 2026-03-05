@@ -246,6 +246,7 @@ async def process_logs(
 @rate_limit("150/minute")
 @handle_route_errors
 async def get_logs_processing_status_route(
+    request: Request,
     job_id: str = PathParam(
         ...,
         description="Log processing job ID",
@@ -414,7 +415,7 @@ async def generate_splunk_config(
 )
 @rate_limit("200/minute")
 @handle_route_errors
-async def get_log_file_configuration():
+async def get_log_file_configuration(request: Request):
     """Get log file configuration including allowed extensions."""
     logger.info("Retrieving log file configuration")
 

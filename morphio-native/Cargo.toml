@@ -2,7 +2,7 @@
 name = "morphio_native"
 version = "0.1.0"
 edition = "2021"
-rust-version = "1.75"
+rust-version = "1.93"
 license = "MIT"
 
 [lib]
@@ -10,12 +10,12 @@ name = "morphio_native"
 crate-type = ["cdylib"]
 
 [dependencies]
-pyo3 = { version = "0.22", features = ["extension-module"] }
-regex = "1.10"
-intervaltree = "0.2"
-ahash = "0.8"
-xxhash-rust = { version = "0.8", features = ["xxh3"] }
-thiserror = "2.0"
+pyo3 = { version = "0.28", features = ["auto-initialize"] }
+regex = "1.12"
+intervaltree = "0.2.7"
+ahash = "0.8.12"
+xxhash-rust = { version = "0.8.15", features = ["xxh3"] }
+thiserror = "2.0.18"
 
 [dev-dependencies]
 # Rust tests only - Python benchmarks use pytest-benchmark
