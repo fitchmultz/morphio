@@ -6,7 +6,7 @@ mod types;
 
 use pyo3::prelude::*;
 
-#[pymodule]
+#[pymodule(gil_used = true)]
 fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     // Anonymizer
     m.add_function(wrap_pyfunction!(anonymizer::anonymize, m)?)?;

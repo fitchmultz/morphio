@@ -7,8 +7,11 @@
 		// Module settings
 		"module": "esnext",
 		"moduleResolution": "bundler",
+		"moduleDetection": "force",
 		"esModuleInterop": true,
 		"resolveJsonModule": true,
+		"verbatimModuleSyntax": true,
+		"noUncheckedSideEffectImports": true,
 		// Type checking
 		"strict": true,
 		"forceConsistentCasingInFileNames": true,
@@ -32,6 +35,7 @@
 	},
 	"include": [
 		"next-env.d.ts",
+		"**/*.d.ts",
 		"**/*.ts",
 		"**/*.tsx",
 		".next/types/**/*.ts",

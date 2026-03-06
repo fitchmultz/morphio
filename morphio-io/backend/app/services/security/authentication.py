@@ -1,5 +1,5 @@
 import logging
-from typing import Optional
+from typing import Annotated, Optional
 
 import bcrypt
 from fastapi import Depends, HTTPException, status
@@ -182,7 +182,8 @@ async def _authenticate_api_key(token: str, db: AsyncSession) -> Optional[User]:
 
 
 async def get_current_user(
-    token: Optional[str] = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
+    token: Annotated[Optional[str], Depends(oauth2_scheme)],
+    db: Annotated[AsyncSession, Depends(get_db)],
 ) -> User:
     """
     Get the current authenticated user from the token or API key.
@@ -288,7 +289,8 @@ async def get_current_user(
 
 
 async def get_optional_current_user(
-    token: Optional[str] = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
+    token: Annotated[Optional[str], Depends(oauth2_scheme)],
+    db: Annotated[AsyncSession, Depends(get_db)],
 ) -> Optional[User]:
     """
     Get the current user if a valid token is provided, otherwise return None.

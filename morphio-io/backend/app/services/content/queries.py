@@ -60,7 +60,7 @@ async def get_trending_tags(session: AsyncSession, limit: int = 5):
         result = await session.execute(
             select(Tag, func.count(ContentTag.content_id).label("content_count"))
             .join(ContentTag)
-            .group_by(Tag)
+            .group_by(Tag.id, Tag.name)
             .order_by(func.count(ContentTag.content_id).desc())
             .limit(limit)
         )

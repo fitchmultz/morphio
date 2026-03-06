@@ -1,16 +1,13 @@
 import json
 import logging
-from typing import Annotated, List
+from typing import List
 
-from fastapi import APIRouter, Depends, Request, status
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Request, status
 
 from ..config import settings
-from ..database import get_db
-from ..models.user import User
+from ..dependencies import CurrentUser, DbSession
 from ..schemas.response_schema import ApiResponse
 from ..schemas.template_schema import TemplateCreate, TemplateOut, TemplateUpdate
-from ..services.security import get_current_user
 from ..services.template import (
     create_custom_template,
     delete_custom_template,
@@ -61,8 +58,8 @@ async def _invalidate_template_cache(template_id: int | None = None) -> None:
 @rate_limit("100/minute")
 async def get_templates(
     request: Request,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+    current_user: CurrentUser,
+    db: DbSession,
 ):
     async def load_templates() -> list:
         templates = await get_all_templates(db, current_user.id)
@@ -102,8 +99,8 @@ async def get_templates(
 async def save_template(
     request: Request,
     template: TemplateCreate,
-    current_user: Annotated[User, Depends(get_current_user)],
-    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: CurrentUser,
+    db: DbSession,
 ):
     logger.info(f"Attempting to save template for user {current_user.id}")
     await validate_template_content(template.template_content)
@@ -135,8 +132,8 @@ async def save_template(
 async def get_template(
     template_id: int,
     request: Request,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+    current_user: CurrentUser,
+    db: DbSession,
 ):
     async def load_template() -> dict:
         tmpl = await get_template_by_id(db, template_id, current_user.id)
@@ -175,8 +172,8 @@ async def update_template_route(
     template_id: int,
     request: Request,
     template_update: TemplateUpdate,
-    current_user: Annotated[User, Depends(get_current_user)],
-    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: CurrentUser,
+    db: DbSession,
 ):
     logger.info(f"Updating template {template_id} for user {current_user.id}")
 
@@ -213,8 +210,8 @@ async def update_template_route(
 async def delete_template_route(
     template_id: int,
     request: Request,
-    current_user: Annotated[User, Depends(get_current_user)],
-    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: CurrentUser,
+    db: DbSession,
 ):
     logger.info(f"Deleting template {template_id} for user {current_user.id}")
     await delete_custom_template(db, template_id, current_user.id)

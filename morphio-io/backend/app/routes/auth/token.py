@@ -2,10 +2,9 @@ import logging
 import secrets
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, HTTPException, Request, Response, status
 
-from ...database import get_db
+from ...dependencies import DbSession
 from ...models.user import User
 from ...schemas.auth_schema import AuthTokenPayload, CsrfTokenPayload, Token, UserOut
 from ...schemas.response_schema import ApiResponse
@@ -89,7 +88,7 @@ logger = logging.getLogger(__name__)
 async def refresh_token(
     request: Request,
     response: Response,
-    db: AsyncSession = Depends(get_db),
+    db: DbSession,
 ):
     # Retrieve refresh token from secure cookie
     refresh_token_cookie: Optional[str] = request.cookies.get("refresh_token")

@@ -10,7 +10,6 @@ requires = ["maturin>=1.12.6,<2.0"]
 build-backend = "maturin"
 
 [tool.maturin]
-features = ["pyo3/extension-module"]
 python-source = "python"
 module-name = "morphio_native._native"
 

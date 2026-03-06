@@ -2,13 +2,10 @@ import logging
 from enum import Enum
 from typing import List
 
-from fastapi import Depends, status
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import status
 
-from ...database import get_db
-from ...models.user import User
+from ...dependencies import CurrentUser, DbSession
 from ...utils.error_handlers import ApplicationException
-from .authentication import get_current_user
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +20,7 @@ class Permission(str, Enum):
 
 async def check_permission(
     required_permission: Permission,
-    user: User = Depends(get_current_user),
+    user: CurrentUser,
 ) -> bool:
     """
     Check if the user has the required permission.
@@ -44,8 +41,8 @@ async def check_permission(
 async def check_resource_owner(
     resource_id: int,
     resource_type: str,
-    user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+    user: CurrentUser,
+    db: DbSession,
 ) -> bool:
     """
     Check if the user is the owner of the specified resource.
@@ -73,7 +70,7 @@ async def check_resource_owner(
 
 
 async def get_user_permissions(
-    user: User = Depends(get_current_user),
+    user: CurrentUser,
 ) -> List[Permission]:
     """
     Get the list of permissions for the user.

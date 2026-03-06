@@ -2,18 +2,15 @@ import logging
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..config import settings
-from ..database import get_db
+from ..dependencies import CurrentUser, DbSession
 from ..models.quota_tier import QuotaTierAssignment
 from ..models.usage import Usage
-from ..models.user import User
 from ..schemas.response_schema import ApiResponse
 from ..schemas.user_schema import UserCredits, UserOut, UserUpdate
 from ..utils.enums import UserRole
 from ..utils.response_utils import utc_now
-from ..services.security import get_current_user
 from ..services.usage import get_current_period_usage_credits
 from ..services.security.protection import rate_limit_by_ip
 from ..utils.response_utils import ResponseStatus, create_response
@@ -41,7 +38,7 @@ router = APIRouter(tags=["User"], dependencies=[Depends(apply_rate_limit)])
     responses={**common_responses},
 )
 @handle_route_errors
-async def get_user_profile(current_user: User = Depends(get_current_user)):
+async def get_user_profile(current_user: CurrentUser):
     if not current_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -65,8 +62,8 @@ async def get_user_profile(current_user: User = Depends(get_current_user)):
 @handle_route_errors
 async def change_display_name(
     update_data: UserUpdate,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+    current_user: CurrentUser,
+    db: DbSession,
 ):
     if update_data.display_name is None:
         raise HTTPException(status_code=400, detail="New display name is required")
@@ -89,8 +86,8 @@ async def change_display_name(
 @handle_route_errors
 async def change_email(
     update_data: UserUpdate,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+    current_user: CurrentUser,
+    db: DbSession,
 ):
     if update_data.email is None:
         raise HTTPException(status_code=400, detail="New email is required")
@@ -147,8 +144,8 @@ async def change_email(
 )
 @handle_route_errors
 async def get_user_credits(
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+    current_user: CurrentUser,
+    db: DbSession,
 ):
     """Get summary of a user's credit usage for the current monthly period."""
     # Determine effective quota tier
@@ -210,8 +207,8 @@ async def get_user_credits(
 )
 @handle_route_errors
 async def get_current_user_usage(
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+    current_user: CurrentUser,
+    db: DbSession,
 ):
     results = await db.execute(
         select(Usage).where(Usage.user_id == current_user.id, Usage.deleted_at.is_(None))

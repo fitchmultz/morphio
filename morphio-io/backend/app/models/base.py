@@ -4,12 +4,15 @@ import logging
 
 from datetime import datetime
 from sqlalchemy import DateTime
-from sqlalchemy.orm import Mapped, declarative_base, declared_attr, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, declared_attr, mapped_column
 
 from ..utils.response_utils import utc_now
 
-Base = declarative_base()
 logger = logging.getLogger(__name__)
+
+
+class Base(DeclarativeBase):
+    """Base class for all SQLAlchemy ORM models."""
 
 
 class SoftDeleteMixin:

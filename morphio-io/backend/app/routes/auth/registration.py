@@ -1,11 +1,10 @@
 import logging
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Request, Response, status
+from fastapi import APIRouter, Body, HTTPException, Request, Response, status
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...config import settings
-from ...database import get_db
+from ...dependencies import CurrentUser, DbSession
 from ...models.user import User
 from ...schemas.auth_schema import (
     AuthTokenPayload,
@@ -18,7 +17,6 @@ from ...schemas.response_schema import ApiResponse
 from ...services.security import (
     create_access_token,
     create_refresh_token,
-    get_current_user,
     get_password_hash,
     is_password_complex,
     set_refresh_cookie,
@@ -96,6 +94,7 @@ logger = logging.getLogger(__name__)
 async def register(
     request: Request,
     response: Response,
+    db: DbSession,
     user: UserCreate = Body(
         ...,
         examples=[
@@ -106,7 +105,6 @@ async def register(
             }
         ],
     ),
-    db: AsyncSession = Depends(get_db),
 ):
     if not settings.REGISTRATION_ENABLED:
         raise ApplicationException(
@@ -184,9 +182,9 @@ async def register(
 @rate_limit("60/minute")
 @handle_route_errors
 async def change_password(
+    current_user: CurrentUser,
+    db: DbSession,
     request: ChangePasswordRequest = Body(...),
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
 ):
     if not verify_password(request.current_password, current_user.hashed_password):
         raise HTTPException(

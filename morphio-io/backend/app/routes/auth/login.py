@@ -1,13 +1,11 @@
 import logging
 import secrets
-from typing import Annotated
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Request, Response, status
+from fastapi import APIRouter, Body, HTTPException, Request, Response, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from ...database import get_db
+from ...dependencies import CurrentUser, DbSession
 from ...models.user import User
 from ...schemas.auth_schema import AuthTokenPayload, Token, UserLogin, UserOut
 from ...schemas.response_schema import ApiResponse
@@ -16,7 +14,6 @@ from ...services.security import (
     clear_auth_cookies,
     create_access_token,
     create_refresh_token,
-    get_current_user,
     set_refresh_cookie,
     verify_password,
     verify_token,
@@ -88,11 +85,11 @@ logger = logging.getLogger(__name__)
 async def login(
     request: Request,
     response: Response,
+    db: DbSession,
     user_login: UserLogin = Body(
         ...,
         examples=[{"email": "user1@example.com", "password": "Str0ngP@ssword!"}],
     ),
-    db: AsyncSession = Depends(get_db),
 ):
     logger.debug(f"Attempting login for user: {user_login.email}")
     user = await db.scalar(select(User).where(User.email == user_login.email))
@@ -203,7 +200,7 @@ async def login(
 @handle_route_errors
 async def logout(
     request: Request,
-    current_user: Annotated[User, Depends(get_current_user)],
+    current_user: CurrentUser,
     response: Response,
 ):
     # Revoke refresh token if present (blacklist it)

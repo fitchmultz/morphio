@@ -5,20 +5,13 @@ from typing import Annotated
 
 from fastapi import Depends, status
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from ...database import get_db
+from ...dependencies import CurrentUser, DbSession
 from ...models.content import Content
-from ...models.user import User
-from ...services.security import get_current_user
 from ...utils.error_handlers import ApplicationException
 
 logger = logging.getLogger(__name__)
-
-# Type aliases for cleaner signatures
-CurrentUser = Annotated[User, Depends(get_current_user)]
-DbSession = Annotated[AsyncSession, Depends(get_db)]
 
 
 async def get_user_content(

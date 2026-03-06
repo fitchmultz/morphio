@@ -2,12 +2,10 @@ import logging
 from pathlib import Path
 
 import aiofiles
-from fastapi import APIRouter, Depends, File, Path as PathParam, Query, Request, UploadFile, status
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, File, Path as PathParam, Query, Request, UploadFile, status
 
 from ..config import settings
-from ..database import get_db
-from ..models.user import User
+from ..dependencies import CurrentUser, DbSession
 from ..schemas.logs_schema import LogsProcessingResponse, LogsProcessingStatusResponse
 from ..schemas.response_schema import ApiResponse
 from ..services.logs import (
@@ -15,7 +13,6 @@ from ..services.logs import (
     enqueue_splunk_config_processing,
     get_logs_processing_status,
 )
-from ..services.security import get_current_user
 from ..utils.decorators import rate_limit, require_auth
 from ..utils.enums import JobStatus, ResponseStatus
 from ..utils.error_handlers import ApplicationException
@@ -99,6 +96,8 @@ ALLOWED_LOG_EXTENSIONS = {ext.lower() for ext in settings.ALLOWED_LOG_EXTENSIONS
 @handle_route_errors
 async def process_logs(
     request: Request,
+    current_user: CurrentUser,
+    db: DbSession,
     log_file: UploadFile = File(
         ...,
         description="Log file to process",
@@ -109,8 +108,6 @@ async def process_logs(
         description="Anonymize sensitive data before processing",
         examples=[False],
     ),
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
 ):
     """Enqueue a log file for processing and return a job ID."""
     logger.debug(f"Received log upload request from user {current_user.id}, anonymize={anonymize}")
@@ -252,13 +249,13 @@ async def process_logs(
 @handle_route_errors
 async def get_logs_processing_status_route(
     request: Request,
+    current_user: CurrentUser,
+    db: DbSession,
     job_id: str = PathParam(
         ...,
         description="Log processing job ID",
         examples=["123e4567-e89b-12d3-a456-426614174000"],
     ),
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
 ):
     """Retrieve the status of a log processing job."""
     logger.info(f"Retrieving status for job {job_id}")
@@ -314,10 +311,10 @@ async def get_logs_processing_status_route(
 @handle_route_errors
 async def generate_splunk_config(
     request: Request,
+    current_user: CurrentUser,
+    db: DbSession,
     log_file: UploadFile = File(...),
     anonymize: bool = Query(False, description="Anonymize sensitive data before processing"),
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
 ):
     """Enqueue a log file sample for Splunk config generation and return a job ID."""
     logger.debug(
