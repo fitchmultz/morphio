@@ -157,7 +157,13 @@ git commit --no-verify -m "message"
 
 ### pre-push hook blocks push
 
-The pre-push hook runs the full CI gate. To see what's failing:
+The pre-push hook runs the fast PR-parity gate. To see what's failing:
+
+```bash
+make ci-fast
+```
+
+For the full local release gate, run:
 
 ```bash
 make ci

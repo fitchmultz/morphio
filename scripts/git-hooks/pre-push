@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if ! make ci; then
-  echo "Push blocked: make ci failed"
+if ! make ci-fast; then
+  echo "Push blocked: make ci-fast failed"
   exit 1
 fi

@@ -58,15 +58,18 @@ bash scripts/install-git-hooks.sh
 
 This sets up:
 - **pre-commit**: Runs linters, formatters, and boundary audits via pre-commit framework
-- **pre-push**: Runs full CI gate (`make ci`) before push
+- **pre-push**: Runs the fast PR-parity gate (`make ci-fast`) before push
 
 ### 5. Verify everything works
 
 ```bash
+make ci-fast
 make ci
 ```
 
-This runs the complete local CI pipeline:
+`make ci-fast` matches the lightweight PR-required checks.
+
+`make ci` runs the complete local CI pipeline:
 - Doctor checks (dependencies, tools)
 - Native build (Rust extension)
 - morphio-core checks (ruff, pytest)
