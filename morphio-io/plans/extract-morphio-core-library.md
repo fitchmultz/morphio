@@ -91,7 +91,7 @@ morphio-core/
     └── test_url_validator.py
 ```
 
-**Key Structure Changes** (from reviewer feedback):
+**Key Structure Changes**:
 1. **Removed `audio/conversion.py` and `video/conversion.py`** → Consolidated into `media/ffmpeg.py`
 2. **No ProviderRegistry** → Direct provider instantiation in router (simpler, no decorative pattern)
 3. **No model presets in library** → Model names are opaque strings; aliases live in app layer

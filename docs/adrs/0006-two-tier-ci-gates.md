@@ -5,7 +5,7 @@ Date: 2026-03-05
 
 ## Context
 
-The repository spans Python, TypeScript, Rust, and Dockerized integration paths. Running every heavy check for every PR increases latency and consumes significant CI resources, while skipping CI entirely reduces reviewer trust and release confidence.
+The repository spans Python, TypeScript, Rust, and Dockerized integration paths. Running every heavy check for every PR increases latency and consumes significant CI resources, while skipping CI entirely reduces release confidence.
 
 ## Decision
 

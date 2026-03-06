@@ -2,7 +2,7 @@
 Responsibilities: Provide usage visibility and system-health endpoints for administrators.
 Scope: Admin HTTP endpoints mounted under the main FastAPI app.
 Usage: Imported by `app.main` and composed with admin sub-routers.
-Invariants/Assumptions: Admin routes should expose portfolio-relevant operational data, not dormant monetization workflows.
+Invariants/Assumptions: Admin routes should expose operational data and usage workflows for administrators.
 """
 
 import logging

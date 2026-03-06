@@ -126,7 +126,7 @@ describe("ProfileManagement Usage Limits", () => {
 		});
 	});
 
-	test("renders monthly demo quota guidance when tier is free", async () => {
+	test("renders monthly usage quota guidance when tier is free", async () => {
 		(sdk.getUserCredits as jest.Mock).mockResolvedValue({
 			data: {
 				status: "success",
@@ -148,7 +148,7 @@ describe("ProfileManagement Usage Limits", () => {
 		await waitFor(() => {
 			expect(
 				screen.getByText(
-					/fixed monthly demo quotas to keep runtime predictable/i,
+					/fixed monthly usage quotas to keep runtime predictable/i,
 				),
 			).toBeInTheDocument();
 		});

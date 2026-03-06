@@ -53,12 +53,12 @@ Date: 2026-03-05
 7. **Updater workflow token scope reduced**
    - `.github/workflows/updater.yml` now uses `github.token` with explicit minimal permissions.
 
-8. **Final public polish pass**
+8. **Final cleanup pass**
    - Removed direct browser console logging from conversation refresh failures.
    - Updated OpenAPI generator config to `postProcess: ["biome:format"]` to remove the deprecated config warning while keeping generated output aligned with repository formatting.
    - Updated secret scanning to prefer a local `gitleaks` binary, fall back to Docker only when available, and otherwise auto-download the pinned release via `gh`.
    - Tightened the root Docker build context ignore rules so local uploads, logs, and media artifacts cannot break Docker smoke builds.
-   - Removed dormant Stripe billing endpoints and billing UI so the public release stays focused on portfolio-quality product flows.
+   - Removed dormant Stripe billing endpoints and billing UI so the application stays focused on active product workflows.
 
 ## Evidence (What Was Verified)
 
@@ -75,7 +75,7 @@ Date: 2026-03-05
 - `make ci` ✅ passed end-to-end (native/core/backend/frontend/openapi/docker-build/docker-smoke/guardrails).
 - `bash scripts/ci/jobs/secrets-scan.sh --history` ✅ passed (`100 commits scanned`, `no leaks found`).
 - Runtime UI smoke ✅ passed on `http://localhost:3005` (`/`, `/login`, invalid-login error feedback, `/dashboard` redirect behavior) via live browser validation.
-- Targeted regression checks ✅ passed for frontend client regeneration/type-check and the final portfolio cleanup pass.
+- Targeted regression checks ✅ passed for frontend client regeneration/type-check and the final cleanup pass.
 
 ## Remaining Risks / Follow-ups
 

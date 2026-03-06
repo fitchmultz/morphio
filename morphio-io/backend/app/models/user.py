@@ -2,7 +2,7 @@
 Responsibilities: Store authentication, profile, role, and ownership relationships.
 Scope: SQLAlchemy ORM mapping for application users.
 Usage: Referenced by auth, content, usage, template, and API key workflows.
-Invariants/Assumptions: Public-release user state should stay focused on account and portfolio-demo features, not dormant billing vendors.
+Invariants/Assumptions: User state should stay focused on account, access, and quota-tier features.
 """
 
 from __future__ import annotations

@@ -1,4 +1,4 @@
-# Reviewer Checklist (Skeptical Engineer Path)
+# Verification Checklist
 
 Use this exact sequence from a fresh clone.
 

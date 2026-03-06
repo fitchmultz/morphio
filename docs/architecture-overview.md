@@ -1,6 +1,6 @@
 # Architecture Overview
 
-This document is a concise reviewer-oriented summary of the Morphio monorepo architecture.
+This document is a concise summary of the Morphio monorepo architecture.
 
 ## System Goals
 
@@ -64,7 +64,7 @@ Operational flow:
 
 **Decision:** keep `make ci` as full local release gate while running a fast deterministic GitHub PR gate for visibility.
 
-**Trade-off:** two gate tiers to maintain, but substantially lower PR latency and better reviewer trust.
+**Trade-off:** two gate tiers to maintain, but substantially lower PR latency and better release confidence.
 
 ### Rust extension as hard dependency for performance paths
 

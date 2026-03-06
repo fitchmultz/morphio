@@ -10,9 +10,9 @@ Shared documentation for the Morphio monorepo.
 
 ## Quick Links
 
-- **[Architecture Overview](./architecture-overview.md)** - Reviewer-friendly system architecture and trade-offs
+- **[Architecture Overview](./architecture-overview.md)** - System architecture and trade-offs
 - **[Validation Commands](./validation-commands.md)** - CI-equivalent local checks
-- **[Reviewer Checklist](./reviewer-checklist.md)** - Short external validation path
+- **[Verification Checklist](./verification-checklist.md)** - Short validation path
 - **[Release Readiness Report](./release-readiness-report.md)** - Concrete hardening outcomes and receipts
 - **[Configuration Guide](./configuration.md)** - Environment variables and setup
 - **[CI Strategy](./ci-strategy.md)** - PR required vs nightly/manual gate model
@@ -27,16 +27,9 @@ Shared documentation for the Morphio monorepo.
 
 | Guide | Description |
 |-------|-------------|
-| [Architecture Overview](./architecture-overview.md) | Reviewer-friendly system architecture and trade-offs |
+| [Architecture Overview](./architecture-overview.md) | System architecture and trade-offs |
 | [Using morphio-core](./using-morphio-core.md) | How to use morphio-core in your own projects |
 | [Architecture](./architecture.md) | Deep dive: adapter boundary and integration details |
-
-## Supplemental Historical Material
-
-These documents are still useful, but they are not the best first stop for understanding the project:
-
-- [Current State](./current-state.md)
-- [Takeover Backlog](./takeover-backlog.md)
 
 ## Project-Specific Docs
 

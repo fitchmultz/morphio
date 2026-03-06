@@ -3,7 +3,7 @@
  * Responsibilities: Show system health, usage analytics, and export tools for maintainers.
  * Scope: Client-side admin dashboard for authenticated admin users.
  * Usage: Mounted on `/admin` for users with the admin role.
- * Invariants/Assumptions: Public portfolio builds should focus this page on operational visibility, not monetization management.
+ * Invariants/Assumptions: This page should focus on operational visibility and usage exports.
  */
 
 "use client";

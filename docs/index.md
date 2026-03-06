@@ -10,15 +10,10 @@ Canonical documentation hub for the Morphio monorepo.
 - [Configuration Guide](./configuration.md)
 - [Onboarding](./onboarding.md)
 - [Validation Commands](./validation-commands.md)
-- [Reviewer Checklist](./reviewer-checklist.md)
+- [Verification Checklist](./verification-checklist.md)
 - [Release Readiness Report](./release-readiness-report.md)
 - [CI Strategy](./ci-strategy.md)
 - [Release Runbook](./release-runbook.md)
 - [Troubleshooting](./troubleshooting.md)
 - [Project Status](./status.md)
 - [ADR Index](./adrs/README.md)
-
-## Supplemental Historical Notes
-
-- [Current State](./current-state.md)
-- [Takeover Backlog](./takeover-backlog.md)

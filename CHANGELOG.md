@@ -9,14 +9,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 ### Added
 - `make env` + `scripts/bootstrap_env.sh` for secure local environment bootstrap.
 - `scripts/audit_env_layout.sh` guardrail enforcing env file policy.
-- `docs/architecture-overview.md` reviewer architecture summary.
+- `docs/architecture-overview.md` architecture summary.
 - `docs/validation-commands.md` local CI-equivalent validation checklist.
 - `docs/release-readiness-report.md` release hardening report.
 - `SECURITY.md` and `CODE_OF_CONDUCT.md`.
 - Nightly schedule for full-stack Docker smoke workflow.
 
 ### Changed
-- Removed Stripe billing endpoints and billing UI so the public release stays focused on portfolio-quality product flows instead of dormant monetization scaffolding.
+- Removed Stripe billing endpoints and billing UI so the application stays focused on active product flows instead of dormant monetization scaffolding.
 - Root `make ci` now runs the canonical full local CI runner (`scripts/ci/run.sh`).
 - Added `make ci-fast` for fast PR-parity checks.
 - PR CI workflow now runs fast deterministic checks automatically on PRs and main pushes.

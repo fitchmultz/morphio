@@ -3,7 +3,7 @@
  * Responsibilities: Load profile data, show monthly usage, and manage personal API keys.
  * Scope: Client-side profile management UI for account settings.
  * Usage: Mounted on the profile page for signed-in users.
- * Invariants/Assumptions: Public portfolio builds should emphasize product capabilities and developer tooling, not dormant billing flows.
+ * Invariants/Assumptions: The profile UI should emphasize account, quota, and API key management.
  */
 
 "use client";
@@ -384,7 +384,7 @@ export const ProfileManagement: FC = () => {
 
 								<div className="pt-4 border-t border-gray-200 dark:border-gray-600">
 									<p className="morphio-body-sm text-gray-600 dark:text-gray-300">
-										This public release uses fixed monthly demo quotas to keep
+										This deployment uses fixed monthly usage quotas to keep
 										runtime predictable. When you hit the limit, access resumes
 										on the next monthly reset.
 									</p>

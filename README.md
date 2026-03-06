@@ -1,12 +1,12 @@
 # Morphio Monorepo
 
 <p align="center">
-  <img src="./docs/assets/portfolio/2026-03-05-morphio-readme-hero.jpg" alt="Morphio portfolio hero artwork" width="100%" />
+  <img src="./docs/assets/readme/2026-03-05-morphio-readme-hero.jpg" alt="Morphio application hero artwork" width="100%" />
 </p>
 
 Morphio is a monorepo for AI-assisted content workflows. The main application is `morphio-io`, a FastAPI + Next.js system for turning media, web, and log inputs into structured outputs. The repo also includes `morphio-core`, which extracts reusable media, LLM, and security logic behind a strict adapter boundary, plus `morphio-native` for performance-sensitive native routines.
 
-## Start Here
+## Overview
 
 If you want the fastest path to understanding the project:
 
@@ -34,7 +34,7 @@ make ci
 
 - [Architecture Overview](./docs/architecture-overview.md) - system boundary and trade-offs
 - [Validation Commands](./docs/validation-commands.md) - local checks matching CI
-- [Reviewer Checklist](./docs/reviewer-checklist.md) - short verification path from a fresh clone
+- [Verification Checklist](./docs/verification-checklist.md) - short validation path from a fresh clone
 - [Release Readiness Report](./docs/release-readiness-report.md) - hardening work and receipts
 - [Configuration Guide](./docs/configuration.md) - environment and runtime configuration
 - [Troubleshooting](./docs/troubleshooting.md) - common setup and CI fixes
@@ -54,12 +54,12 @@ make dev
 ## Visual Tour
 
 <p align="center">
-  <img src="./docs/assets/portfolio/2026-03-05-morphio-readme-showcase.jpg" alt="Morphio product showcase built from the live application" width="82%" />
+  <img src="./docs/assets/readme/2026-03-05-morphio-readme-showcase.jpg" alt="Morphio product showcase built from the live application" width="82%" />
 </p>
 
-These visuals are based on the live application UI and current runtime screenshots, then composed into lighter README-friendly portfolio assets.
+These visuals are based on the live application UI and current runtime screenshots, then compressed for README use.
 
-- `morphio-io` is the primary reviewer path: content generation, profile management, templates, logs, transcripts, and admin tooling.
+- `morphio-io` is the primary application surface: content generation, profile management, templates, logs, transcripts, and admin tooling.
 - `morphio-core` is where the reusable AI/media/security integration logic lives.
 - `morphio-native` provides focused native acceleration for performance-sensitive paths.
 
