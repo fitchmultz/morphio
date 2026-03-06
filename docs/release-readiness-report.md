@@ -2,7 +2,7 @@
 
 Date: 2026-03-05
 
-## Current State (Phase 0)
+## Current State
 
 - **Stack:** Python 3.13+, FastAPI backend, Next.js frontend, Rust/PyO3 native extension, Docker Compose.
 - **Entrypoints:** root `Makefile`, `scripts/ci/run.sh`, `scripts/ci/jobs/*`, `.github/workflows/*`.
@@ -12,7 +12,7 @@ Date: 2026-03-05
   3. full release parity (`make ci`)
 - **Main risks reviewed:** install footprint, CI runtime determinism, secret hygiene, docs/ADR drift, compose cold-start behavior.
 
-## Changes Implemented in This Takeover Pass
+## Changes Implemented
 
 ### P0 fixes
 
@@ -67,7 +67,7 @@ Date: 2026-03-05
 - Fast gate workflow split and timeout constraints applied in code.
 - Compose default path validated structurally through preflight integration in guardrails.
 
-### Verification receipts (2026-03-05 final cutoff)
+### Verification Receipts (2026-03-05)
 
 - `make update` ✅ completed; Python/Node lock resolution reported no newer direct stable versions to apply.
 - Latest-stable registry checks ✅ completed for Python/Node/Rust direct tooling/dependencies (e.g., `ty`, `ruff`, `fastapi`, `next`, `react`, `@biomejs/biome`, `pyo3`).
