@@ -1,12 +1,11 @@
 # Stage 1: Build the Next.js application
-FROM node:24-alpine AS builder
+FROM node:25-alpine AS builder
 
 WORKDIR /app
 
 # Install dependencies first (better layer caching)
 COPY frontend/package.json frontend/pnpm-lock.yaml ./
-RUN corepack enable \
- && corepack prepare "$(node -p "require('./package.json').packageManager")" --activate
+RUN npm install -g "$(node -p "require('./package.json').packageManager.split('+')[0]")"
 RUN apk add --no-cache python3 make g++ \
  && pnpm install --frozen-lockfile
 
@@ -20,7 +19,7 @@ COPY frontend .
 RUN pnpm build
 
 # Stage 2: Serve the Next.js application
-FROM node:24-alpine
+FROM node:25-alpine
 
 WORKDIR /app
 
@@ -43,8 +42,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/src ./src
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 
 # Keep pnpm version aligned with packageManager from package.json
-RUN corepack enable \
- && corepack prepare "$(node -p "require('./package.json').packageManager")" --activate
+RUN npm install -g "$(node -p "require('./package.json').packageManager.split('+')[0]")"
 
 USER nextjs
 

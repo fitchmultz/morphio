@@ -1,5 +1,5 @@
 # Stage 1: Build with Rust and uv
-FROM python:3.13-slim AS builder
+FROM python:3.14-slim AS builder
 
 WORKDIR /app
 
@@ -26,7 +26,7 @@ COPY morphio-io/backend/ morphio-io/backend/
 RUN uv sync --project morphio-io/backend --frozen --no-dev --no-editable
 
 # Stage 2: Runtime
-FROM python:3.13-slim
+FROM python:3.14-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -39,6 +39,7 @@ WORKDIR /app
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    adduser \
     curl \
  && rm -rf /var/lib/apt/lists/*
 

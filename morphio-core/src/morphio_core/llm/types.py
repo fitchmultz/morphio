@@ -121,11 +121,11 @@ class TokenUsage(BaseModel):
     @classmethod
     def from_usage(
         cls,
-        usage: "Usage | None",
+        usage: Usage | None,
         *,
         provider: str | None = None,
         model: str | None = None,
-    ) -> "TokenUsage":
+    ) -> TokenUsage:
         """Create TokenUsage from a basic Usage object.
 
         Args:
@@ -225,7 +225,7 @@ class LLMConfig(BaseModel):
     gemini: ProviderConfig | None = None
 
     # Custom provider support
-    custom_providers: dict[str, "ProviderFactory"] = Field(default_factory=dict)
+    custom_providers: dict[str, ProviderFactory] = Field(default_factory=dict)
     custom_configs: dict[str, ProviderConfig] = Field(default_factory=dict)
 
     # Default can be any string (built-in or custom)

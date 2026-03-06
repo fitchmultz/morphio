@@ -48,7 +48,7 @@ class ChunkingConfig(BaseModel):
     )
 
     @model_validator(mode="after")
-    def validate_overlap(self) -> "ChunkingConfig":
+    def validate_overlap(self) -> ChunkingConfig:
         """Ensure overlap is less than segment duration to prevent infinite loops."""
         overlap_sec = self.overlap_ms / 1000.0
         if overlap_sec >= self.segment_duration:

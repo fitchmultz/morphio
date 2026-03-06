@@ -20,10 +20,10 @@ This script checks for all required tools. If it fails, it will tell you exactly
 | gh | `brew install gh` (macOS) or see [GitHub CLI docs](https://cli.github.com/) |
 | docker | Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) |
 
-### Python 3.13 not found
+### Python 3.14 not found
 
 ```bash
-uv python install 3.13
+uv python install 3.14
 ```
 
 Then restart your shell or run `hash -r` to refresh PATH.
@@ -34,7 +34,7 @@ If you see warnings about Python version mismatches:
 
 ```bash
 # Ensure the correct Python is used
-uv python pin 3.13
+uv python pin 3.14
 uv sync
 ```
 

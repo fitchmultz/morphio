@@ -170,14 +170,14 @@ morphio-io uses thin adapters (`app/adapters/`) that:
 ## Tech Stack
 
 ### morphio-io
-- **Backend**: Python 3.13+, FastAPI, SQLAlchemy, PostgreSQL, Redis
-- **Frontend**: Next.js 16.1.1, React 19, TypeScript, TailwindCSS 4
-- **Node.js**: ≥24.0.0
+- **Backend**: Python 3.14+, FastAPI, SQLAlchemy, PostgreSQL, Redis
+- **Frontend**: Next.js 16.1.6, React 19.2.4, TypeScript, TailwindCSS 4
+- **Node.js**: ≥25.0.0
 - **Ports**: Backend 8005, Frontend 3005 (Docker 3500→3005), Redis 6384
 - **DevOps**: Docker, local CI via `make ci`
 
 ### morphio-core
-- **Language**: Python 3.13+
+- **Language**: Python 3.14+
 - **Audio**: FFmpeg, Whisper (MLX/faster-whisper)
 - **LLM**: OpenAI, Anthropic, Gemini SDKs
 - **Video**: yt-dlp

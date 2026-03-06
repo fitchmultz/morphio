@@ -6,14 +6,14 @@ This is the frontend application for Morphio, a platform for generating content 
 
 ### Prerequisites
 
-- Node.js v24 or higher (see `.nvmrc`)
-- pnpm v10.17.0 (managed via `packageManager` field)
+- Node.js v25 or higher (see `.nvmrc`)
+- pnpm v10.30.3 (managed via `packageManager` field)
 
 ### Installation
 
 1. Clone the repository
 2. Navigate to the frontend directory
-3. Use Node 24 (Corepack-enabled):
+3. Use Node 25 (Corepack-enabled):
 
 ```bash
 nvm use

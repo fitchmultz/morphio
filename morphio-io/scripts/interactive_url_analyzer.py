@@ -8,7 +8,7 @@ Features
 - If a template is selected: calls OpenAI Responses API (configurable model + reasoning).
 
 Requirements
-- Python 3.13+ (tested for 3.11+ syntax compatibility).
+- Python 3.14+.
 - Env var: OPENAI_API_KEY.
 - Optional deps: youtube-transcript-api, yt-dlp, httpx (already used in this repo).
 

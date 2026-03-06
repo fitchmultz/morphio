@@ -70,7 +70,7 @@ For Docker deployment, either:
 - Reproducible deps: Python deps are resolved from `uv.lock` using `uv sync --frozen`.
 - Healthcheck: Image declares a `HEALTHCHECK` against `/health/` for orchestration.
 - For stricter reproducibility in your fork:
-  - Pin base image by digest (e.g., `FROM python:3.13-slim@sha256:<digest>`).
+  - Pin base image by digest (e.g., `FROM python:3.14-slim@sha256:<digest>`).
   - Consider pinning apt versions to your Debian snapshot mirror.
   - Keep `UV_FROZEN=1` in CI to forbid drift from the lockfile.
 
@@ -129,7 +129,7 @@ uv run uvicorn app.main:app --reload --port 8005
 
 ```bash
 uv run ruff check .
-uv run basedpyright
+uv run ty check
 ```
 
 4. Tests:

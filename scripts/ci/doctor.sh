@@ -13,8 +13,8 @@ Usage: bash scripts/ci/doctor.sh
 
 Checks:
   - root env files and nested-env policy
-  - uv + Python 3.13
-  - Node >= 24 + corepack
+  - uv + Python 3.14
+  - Node >= 25 + corepack
   - Docker CLI + daemon reachability
   - Rust cargo toolchain
 
@@ -41,16 +41,16 @@ require_cmd() {
 [[ ! -f "morphio-io/.env" ]] || fail "Nested morphio-io/.env found" "Remove morphio-io/.env"
 
 require_cmd uv "curl -LsSf https://astral.sh/uv/install.sh | sh"
-PYTHON="$(uv python find 3.13 2>/dev/null || true)"
+PYTHON="$(uv python find 3.14 2>/dev/null || true)"
 if [[ -z "${PYTHON}" ]]; then
-  fail "Python 3.13 required" "uv python install 3.13"
+  fail "Python 3.14 required" "uv python install 3.14"
 fi
-"${PYTHON}" -c 'import sys; assert sys.version_info[:2] >= (3, 13)' >/dev/null 2>&1 \
-  || fail "Python 3.13 required" "uv python install 3.13"
+"${PYTHON}" -c 'import sys; assert sys.version_info[:2] >= (3, 14)' >/dev/null 2>&1 \
+  || fail "Python 3.14 required" "uv python install 3.14"
 
-require_cmd node "Install Node.js 24+ (https://nodejs.org)"
-node -p "Number(process.versions.node.split('.')[0]) >= 24" | grep -q true \
-  || fail "node >= 24 required" "Install Node.js 24+ (https://nodejs.org)"
+require_cmd node "Install Node.js 25+ (https://nodejs.org)"
+node -p "Number(process.versions.node.split('.')[0]) >= 25" | grep -q true \
+  || fail "node >= 25 required" "Install Node.js 25+ (https://nodejs.org)"
 
 require_cmd corepack "npm install -g corepack"
 require_cmd docker "Install Docker Desktop/Engine and add docker to PATH"

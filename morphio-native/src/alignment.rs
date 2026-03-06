@@ -129,25 +129,25 @@ pub fn align_speakers_to_words(
     }
 
     // Finalize last utterance
-    if !current_words.is_empty() {
-        if let Some(speaker) = current_speaker {
-            let text = current_words
-                .iter()
-                .map(|w| w.word.as_str())
-                .collect::<Vec<_>>()
-                .join(" ");
-            let end_time = current_words
-                .last()
-                .map(|w| w.end_time)
-                .unwrap_or(current_start);
-            utterances.push(SpeakerUtterance::new(
-                speaker,
-                text,
-                current_start,
-                end_time,
-                current_words,
-            ));
-        }
+    if !current_words.is_empty()
+        && let Some(speaker) = current_speaker
+    {
+        let text = current_words
+            .iter()
+            .map(|w| w.word.as_str())
+            .collect::<Vec<_>>()
+            .join(" ");
+        let end_time = current_words
+            .last()
+            .map(|w| w.end_time)
+            .unwrap_or(current_start);
+        utterances.push(SpeakerUtterance::new(
+            speaker,
+            text,
+            current_start,
+            end_time,
+            current_words,
+        ));
     }
 
     utterances
@@ -215,14 +215,14 @@ pub fn merge_cross_chunk_speakers(
     // Merge consecutive same-speaker segments
     let mut merged: Vec<TranscriptionSpeakerSegment> = Vec::with_capacity(all_segments.len());
     for segment in all_segments {
-        if let Some(last) = merged.last_mut() {
-            if last.speaker_id == segment.speaker_id {
-                last.end_time = segment.end_time;
-                // Append text in place (avoid cloning)
-                last.text.push(' ');
-                last.text.push_str(&segment.text);
-                continue;
-            }
+        if let Some(last) = merged.last_mut()
+            && last.speaker_id == segment.speaker_id
+        {
+            last.end_time = segment.end_time;
+            // Append text in place (avoid cloning)
+            last.text.push(' ');
+            last.text.push_str(&segment.text);
+            continue;
         }
         merged.push(segment);
     }

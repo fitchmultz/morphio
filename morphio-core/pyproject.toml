@@ -3,7 +3,7 @@ name = "morphio-core"
 version = "0.1.0"
 description = "Reusable Python library for audio processing, LLM orchestration, and security utilities"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.14"
 license = "MIT"
 authors = [{ name = "Mitch Fultz" }]
 keywords = ["audio", "llm", "transcription", "ai", "security"]
@@ -11,13 +11,13 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Multimedia :: Sound/Audio",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Typing :: Typed",
 ]
 dependencies = [
-    "pydantic>=2.10.0",
+    "pydantic>=2.12.5",
     "morphio-native",  # Required Rust extension, no fallback
 ]
 
@@ -26,35 +26,35 @@ morphio-native = { workspace = true }
 
 [project.optional-dependencies]
 # LLM providers - split for minimal installs
-llm-openai = ["openai>=1.75.0"]
-llm-anthropic = ["anthropic>=0.45.0"]
-llm-gemini = ["google-genai>=1.0.0"]
-llm = ["openai>=1.75.0", "anthropic>=0.45.0", "google-genai>=1.0.0"]
+llm-openai = ["openai>=2.26.0"]
+llm-anthropic = ["anthropic>=0.84.0"]
+llm-gemini = ["google-genai>=1.66.0"]
+llm = ["openai>=2.26.0", "anthropic>=0.84.0", "google-genai>=1.66.0"]
 
 # Video downloading
-video = ["yt-dlp>=2024.12.1"]
+video = ["yt-dlp>=2026.3.3"]
 
 # Whisper backends (install one based on your hardware)
-whisper-mlx = ["mlx-whisper>=0.4.0"]
-whisper-cuda = ["faster-whisper>=1.0.0"]
-whisper-cpu = ["faster-whisper>=1.0.0"]
+whisper-mlx = ["mlx-whisper>=0.4.3"]
+whisper-cuda = ["faster-whisper>=1.2.1"]
+whisper-cpu = ["faster-whisper>=1.2.1"]
 
 # CLI support
 cli = [
-    "typer>=0.15.0",
-    "rich>=13.0.0",
+    "typer>=0.24.1",
+    "rich>=14.3.3",
 ]
 
 # Explicit union - avoid self-referential extras
 all = [
-    "openai>=1.75.0",
-    "anthropic>=0.45.0",
-    "google-genai>=1.0.0",
-    "yt-dlp>=2024.12.1",
-    "faster-whisper>=1.0.0",
-    "mlx-whisper>=0.4.0",
-    "typer>=0.15.0",
-    "rich>=13.0.0",
+    "openai>=2.26.0",
+    "anthropic>=0.84.0",
+    "google-genai>=1.66.0",
+    "yt-dlp>=2026.3.3",
+    "faster-whisper>=1.2.1",
+    "mlx-whisper>=0.4.3",
+    "typer>=0.24.1",
+    "rich>=14.3.3",
 ]
 
 [project.scripts]
@@ -65,10 +65,10 @@ Repository = "https://github.com/fitchmultz/morphio"
 
 [dependency-groups]
 dev = [
-    "pytest>=8.0.0",
-    "pytest-asyncio>=0.24.0",
-    "ruff>=0.8.0",
-    "ty>=0.0.20",
+    "pytest>=9.0.2",
+    "pytest-asyncio>=1.3.0",
+    "ruff>=0.15.5",
+    "ty>=0.0.21",
 ]
 
 [build-system]
@@ -79,7 +79,7 @@ build-backend = "hatchling.build"
 packages = ["src/morphio_core"]
 
 [tool.ruff]
-target-version = "py313"
+target-version = "py314"
 line-length = 100
 
 [tool.ruff.lint]

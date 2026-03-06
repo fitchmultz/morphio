@@ -62,7 +62,7 @@ async def job_status_ws(
 
     try:
         current_user = await get_current_user(token=token, db=db)
-    except (ApplicationException, Exception):
+    except ApplicationException, Exception:
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
         return
 

@@ -55,7 +55,7 @@ def parse_log_line(line: str) -> Optional[Dict]:
         log_data["log_timestamp"] = timestamp_str
 
         return log_data
-    except (json.JSONDecodeError, ValueError, IndexError):
+    except json.JSONDecodeError, ValueError, IndexError:
         return None
 
 
@@ -78,7 +78,7 @@ def filter_events(
                 event_time = datetime.datetime.fromisoformat(event["timestamp"])
                 if event_time < start_date:
                     continue
-            except (ValueError, TypeError):
+            except ValueError, TypeError:
                 continue
 
         if end_date and "timestamp" in event:
@@ -86,7 +86,7 @@ def filter_events(
                 event_time = datetime.datetime.fromisoformat(event["timestamp"])
                 if event_time > end_date:
                     continue
-            except (ValueError, TypeError):
+            except ValueError, TypeError:
                 continue
 
         if user_id and event.get("user_id") != user_id:
@@ -119,7 +119,7 @@ def generate_summary(events: List[Dict]) -> Dict:
         if "timestamp" in event:
             try:
                 timestamps.append(datetime.datetime.fromisoformat(event["timestamp"]))
-            except (ValueError, TypeError):
+            except ValueError, TypeError:
                 continue
 
     time_range = {}
@@ -210,7 +210,7 @@ def find_suspicious_events(events: List[Dict]) -> List[Dict]:
             try:
                 timestamp = datetime.datetime.fromisoformat(event["timestamp"])
                 user_event_times[user_id].append(timestamp)
-            except (ValueError, TypeError):
+            except ValueError, TypeError:
                 pass
 
     # Analyze for suspicious patterns

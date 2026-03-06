@@ -19,8 +19,8 @@
 
 ### Frontend
 
-- **Next.js 16.1.1**: React framework for server-side rendering and static site generation
-- **React 19.0.0**: Component-based UI library
+- **Next.js 16.1.6**: React framework for server-side rendering and static site generation
+- **React 19.2.4**: Component-based UI library
 - **TailwindCSS 4+**: Utility-first CSS framework for rapid styling
 - **TypeScript**: Static typing for enhanced code quality
 - **Zustand**: State management
@@ -28,7 +28,7 @@
 
 ### Backend
 
-- **Python 3.13**: Core programming language
+- **Python 3.14**: Core programming language
 - **FastAPI**: High-performance web framework for building APIs
 - **SQLAlchemy**: ORM for database interactions
 - **Alembic**: Database migration tool
@@ -112,8 +112,8 @@ The current implementation routes model access through `morphio-core` and adapte
 
 1. **Prerequisites**:
 
-   - Node.js >= 24.0.0
-   - Python 3.13
+   - Node.js >= 25.0.0
+   - Python 3.14
    - Docker and Docker Compose
    - PostgreSQL and Redis instances (or use Docker; Redis port 6384)
 
@@ -294,7 +294,7 @@ For bugs or feature requests, open an issue with detailed information.
 
 ## Developer Tooling
 
-- Python linting uses `ruff`; type checking uses `ty`. Settings live in `backend/pyproject.toml` (line length 100, Python 3.13).
+- Python linting uses `ruff`; type checking uses `ty`. Settings live in `backend/pyproject.toml` (line length 100, Python 3.14).
 
   ```bash
   # From backend/

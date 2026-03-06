@@ -127,7 +127,7 @@ class URLValidator:
             try:
                 # AF_UNSPEC gets both A and AAAA records
                 addr_info = self._resolve(hostname, port, socket.AF_UNSPEC, socket.SOCK_STREAM)
-            except (socket.gaierror, socket.herror, OSError):
+            except socket.gaierror, socket.herror, OSError:
                 # DNS resolution failed - block by default (fail closed)
                 return self._config.block_on_resolution_error
 

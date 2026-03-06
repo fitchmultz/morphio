@@ -14,9 +14,9 @@
 		"format": "biome format --write .",
 		"tlc": "pnpm type-check && biome check --write .",
 		"tlcbuild": "pnpm type-check && biome check --write . && pnpm build",
-		"test": "jest",
+		"test": "jest --runInBand",
 		"test:watch": "jest --watch",
-		"test:coverage": "jest --coverage",
+		"test:coverage": "jest --coverage --runInBand",
 		"test:utils": "jest --config=jest.config.simple.mjs",
 		"docs": "typedoc",
 		"openapi:generate": "openapi-ts",
@@ -42,7 +42,7 @@
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4",
 		"react-hook-form": "^7.71.2",
-		"react-i18next": "^16.5.4",
+		"react-i18next": "^16.5.6",
 		"react-icons": "^5.6.0",
 		"react-markdown": "^10.1.0",
 		"react-toastify": "^11.0.5",
@@ -66,7 +66,7 @@
 		"@types/formidable": "^3.5.0",
 		"@types/jest": "^30.0.0",
 		"@types/lodash": "^4.17.24",
-		"@types/node": "^25.3.3",
+		"@types/node": "^25.3.5",
 		"@types/react": "^19.2.14",
 		"@types/react-dom": "^19.2.3",
 		"cssnano": "^7.1.2",
@@ -80,6 +80,6 @@
 		"typescript": "^5.9.3"
 	},
 	"engines": {
-		"node": ">=24"
+		"node": ">=25"
 	}
 }

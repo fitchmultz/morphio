@@ -1,5 +1,5 @@
 # Build stage
-FROM python:3.13-slim AS builder
+FROM python:3.14-slim AS builder
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -19,6 +19,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
 RUN set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
+      adduser \
       curl \
       # Playwright runtime deps (Chromium)
       libnss3 \
@@ -51,7 +52,7 @@ RUN python -m pip install --upgrade pip \
  && NODE_NO_WARNINGS=1 playwright install chromium
 
 # Final stage
-FROM python:3.13-slim
+FROM python:3.14-slim
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1

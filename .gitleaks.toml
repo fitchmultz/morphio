@@ -9,7 +9,9 @@ paths = [
   '''(^|/)\.venv/''',
   '''(^|/)\.venv-ci/''',
   '''(^|/)log_files/''',
+  '''(^|/)morphio-io/mlx_models/''',
   '''(^|/)morphio-io/frontend/openapi\.json$''',
+  '''(^|/)morphio-native/target/''',
   '''(^|/)node_modules/''',
   '''(^|/)uploads/''',
 ]

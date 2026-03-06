@@ -3,7 +3,7 @@
 # Responsibilities: Sync backend deps in pinned env, run lint/format/type checks, run smoke-critical tests.
 # Scope: morphio-io/backend static checks and selected regression/integration tests.
 # Usage: bash scripts/ci/jobs/backend-checks.sh
-# Invariants/Assumptions: Uses Python 3.13 in .venv-ci and uv lockfile for reproducibility.
+# Invariants/Assumptions: Uses Python 3.14 in .venv-ci and uv lockfile for reproducibility.
 
 set -euo pipefail
 
@@ -12,7 +12,7 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
 Usage: bash scripts/ci/jobs/backend-checks.sh
 
 Runs the backend fast-gate checks:
-  1) sync backend dependencies into .venv-ci (Python 3.13)
+  1) sync backend dependencies into .venv-ci (Python 3.14)
   2) env-template audit
   3) ruff lint/format check
   4) ty type check
@@ -32,10 +32,10 @@ cd "${ROOT_DIR}"
 if [ -x ".venv-ci/bin/python3" ]; then
   if .venv-ci/bin/python3 - <<'PY'
 import sys
-raise SystemExit(0 if (sys.version_info.major, sys.version_info.minor) == (3, 13) else 1)
+raise SystemExit(0 if (sys.version_info.major, sys.version_info.minor) == (3, 14) else 1)
 PY
   then
-    : # Reuse the existing venv when it is already Python 3.13.x.
+    : # Reuse the existing venv when it is already Python 3.14.x.
   else
     rm -rf .venv-ci
   fi
@@ -43,7 +43,7 @@ fi
 
 if [ ! -x ".venv-ci/bin/python3" ]; then
   rm -rf .venv-ci
-  uv venv --python 3.13 .venv-ci
+  uv venv --python 3.14 .venv-ci
 fi
 UV_PROJECT_ENVIRONMENT=.venv-ci uv sync --project morphio-io/backend --dev --frozen
 .venv-ci/bin/python3 morphio-io/scripts/audit_env_template.py

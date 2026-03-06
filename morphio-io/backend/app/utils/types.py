@@ -1,11 +1,12 @@
 """Type definitions for the Morphio backend."""
 
+from collections.abc import Mapping, Sequence
 from typing import Protocol, runtime_checkable
 
 # JSON-serializable type hierarchy (Python 3.12+)
 type JsonPrimitive = str | int | float | bool | None
-type JsonDict = dict[str, "JsonValue"]
-type JsonList = list["JsonValue"]
+type JsonDict = Mapping[str, "JsonValue"]
+type JsonList = Sequence["JsonValue"]
 type JsonValue = JsonPrimitive | JsonDict | JsonList
 
 # For cache key components - must be stringifiable

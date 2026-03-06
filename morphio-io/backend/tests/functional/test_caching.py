@@ -26,6 +26,7 @@ from app.utils.cache_utils import (
     set_redis_data,
 )
 from app.utils.file_utils import compute_hash
+from app.utils.types import JsonValue
 from schemas.media_schema import MediaProcessingInput, MediaSource, MediaType
 
 TEST_VIDEO_FILE = os.path.join(os.path.dirname(__file__), "test_video.mp4")
@@ -393,7 +394,7 @@ async def test_cache_error_handling(mock_redis):
 
 @pytest.mark.asyncio
 async def test_cache_different_data_types(mock_redis):
-    test_cases = [
+    test_cases: list[tuple[str, JsonValue]] = [
         ("string_key", "string_value"),
         ("int_key", 42),
         ("float_key", 3.14),

@@ -15,6 +15,18 @@ from .types import CacheKeyComponent, JsonValue, TranscriptionLike
 
 logger = logging.getLogger(__name__)
 
+
+def _to_json_value(value: object) -> JsonValue:
+    """Normalize arbitrary values into the JSON-safe cache type union."""
+    if value is None or isinstance(value, str | int | float | bool):
+        return value
+    if isinstance(value, dict):
+        return {str(key): _to_json_value(nested) for key, nested in value.items()}
+    if isinstance(value, list | tuple | set):
+        return [_to_json_value(item) for item in value]
+    return str(value)
+
+
 # Module-level Redis client with proper typing
 _redis_client: Redis | None = None
 
@@ -256,13 +268,13 @@ async def get_cached_generated_content(
     return await get_cache(key)
 
 
-def serialize_transcription(transcription: TranscriptionLike) -> dict:
+def serialize_transcription(transcription: TranscriptionLike) -> dict[str, JsonValue]:
     """Serialize transcription to a JSON-compatible dict."""
     from .types import HasText, SupportsToDict
 
     # Check protocols using isinstance (runtime_checkable)
     if isinstance(transcription, dict):
-        return transcription
+        return {str(key): _to_json_value(value) for key, value in transcription.items()}
     if isinstance(transcription, str):
         return {"text": transcription}
     if isinstance(transcription, SupportsToDict):
@@ -270,7 +282,7 @@ def serialize_transcription(transcription: TranscriptionLike) -> dict:
     if isinstance(transcription, HasText):
         return {"text": transcription.text}
     if hasattr(transcription, "__dict__"):
-        return dict(transcription.__dict__)
+        return {str(key): _to_json_value(value) for key, value in transcription.__dict__.items()}
     return {"text": str(transcription)}
 
 
@@ -318,7 +330,7 @@ async def cache_transcription(
     key = cache_key_builder(
         f"{source.value}_transcription", identifier, settings.AUDIO_TRANSCRIPTION_MODEL
     )
-    cache_data = {
+    cache_data: dict[str, JsonValue] = {
         "text": transcription.text,
         "confidence": transcription.confidence,
         "status": (
@@ -327,7 +339,9 @@ async def cache_transcription(
             else transcription.status
         ),
         "source": source.value,
-        "metadata": (transcription.metadata if hasattr(transcription, "metadata") else {}),
+        "metadata": _to_json_value(
+            transcription.metadata if hasattr(transcription, "metadata") else {}
+        ),
         "timestamp": datetime.datetime.now().isoformat(),
         "model": settings.AUDIO_TRANSCRIPTION_MODEL,
         "error": transcription.error if hasattr(transcription, "error") else None,

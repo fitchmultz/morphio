@@ -1,7 +1,7 @@
 [package]
 name = "morphio_native"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 rust-version = "1.93"
 license = "MIT"
 
@@ -10,7 +10,7 @@ name = "morphio_native"
 crate-type = ["cdylib"]
 
 [dependencies]
-pyo3 = { version = "0.28", features = ["auto-initialize"] }
+pyo3 = { version = "0.28.2", features = ["auto-initialize"] }
 regex = "1.12"
 intervaltree = "0.2.7"
 ahash = "0.8.12"

@@ -2,11 +2,11 @@
 name = "morphio-native"
 version = "0.1.0"
 description = "Rust-native performance extensions for morphio"
-requires-python = ">=3.13"
+requires-python = ">=3.14"
 license = "MIT"
 
 [build-system]
-requires = ["maturin>=1.7,<2.0"]
+requires = ["maturin>=1.12.6,<2.0"]
 build-backend = "maturin"
 
 [tool.maturin]
@@ -15,4 +15,4 @@ python-source = "python"
 module-name = "morphio_native._native"
 
 [dependency-groups]
-dev = ["pytest-benchmark>=4.0"]
+dev = ["pytest-benchmark>=5.2.3"]

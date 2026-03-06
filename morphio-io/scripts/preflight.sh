@@ -40,8 +40,12 @@ if grep -RInE "$forbidden_url_regex" "$REPO_ROOT" \
   --exclude-dir=node_modules \
   --exclude-dir=.venv \
   --exclude-dir=.venv-ci \
+  --exclude-dir=target \
+  --exclude-dir=mlx_models \
   --exclude-dir=dist \
-  --exclude-dir=.next; then
+  --exclude-dir=.next \
+  --exclude-dir=log_files \
+  --exclude-dir=uploads; then
   echo "Forbidden standard ports found in URLs." >&2
   exit 1
 fi

@@ -13,6 +13,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.elements import ColumnElement
 
 from ...database import get_db
 from ...models.llm_usage import LLMUsageRecord
@@ -163,11 +164,15 @@ async def get_llm_usage_summary(
         )
 
     # Build date filters (shared between queries)
-    filters = [LLMUsageRecord.deleted_at.is_(None)]
+    filters: list[ColumnElement[bool]] = [LLMUsageRecord.deleted_at.is_(None)]
     if start:
-        filters.append(LLMUsageRecord.created_at >= datetime.combine(start, datetime.min.time()))
+        filters.append(
+            LLMUsageRecord.created_at.bool_op(">=")(datetime.combine(start, datetime.min.time()))
+        )
     if end:
-        filters.append(LLMUsageRecord.created_at <= datetime.combine(end, datetime.max.time()))
+        filters.append(
+            LLMUsageRecord.created_at.bool_op("<=")(datetime.combine(end, datetime.max.time()))
+        )
 
     # Total tokens and cost
     totals_query = select(

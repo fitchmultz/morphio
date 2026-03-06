@@ -29,6 +29,7 @@ from ...utils.enums import JobStatus, ProcessingStage, UsageType
 from ...utils.error_handlers import ApplicationException
 from ...utils.file_utils import compute_file_hash, compute_hash
 from ...utils.job_utils import enqueue_task
+from ...utils.types import JsonValue
 from ...adapters.video import download_video_via_ytdlp
 from ..generation import generate_content_from_transcript, save_generated_content
 from ..job import get_job_status, update_job_status
@@ -52,6 +53,21 @@ __all__ = [
     "cleanup_chunks",
     "transcribe_with_diarization",
 ]
+
+
+def _serialize_speaker_segments(
+    segments: List[TranscriptionSpeakerSegment],
+) -> list[dict[str, JsonValue]]:
+    """Convert speaker segments into the JSON-safe shape used in cache/job payloads."""
+    return [
+        {
+            "speaker_id": segment.speaker_id,
+            "start_time": segment.start_time,
+            "end_time": segment.end_time,
+            "text": segment.text,
+        }
+        for segment in segments
+    ]
 
 
 async def transcribe_and_generate_audio(
@@ -258,7 +274,7 @@ async def _transcribe_audio(
             if text:
                 cache_data = {
                     "text": text,
-                    "speakers": [s.model_dump() for s in segments],
+                    "speakers": _serialize_speaker_segments(segments),
                     "num_speakers": num,
                     "diarization_enabled": True,
                 }
@@ -275,9 +291,9 @@ async def _transcribe_audio(
 
 def _build_transcript_only_result(
     text: str, user_id: int, segments: List[TranscriptionSpeakerSegment], num_speakers: int
-) -> dict:
+) -> dict[str, JsonValue]:
     """Build result dict for transcript-only mode."""
-    result = {
+    result: dict[str, JsonValue] = {
         "content": text,
         "title": "Transcript Only",
         "content_id": None,
@@ -285,7 +301,7 @@ def _build_transcript_only_result(
         "template_id": 0,
     }
     if segments:
-        result["speakers"] = [s.model_dump() for s in segments]
+        result["speakers"] = _serialize_speaker_segments(segments)
         result["num_speakers"] = num_speakers
         result["diarization_enabled"] = True
     return result

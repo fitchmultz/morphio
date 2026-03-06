@@ -4,7 +4,7 @@ Date: 2026-03-05
 
 ## Current State
 
-- **Stack:** Python 3.13+, FastAPI backend, Next.js frontend, Rust/PyO3 native extension, Docker Compose.
+- **Stack:** Python 3.14+, FastAPI backend, Next.js frontend, Rust/PyO3 native extension, Docker Compose.
 - **Entrypoints:** root `Makefile`, `scripts/ci/run.sh`, `scripts/ci/jobs/*`, `.github/workflows/*`.
 - **Primary flows:**
   1. local bootstrap (`make env`, `make install`, `make dev`)
