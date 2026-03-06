@@ -75,19 +75,19 @@ class LLMUsageRecord(Base):
     created_at: datetime
 ```
 
-### Subscription (`subscription.py`)
+### Quota Tier Assignment (`quota_tier.py`)
 
 ```python
-class Subscription(Base):
+class QuotaTierAssignment(Base):
     id: int
-    plan: str (free, pro, enterprise)
+    tier: str (free, pro, enterprise)
     credits_limit: int
 ```
 
 ## Relationships
 
 - User → many Content, Usage, LLMUsageRecord
-- User → one Subscription
+- User → zero or more QuotaTierAssignment records
 - Content → many Comment, Conversation
 - Content → one Template (optional)
 

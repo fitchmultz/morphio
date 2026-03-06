@@ -74,8 +74,8 @@ class UserOut(UserBase):
 class UserCredits(BaseModel):
     """Summary of a user's credit usage for the current monthly period."""
 
-    plan: str = Field(..., description="Current subscription plan")
-    limit: int = Field(..., description="Total credits available in this plan")
+    tier: str = Field(..., description="Current quota tier")
+    limit: int = Field(..., description="Total credits available in this tier")
     used: int = Field(..., description="Credits used this period")
     remaining: int = Field(..., description="Credits remaining this period")
     remaining_pct: float = Field(..., description="Percentage of credits remaining (0-100)")

@@ -1,8 +1,8 @@
-"""Purpose: Define subscription-plan records used for quota and usage policies.
-Responsibilities: Store plan/status data that informs monthly credit limits.
-Scope: SQLAlchemy ORM mapping for internal plan assignment records.
+"""Purpose: Define quota-tier assignment records used for usage policies.
+Responsibilities: Store tier/status data that informs monthly credit limits.
+Scope: SQLAlchemy ORM mapping for internal quota-tier assignment records.
 Usage: Queried by usage tracking and user credit summary endpoints.
-Invariants/Assumptions: Subscription records represent generic quota tiers, not direct payment-provider state.
+Invariants/Assumptions: The historical database table name remains `subscriptions` for migration stability, even though the app surface now speaks in quota-tier terms.
 """
 
 from __future__ import annotations
@@ -22,25 +22,26 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class SubscriptionPlanEnum(Enum):
+class QuotaTierName(Enum):
     FREE = "free"
     PRO = "pro"
     ENTERPRISE = "enterprise"
 
 
-class SubscriptionStatusEnum(Enum):
+class QuotaTierStatus(Enum):
     ACTIVE = "active"
     CANCELLED = "cancelled"
     EXPIRED = "expired"
 
 
-class Subscription(Base, SoftDeleteMixin):
+class QuotaTierAssignment(Base, SoftDeleteMixin):
     __tablename__ = "subscriptions"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False)
-    plan: Mapped[str] = mapped_column(String, default=SubscriptionPlanEnum.FREE.value)
-    status: Mapped[str] = mapped_column(String, default=SubscriptionStatusEnum.ACTIVE.value)
+    # Preserve the historical `plan` column name for migrated databases.
+    tier: Mapped[str] = mapped_column("plan", String, default=QuotaTierName.FREE.value)
+    status: Mapped[str] = mapped_column(String, default=QuotaTierStatus.ACTIVE.value)
     created_at: Mapped[DateTime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
@@ -48,10 +49,12 @@ class Subscription(Base, SoftDeleteMixin):
         DateTime(timezone=True), onupdate=func.now()
     )
 
-    user: Mapped["User"] = relationship("User", back_populates="subscriptions", lazy="joined")
+    user: Mapped["User"] = relationship(
+        "User", back_populates="quota_tier_assignments", lazy="joined"
+    )
 
     def __repr__(self):
         return (
-            f"<Subscription id={self.id} user_id={self.user_id} "
-            f"plan={self.plan} status={self.status}>"
+            f"<QuotaTierAssignment id={self.id} user_id={self.user_id} "
+            f"tier={self.tier} status={self.status}>"
         )

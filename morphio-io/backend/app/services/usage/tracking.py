@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...config import settings
 from ...models.llm_usage import LLMUsageRecord
-from ...models.subscription import Subscription
+from ...models.quota_tier import QuotaTierAssignment
 from ...models.usage import Usage
 from ...models.user import User
 from ...utils.enums import UsageType, UserRole
@@ -104,26 +104,26 @@ async def check_usage_limit(
         else:
             current_credits = usage.usage_credits
 
-    # Get plan limit
-    subscription_plan = "free"
-    subscription_result = await db.execute(
-        select(Subscription).where(
-            Subscription.user_id == user_id,
-            Subscription.deleted_at.is_(None),
+    # Get quota tier limit
+    quota_tier = "free"
+    quota_tier_result = await db.execute(
+        select(QuotaTierAssignment).where(
+            QuotaTierAssignment.user_id == user_id,
+            QuotaTierAssignment.deleted_at.is_(None),
         )
     )
-    user_subscriptions = subscription_result.scalars().all()
-    active_sub = next((sub for sub in user_subscriptions if sub.status == "active"), None)
-    if active_sub:
-        subscription_plan = active_sub.plan.lower()
+    quota_assignments = quota_tier_result.scalars().all()
+    active_tier = next((record for record in quota_assignments if record.status == "active"), None)
+    if active_tier:
+        quota_tier = active_tier.tier.lower()
 
-    plan_limit = settings.SUBSCRIPTION_PLAN_LIMITS.get(subscription_plan, 50)
+    tier_limit = settings.QUOTA_TIER_LIMITS.get(quota_tier, 50)
     cost = settings.USAGE_WEIGHTS.get(usage_type.value.upper(), 1)
 
     # Check if would exceed limit
-    if current_credits + cost > plan_limit:
+    if current_credits + cost > tier_limit:
         msg = (
-            f"You have reached the monthly usage limit for the '{subscription_plan}' plan. "
+            f"You have reached the monthly usage limit for the '{quota_tier}' tier. "
             "Please wait for the monthly reset."
         )
         logger.warning(f"Usage limit check failed for user {user_id}: {msg}")
@@ -136,7 +136,7 @@ async def increment_usage(db: AsyncSession, user_id: int, usage_type: UsageType 
     """
     Increment usage for user_id, factoring in usage weighting from config.
     If user is ADMIN => skip plan usage check.
-    Plan-limits come from config as well.
+    Tier limits come from config as well.
 
     :param db: Database session
     :param user_id: ID of the user to increment usage for
@@ -179,7 +179,7 @@ async def increment_usage(db: AsyncSession, user_id: int, usage_type: UsageType 
     else:
         usage.updated_at = now
 
-    # 3) If user is ADMIN, skip plan usage limit checks
+    # 3) If user is ADMIN, skip quota-tier usage limit checks
     if user.role == UserRole.ADMIN:
         usage.usage_count += 1
         # Grab cost from config
@@ -195,26 +195,26 @@ async def increment_usage(db: AsyncSession, user_id: int, usage_type: UsageType 
         )
         return
 
-    # 4) Determine subscription plan
-    subscription_plan = "free"
-    subscription_result = await db.execute(
-        select(Subscription).where(
-            Subscription.user_id == user_id,
-            Subscription.deleted_at.is_(None),
+    # 4) Determine effective quota tier
+    quota_tier = "free"
+    quota_tier_result = await db.execute(
+        select(QuotaTierAssignment).where(
+            QuotaTierAssignment.user_id == user_id,
+            QuotaTierAssignment.deleted_at.is_(None),
         )
     )
-    user_subscriptions = subscription_result.scalars().all()
-    active_sub = next((sub for sub in user_subscriptions if sub.status == "active"), None)
-    if active_sub:
-        subscription_plan = active_sub.plan.lower()
+    quota_assignments = quota_tier_result.scalars().all()
+    active_tier = next((record for record in quota_assignments if record.status == "active"), None)
+    if active_tier:
+        quota_tier = active_tier.tier.lower()
 
-    plan_limit = settings.SUBSCRIPTION_PLAN_LIMITS.get(subscription_plan, 50)
+    tier_limit = settings.QUOTA_TIER_LIMITS.get(quota_tier, 50)
     cost = settings.USAGE_WEIGHTS.get(usage_type.value.upper(), 1)
 
-    # 5) Check plan limit
-    if usage.usage_credits + cost > plan_limit:
+    # 5) Check quota-tier limit
+    if usage.usage_credits + cost > tier_limit:
         msg = (
-            f"You have reached the monthly usage limit for the '{subscription_plan}' plan. "
+            f"You have reached the monthly usage limit for the '{quota_tier}' tier. "
             "Please wait for the monthly reset."
         )
         logger.warning(f"Usage limit exceeded for user {user_id}: {msg}")
@@ -230,7 +230,7 @@ async def increment_usage(db: AsyncSession, user_id: int, usage_type: UsageType 
     await db.refresh(usage)
     logger.debug(
         f"Usage updated for user {user_id}, type={usage_type.value}, "
-        f"calls={usage.usage_count}, credits={usage.usage_credits}, plan={subscription_plan}"
+        f"calls={usage.usage_count}, credits={usage.usage_credits}, tier={quota_tier}"
     )
 
 

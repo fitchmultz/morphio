@@ -71,7 +71,7 @@ All core development phases have been completed as of 2025-12-23. See [phase-11-
 
 **Usage & Billing:**
 - LLM usage tracking end-to-end (Phase 11)
-- Subscription/credits gating with fail-fast behavior (Phase 12)
+- Quota-tier/credits gating with fail-fast behavior (Phase 12)
 
 **User Experience:**
 - Processing progress with detailed stages (Phase 13)

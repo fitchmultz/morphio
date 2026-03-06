@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from .comment import Comment
     from .content import Content
     from .conversation import ContentConversation
-    from .subscription import Subscription
+    from .quota_tier import QuotaTierAssignment
     from .template import Template
     from .usage import Usage
 
@@ -56,8 +56,8 @@ class User(Base, SoftDeleteMixin):
     usage_records: Mapped[list["Usage"]] = relationship(
         "Usage", back_populates="user", lazy="selectin"
     )
-    subscriptions: Mapped[list["Subscription"]] = relationship(
-        "Subscription", back_populates="user", lazy="selectin"
+    quota_tier_assignments: Mapped[list["QuotaTierAssignment"]] = relationship(
+        "QuotaTierAssignment", back_populates="user", lazy="selectin"
     )
     api_keys: Mapped[list["APIKey"]] = relationship(
         "APIKey", back_populates="user", lazy="selectin"

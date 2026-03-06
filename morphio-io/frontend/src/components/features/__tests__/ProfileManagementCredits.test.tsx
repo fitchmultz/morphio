@@ -53,7 +53,7 @@ describe("ProfileManagement Credits", () => {
 			data: {
 				status: "success",
 				data: {
-					plan: "free",
+					tier: "free",
 					limit: 50,
 					used: 10,
 					remaining: 40,
@@ -77,7 +77,7 @@ describe("ProfileManagement Credits", () => {
 			data: {
 				status: "success",
 				data: {
-					plan: "free",
+					tier: "free",
 					limit: 50,
 					used: 10,
 					remaining: 40,
@@ -92,7 +92,7 @@ describe("ProfileManagement Credits", () => {
 		render(<ProfileManagement />);
 
 		await waitFor(() => {
-			expect(screen.getByText("Plan:")).toBeInTheDocument();
+			expect(screen.getByText("Tier:")).toBeInTheDocument();
 			expect(screen.getByText("free")).toBeInTheDocument();
 			expect(screen.getByText("10 / 50")).toBeInTheDocument();
 		});
@@ -103,7 +103,7 @@ describe("ProfileManagement Credits", () => {
 			data: {
 				status: "success",
 				data: {
-					plan: "free",
+					tier: "free",
 					limit: 50,
 					used: 48,
 					remaining: 2,
@@ -129,7 +129,7 @@ describe("ProfileManagement Credits", () => {
 			data: {
 				status: "success",
 				data: {
-					plan: "free",
+					tier: "free",
 					limit: 50,
 					used: 10,
 					remaining: 40,
@@ -145,7 +145,7 @@ describe("ProfileManagement Credits", () => {
 
 		await waitFor(() => {
 			expect(
-				screen.getByText(/fixed monthly quotas for demo stability/i),
+				screen.getByText(/fixed monthly quota tiers for demo stability/i),
 			).toBeInTheDocument();
 		});
 	});
@@ -155,7 +155,7 @@ describe("ProfileManagement Credits", () => {
 			data: {
 				status: "success",
 				data: {
-					plan: "free",
+					tier: "free",
 					limit: 50,
 					used: 10,
 					remaining: 40,
@@ -183,7 +183,7 @@ describe("ProfileManagement Credits", () => {
 			data: {
 				status: "success",
 				data: {
-					plan: "pro",
+					tier: "pro",
 					limit: 1000,
 					used: 100,
 					remaining: 900,

@@ -1335,15 +1335,15 @@ export type UserCreate = {
  */
 export type UserCredits = {
     /**
-     * Plan
+     * Tier
      *
-     * Current subscription plan
+     * Current quota tier
      */
-    plan: string;
+    tier: string;
     /**
      * Limit
      *
-     * Total credits available in this plan
+     * Total credits available in this tier
      */
     limit: number;
     /**

@@ -138,11 +138,11 @@ ALLOWED_LOG_EXTENSIONS=["csv","json","log","md","txt"]
 CORS_ORIGINS=["http://localhost:3005","http://localhost:3500","https://morphio.io"]
 ```
 
-## Usage & Subscription
+## Usage & Quota Tiers
 
 ```env
 USAGE_WEIGHTS_JSON={"VIDEO_PROCESSING":2,"AUDIO_PROCESSING":1,"WEB_SCRAPING":1,"CONTENT_GENERATION":2,"LOG_PROCESSING":1,"OTHER":1}
-SUBSCRIPTION_PLAN_LIMITS_JSON={"free":50,"pro":1000,"enterprise":999999999}
+QUOTA_TIER_LIMITS_JSON={"free":50,"pro":1000,"enterprise":999999999}
 ```
 
 ## Local Bootstrap

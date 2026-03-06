@@ -110,7 +110,7 @@ class SortOrder(str, Enum):
     desc = "desc"
 
 
-class SubscriptionTier(SerializableEnum):
+class QuotaTier(SerializableEnum):
     FREE = "free"
     BASIC = "basic"
     PRO = "pro"

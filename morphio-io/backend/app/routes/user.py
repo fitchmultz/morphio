@@ -6,9 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..config import settings
 from ..database import get_db
+from ..models.quota_tier import QuotaTierAssignment
 from ..models.usage import Usage
 from ..models.user import User
-from ..models.subscription import Subscription
 from ..schemas.response_schema import ApiResponse
 from ..schemas.user_schema import UserCredits, UserOut, UserUpdate
 from ..utils.enums import UserRole
@@ -118,7 +118,7 @@ async def change_email(
                         "status": "success",
                         "message": "User credits retrieved successfully",
                         "data": {
-                            "plan": "free",
+                            "tier": "free",
                             "limit": 50,
                             "used": 12,
                             "remaining": 38,
@@ -151,20 +151,20 @@ async def get_user_credits(
     db: AsyncSession = Depends(get_db),
 ):
     """Get summary of a user's credit usage for the current monthly period."""
-    # Determine subscription plan
-    subscription_plan = "free"
-    subscription_result = await db.execute(
-        select(Subscription).where(
-            Subscription.user_id == current_user.id,
-            Subscription.deleted_at.is_(None),
+    # Determine effective quota tier
+    quota_tier = "free"
+    quota_tier_result = await db.execute(
+        select(QuotaTierAssignment).where(
+            QuotaTierAssignment.user_id == current_user.id,
+            QuotaTierAssignment.deleted_at.is_(None),
         )
     )
-    user_subscriptions = subscription_result.scalars().all()
-    active_sub = next((sub for sub in user_subscriptions if sub.status == "active"), None)
-    if active_sub:
-        subscription_plan = active_sub.plan.lower()
+    quota_assignments = quota_tier_result.scalars().all()
+    active_tier = next((record for record in quota_assignments if record.status == "active"), None)
+    if active_tier:
+        quota_tier = active_tier.tier.lower()
 
-    plan_limit = settings.SUBSCRIPTION_PLAN_LIMITS.get(subscription_plan, 50)
+    tier_limit = settings.QUOTA_TIER_LIMITS.get(quota_tier, 50)
     is_admin = current_user.role == UserRole.ADMIN
 
     now = utc_now()
@@ -173,11 +173,11 @@ async def get_user_credits(
     # Admins have unlimited credits
     if is_admin:
         remaining = 999999999
-        plan_limit = 999999999
+        tier_limit = 999999999
         remaining_pct = 100.0
     else:
-        remaining = max(0, plan_limit - total_used)
-        remaining_pct = (remaining / plan_limit * 100) if plan_limit > 0 else 0.0
+        remaining = max(0, tier_limit - total_used)
+        remaining_pct = (remaining / tier_limit * 100) if tier_limit > 0 else 0.0
 
     # Calculate reset date (first of next month)
     next_month = now.month % 12 + 1
@@ -185,8 +185,8 @@ async def get_user_credits(
     reset_date = f"{next_year:04d}-{next_month:02d}-01"
 
     credits_data = UserCredits(
-        plan=subscription_plan,
-        limit=plan_limit,
+        tier=quota_tier,
+        limit=tier_limit,
         used=total_used,
         remaining=remaining,
         remaining_pct=round(remaining_pct, 1),

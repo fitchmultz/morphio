@@ -57,6 +57,7 @@ make ci         # Full CI gate (required for PRs)
 ## Coding Style & Naming Conventions
 
 - **Rate-limited FastAPI routes**: Any endpoint using `@rate_limit(...)` must include `request: Request` in the function signature so decorator enforcement has request context.
+- **Quota terminology**: Public-facing usage limits are "quota tiers" and internal ORM naming should follow `QuotaTierAssignment`/`tier`; do not reintroduce dormant subscription/billing language unless a real paid surface is added again.
 
 - **Python**: Ruff for lint/format; ty for type-check. Line length 100, Python 3.13+.
   - snake_case modules/functions, PascalCase classes; include type hints.

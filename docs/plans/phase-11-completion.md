@@ -48,7 +48,7 @@
   - `generate_conversation_completion_tracked()`
 - Database migration: `db/versions/20251223_add_llm_usage_records.py`
 
-**Phase 12: Subscription/credits gating**
+**Phase 12: Quota-tier/credits gating**
 - Implemented `check_usage_limit()` for pre-generation limit enforcement
 - Wired to generation functions with fail-fast behavior (403 before LLM call)
 - Credits checked before expensive operations

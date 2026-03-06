@@ -295,13 +295,13 @@ class Settings(BaseSettings):
         },
         validation_alias="USAGE_WEIGHTS_JSON",
     )
-    SUBSCRIPTION_PLAN_LIMITS: Dict[str, int] = Field(
+    QUOTA_TIER_LIMITS: Dict[str, int] = Field(
         default={
             "free": 50,
             "pro": 1000,
             "enterprise": 999999999,
         },
-        validation_alias="SUBSCRIPTION_PLAN_LIMITS_JSON",
+        validation_alias="QUOTA_TIER_LIMITS_JSON",
     )
 
     ALLOWED_LOG_EXTENSIONS: List[str] = Field(

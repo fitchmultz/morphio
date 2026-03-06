@@ -4,7 +4,7 @@ from .comment import Comment
 from .content import Content
 from .conversation import ContentConversation, ConversationMessage
 from .llm_usage import LLMUsageRecord
-from .subscription import Subscription
+from .quota_tier import QuotaTierAssignment
 from .tag import Tag
 from .template import Template
 from .usage import Usage
@@ -19,7 +19,7 @@ __all__ = [
     "ContentConversation",
     "ConversationMessage",
     "LLMUsageRecord",
-    "Subscription",
+    "QuotaTierAssignment",
     "Tag",
     "Template",
     "Usage",

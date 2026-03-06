@@ -169,6 +169,7 @@ openapi: openapi-export openapi-generate ## Regenerate frontend API types from b
 openapi-export: ## Export OpenAPI schema from backend (offline)
 	@echo "📄 Exporting OpenAPI schema..."
 	@cd backend && PYTHONPATH=. uv run python scripts/export_openapi.py --output ../frontend/openapi.json
+	@cd frontend && pnpm biome format --write openapi.json >/dev/null
 
 openapi-generate: ## Generate frontend TypeScript types from OpenAPI schema
 	@echo "🔧 Generating frontend API types..."

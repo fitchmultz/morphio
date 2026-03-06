@@ -2345,7 +2345,7 @@
 									"status": "success",
 									"message": "User credits retrieved successfully",
 									"data": {
-										"plan": "free",
+										"tier": "free",
 										"limit": 50,
 										"used": 12,
 										"remaining": 38,
@@ -6521,15 +6521,15 @@
 			},
 			"UserCredits": {
 				"properties": {
-					"plan": {
+					"tier": {
 						"type": "string",
-						"title": "Plan",
-						"description": "Current subscription plan"
+						"title": "Tier",
+						"description": "Current quota tier"
 					},
 					"limit": {
 						"type": "integer",
 						"title": "Limit",
-						"description": "Total credits available in this plan"
+						"description": "Total credits available in this tier"
 					},
 					"used": {
 						"type": "integer",
@@ -6572,7 +6572,7 @@
 					}
 				},
 				"type": "object",
-				"required": ["plan", "limit", "used", "remaining", "remaining_pct"],
+				"required": ["tier", "limit", "used", "remaining", "remaining_pct"],
 				"title": "UserCredits",
 				"description": "Summary of a user's credit usage for the current monthly period."
 			},

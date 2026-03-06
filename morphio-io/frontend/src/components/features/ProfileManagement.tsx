@@ -331,14 +331,15 @@ export const ProfileManagement: FC = () => {
 										Warning: Less than 20% of credits remaining
 									</p>
 									<p className="morphio-caption text-yellow-600 dark:text-yellow-400">
-										Consider upgrading to avoid running out of credits.
+										Plan your next run carefully to avoid exhausting this
+										month&apos;s quota.
 									</p>
 								</div>
 							)}
 
 						<div className="flex justify-between items-center">
-							<span className="morphio-body font-medium">Plan:</span>
-							<span className="morphio-body capitalize">{credits.plan}</span>
+							<span className="morphio-body font-medium">Tier:</span>
+							<span className="morphio-body capitalize">{credits.tier}</span>
 						</div>
 						{credits.is_admin ? (
 							<p className="morphio-body text-green-600 dark:text-green-400">
@@ -382,7 +383,7 @@ export const ProfileManagement: FC = () => {
 
 								<div className="pt-4 border-t border-gray-200 dark:border-gray-600">
 									<p className="morphio-body-sm text-gray-600 dark:text-gray-300">
-										This public release uses fixed monthly quotas for demo
+										This public release uses fixed monthly quota tiers for demo
 										stability. When you hit the limit, access resumes on the
 										next monthly reset.
 									</p>

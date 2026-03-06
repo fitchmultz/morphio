@@ -10,7 +10,7 @@ their plan limits.
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.subscription import Subscription
+from app.models.quota_tier import QuotaTierAssignment
 from app.models.usage import Usage
 from app.models.user import User
 from app.services.usage.tracking import check_usage_limit, increment_usage
@@ -53,7 +53,7 @@ async def admin_user(db_session: AsyncSession) -> User:
 
 @pytest.fixture
 async def pro_user(db_session: AsyncSession) -> User:
-    """Create a pro user with active subscription."""
+    """Create a pro user with an active quota-tier assignment."""
     user = User(
         email="pro@example.com",
         hashed_password="pro_hash",
@@ -65,14 +65,14 @@ async def pro_user(db_session: AsyncSession) -> User:
     await db_session.commit()
     await db_session.refresh(user)
 
-    # Add active pro subscription
-    subscription = Subscription(
+    # Add active pro quota-tier assignment
+    quota_tier_assignment = QuotaTierAssignment(
         user_id=user.id,
-        plan="pro",
+        tier="pro",
         status="active",
         created_at=utc_now(),
     )
-    db_session.add(subscription)
+    db_session.add(quota_tier_assignment)
     await db_session.commit()
 
     return user

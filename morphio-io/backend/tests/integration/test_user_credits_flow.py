@@ -2,9 +2,9 @@
 API E2E tests for the user credits flow.
 
 Tests the GET /user/credits endpoint to verify:
-1. New user gets correct defaults (free plan, full credits)
+1. New user gets correct defaults (free tier, full credits)
 2. Usage rows are reflected in credits
-3. Subscription plan changes update limits
+3. Quota-tier changes update limits
 """
 
 import uuid
@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 from sqlalchemy import event, select
 
 from app.config import settings
-from app.models.subscription import Subscription
+from app.models.quota_tier import QuotaTierAssignment
 from app.models.usage import Usage
 from app.models.user import User
 
@@ -56,9 +56,9 @@ class TestCreditsFlowNewUser:
         assert payload["status"] == "success"
 
         data = payload["data"]
-        free_limit = settings.SUBSCRIPTION_PLAN_LIMITS["free"]
+        free_limit = settings.QUOTA_TIER_LIMITS["free"]
 
-        assert data["plan"] == "free"
+        assert data["tier"] == "free"
         assert data["limit"] == free_limit
         assert data["used"] == 0
         assert data["remaining"] == free_limit
@@ -97,7 +97,7 @@ class TestCreditsFlowWithUsage:
 
         assert response.status_code == 200
         data = response.json()["data"]
-        free_limit = settings.SUBSCRIPTION_PLAN_LIMITS["free"]
+        free_limit = settings.QUOTA_TIER_LIMITS["free"]
 
         assert data["used"] == 10
         assert data["remaining"] == free_limit - 10
@@ -105,31 +105,31 @@ class TestCreditsFlowWithUsage:
         assert data["remaining_pct"] == expected_pct
 
 
-class TestCreditsFlowWithSubscription:
-    """Test 3: Active subscription updates plan and limits."""
+class TestCreditsFlowWithQuotaTier:
+    """Test 3: Active quota-tier assignments update limits."""
 
-    async def test_pro_subscription_updates_credits(self, async_client, db_session):
-        """Insert an active Subscription(plan='pro') and verify credits reflect it."""
+    async def test_pro_quota_tier_updates_credits(self, async_client, db_session):
+        """Insert an active QuotaTierAssignment(tier='pro') and verify credits reflect it."""
         access_token = await _register_user(async_client)
         headers = {"Authorization": f"Bearer {access_token}"}
         user_id = await _get_user_id_from_token(async_client, access_token, db_session)
 
-        # Insert an active pro subscription
-        subscription = Subscription(
+        # Insert an active pro quota-tier assignment
+        quota_tier_assignment = QuotaTierAssignment(
             user_id=user_id,
-            plan="pro",
+            tier="pro",
             status="active",
         )
-        db_session.add(subscription)
+        db_session.add(quota_tier_assignment)
         await db_session.commit()
 
         response = await async_client.get("/user/credits", headers=headers)
 
         assert response.status_code == 200
         data = response.json()["data"]
-        pro_limit = settings.SUBSCRIPTION_PLAN_LIMITS["pro"]
+        pro_limit = settings.QUOTA_TIER_LIMITS["pro"]
 
-        assert data["plan"] == "pro"
+        assert data["tier"] == "pro"
         assert data["limit"] == pro_limit
         assert data["used"] == 0
         assert data["remaining"] == pro_limit
