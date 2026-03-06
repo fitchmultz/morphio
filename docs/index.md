@@ -15,5 +15,4 @@ Canonical documentation hub for the Morphio monorepo.
 - [CI Strategy](./ci-strategy.md)
 - [Release Runbook](./release-runbook.md)
 - [Troubleshooting](./troubleshooting.md)
-- [Project Status](./status.md)
 - [ADR Index](./adrs/README.md)

@@ -16,12 +16,10 @@ Shared documentation for the Morphio monorepo.
 - **[Release Readiness Report](./release-readiness-report.md)** - Concrete hardening outcomes and receipts
 - **[Configuration Guide](./configuration.md)** - Environment variables and setup
 - **[CI Strategy](./ci-strategy.md)** - PR required vs nightly/manual gate model
-- **[Project Status](./status.md)** - Current state, completed work, and what's next
 - **[Upgrade Procedures](./upgrade-procedures.md)** - How to run dependency and schema upgrades
 - **[Architecture Decision Records](./adrs/README.md)** - Key architectural decisions and rationale
 - **[Contributing](../CONTRIBUTING.md)** - Workflow, PR protocol, and non-negotiables
 - **[Troubleshooting FAQ](./troubleshooting.md)** - Common setup and CI fixes
-- **[Roadmap](./roadmap.md)** - Upcoming features and priorities
 
 ## Guides
 

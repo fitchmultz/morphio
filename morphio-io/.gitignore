@@ -57,6 +57,7 @@
 **/code_summary.txt
 
 # IDE & System files
+**/.vscode/
 **/.idea/
 **/*.swp
 **/*.swo
