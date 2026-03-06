@@ -27,7 +27,8 @@ class GenerationWithUsage(TokenUsage):
     """Generation result with token usage for tracking and usage analytics.
 
     Inherits token tracking fields from TokenUsage and adds content.
-    Use this when you need to track token consumption for monetization.
+    Use this when you need to track token consumption for quotas, observability,
+    or operator-facing analytics.
     """
 
     content: str
@@ -337,9 +338,9 @@ async def generate_completion_with_usage(
     Generate a completion and return token usage for tracking and usage analytics.
 
     This function is preferred when you need to:
-    - Track token consumption for monetization
+    - Track token consumption for quota enforcement
     - Log usage for analytics
-    - Implement credit-based access control
+    - Implement operator-visible usage controls
 
     Args:
         messages: List of message dicts with 'role' and 'content' keys

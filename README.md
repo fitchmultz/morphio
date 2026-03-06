@@ -6,6 +6,21 @@
 
 Morphio is a portfolio-grade monorepo for AI-assisted content workflows. It pairs a polished full-stack application with a reusable core library and native acceleration layer, with the repo tuned to show strong engineering judgment around boundaries, local CI, security guardrails, and product finish.
 
+## Reviewer Fast Path
+
+If you want the highest-signal evaluation route, use this order:
+
+1. Read the [Architecture Overview](./docs/architecture-overview.md) for the system boundary and trade-offs.
+2. Skim the [Release Readiness Report](./docs/release-readiness-report.md) for concrete verification receipts.
+3. Run:
+
+```bash
+make env
+make install
+make ci-fast
+make ci
+```
+
 ## Projects
 
 | Project | Description | Path |
@@ -46,6 +61,8 @@ make dev
 <p align="center">
   <img src="./docs/assets/portfolio/2026-03-05-morphio-readme-showcase.jpg" alt="Morphio product showcase built from the live application" width="82%" />
 </p>
+
+These visuals are based on the live application UI and current runtime screenshots, then composed into lighter README-friendly portfolio assets.
 
 - `morphio-io` demonstrates the end-user product surface: content generation, profile management, templates, logs, transcripts, and admin tooling.
 - `morphio-core` captures reusable primitives for media, LLM, and security workflows behind a clean adapter boundary.

@@ -16,7 +16,7 @@ class User(Base):
     hashed_password: str
     is_admin: bool
     is_active: bool
-    subscription_id: int (FK)
+    quota_tier_assignments: list[QuotaTierAssignment]
     created_at, updated_at, deleted_at
 ```
 
@@ -47,7 +47,7 @@ class Template(Base):
     is_system: bool
 ```
 
-## Usage & Billing Models
+## Usage & Quota Models
 
 ### Usage (`usage.py`)
 
@@ -71,7 +71,7 @@ class LLMUsageRecord(Base):
     model: str
     input_tokens: int
     output_tokens: int
-    cost: float (optional)
+    cost: float (optional, observability only)
     created_at: datetime
 ```
 
@@ -81,13 +81,13 @@ class LLMUsageRecord(Base):
 class QuotaTierAssignment(Base):
     id: int
     tier: str (free, pro, enterprise)
-    credits_limit: int
+    status: str (active, cancelled, expired)
 ```
 
 ## Relationships
 
 - User → many Content, Usage, LLMUsageRecord
-- User → zero or more QuotaTierAssignment records
+- User → one quota tier assignment record (historical table name retained under the ORM)
 - Content → many Comment, Conversation
 - Content → one Template (optional)
 

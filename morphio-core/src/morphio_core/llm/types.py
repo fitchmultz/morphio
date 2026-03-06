@@ -103,7 +103,7 @@ class Usage(BaseModel):
 
 
 class TokenUsage(BaseModel):
-    """Extended token usage with cost tracking for monetization.
+    """Extended token usage with optional cost tracking for observability.
 
     This is the full usage model for tracking across the application layer.
     Includes provider/model metadata and optional cost estimation.
@@ -162,7 +162,7 @@ class GenerationResult(BaseModel):
         """Get extended token usage with provider/model metadata.
 
         Returns:
-            TokenUsage with full metadata for tracking/billing
+            TokenUsage with full metadata for tracking and reporting
         """
         return TokenUsage.from_usage(self.usage, provider=self.provider, model=self.model)
 

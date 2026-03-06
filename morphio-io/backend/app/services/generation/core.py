@@ -142,7 +142,7 @@ async def generate_content_from_transcript_tracked(
 
     This version:
     - Checks usage limits BEFORE generation (fails fast with 403)
-    - Records LLM token usage for billing/analytics
+    - Records LLM token usage for usage analytics and auditability
 
     Args:
         transcript: The audio transcript to process
@@ -251,7 +251,7 @@ async def generate_conversation_completion_tracked(
 
     This version:
     - Checks usage limits BEFORE generation (fails fast with 403)
-    - Records LLM token usage for billing/analytics
+    - Records LLM token usage for usage analytics and auditability
 
     Args:
         messages: Conversation history
