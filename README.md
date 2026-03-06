@@ -1,6 +1,10 @@
 # Morphio Monorepo
 
-This monorepo contains related Morphio projects for AI-powered content generation.
+<p align="center">
+  <img src="./docs/assets/portfolio/2026-03-05-morphio-readme-hero.jpg" alt="Morphio portfolio hero artwork" width="100%" />
+</p>
+
+Morphio is a portfolio-grade monorepo for AI-assisted content workflows. It pairs a polished full-stack application with a reusable core library and native acceleration layer, with the repo tuned to show strong engineering judgment around boundaries, local CI, security guardrails, and product finish.
 
 ## Projects
 
@@ -36,6 +40,16 @@ make ci-fast
 make ci
 make dev
 ```
+
+## Visual Tour
+
+<p align="center">
+  <img src="./docs/assets/portfolio/2026-03-05-morphio-readme-showcase.jpg" alt="Morphio product showcase built from the live application" width="82%" />
+</p>
+
+- `morphio-io` demonstrates the end-user product surface: content generation, profile management, templates, logs, transcripts, and admin tooling.
+- `morphio-core` captures reusable primitives for media, LLM, and security workflows behind a clean adapter boundary.
+- `morphio-native` provides focused native acceleration for performance-sensitive paths.
 
 ## Project Relationship
 
