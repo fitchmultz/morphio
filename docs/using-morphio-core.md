@@ -16,7 +16,7 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-morphio-core = { git = "https://github.com/fitchmultz/morphio-all", subdirectory = "morphio-core" }
+morphio-core = { git = "https://github.com/fitchmultz/morphio", subdirectory = "morphio-core" }
 ```
 
 Then install:
@@ -254,11 +254,11 @@ For stability, pin to a specific commit:
 
 ```toml
 [tool.uv.sources]
-morphio-core = { git = "https://github.com/fitchmultz/morphio-all", rev = "abc123", subdirectory = "morphio-core" }
+morphio-core = { git = "https://github.com/fitchmultz/morphio", rev = "abc123", subdirectory = "morphio-core" }
 ```
 
 Or use a tag (when available):
 
 ```toml
-morphio-core = { git = "https://github.com/fitchmultz/morphio-all", tag = "v0.1.0", subdirectory = "morphio-core" }
+morphio-core = { git = "https://github.com/fitchmultz/morphio", tag = "v0.1.0", subdirectory = "morphio-core" }
 ```

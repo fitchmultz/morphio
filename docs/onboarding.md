@@ -19,7 +19,7 @@ Before starting, ensure you have:
 ### 1. Clone and enter the repo
 
 ```bash
-git clone https://github.com/fitchmultz/morphio-all.git
+git clone https://github.com/fitchmultz/morphio.git
 cd morphio-all
 ```
 

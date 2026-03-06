@@ -61,7 +61,7 @@ all = [
 morphio = "morphio_core.cli:app"
 
 [project.urls]
-Repository = "https://github.com/fitchmultz/morphio-all"
+Repository = "https://github.com/fitchmultz/morphio"
 
 [dependency-groups]
 dev = [

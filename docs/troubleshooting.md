@@ -269,5 +269,5 @@ Or enable it globally in Docker Desktop settings.
 ## Getting More Help
 
 1. Check the [Troubleshooting FAQ](./troubleshooting.md), [Verification Checklist](./verification-checklist.md), and [Release Readiness Report](./release-readiness-report.md)
-2. Search existing [GitHub Issues](https://github.com/fitchmultz/morphio-all/issues)
+2. Search existing [GitHub Issues](https://github.com/fitchmultz/morphio/issues)
 3. Ask in the project's communication channels
