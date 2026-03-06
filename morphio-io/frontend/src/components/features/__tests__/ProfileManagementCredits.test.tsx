@@ -37,7 +37,7 @@ const mockUserProfile = {
 	role: "user",
 };
 
-describe("ProfileManagement Credits", () => {
+describe("ProfileManagement Usage Limits", () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
 		(sdk.getUserProfile as jest.Mock).mockResolvedValue({
@@ -48,7 +48,7 @@ describe("ProfileManagement Credits", () => {
 		});
 	});
 
-	test("renders Usage Credits section when credits data is available", async () => {
+	test("renders Usage Limits section when quota data is available", async () => {
 		(sdk.getUserCredits as jest.Mock).mockResolvedValue({
 			data: {
 				status: "success",
@@ -68,11 +68,11 @@ describe("ProfileManagement Credits", () => {
 		render(<ProfileManagement />);
 
 		await waitFor(() => {
-			expect(screen.getByText("Usage Credits")).toBeInTheDocument();
+			expect(screen.getByText("Usage Limits")).toBeInTheDocument();
 		});
 	});
 
-	test("renders plan and usage text correctly", async () => {
+	test("renders tier and usage text correctly", async () => {
 		(sdk.getUserCredits as jest.Mock).mockResolvedValue({
 			data: {
 				status: "success",
@@ -119,12 +119,14 @@ describe("ProfileManagement Credits", () => {
 
 		await waitFor(() => {
 			expect(
-				screen.getByText("Critical: Less than 5% of credits remaining!"),
+				screen.getByText(
+					"Critical: Less than 5% of this month's quota remains",
+				),
 			).toBeInTheDocument();
 		});
 	});
 
-	test("renders monthly quota guidance when plan is free", async () => {
+	test("renders monthly demo quota guidance when tier is free", async () => {
 		(sdk.getUserCredits as jest.Mock).mockResolvedValue({
 			data: {
 				status: "success",
@@ -145,7 +147,9 @@ describe("ProfileManagement Credits", () => {
 
 		await waitFor(() => {
 			expect(
-				screen.getByText(/fixed monthly quota tiers for demo stability/i),
+				screen.getByText(
+					/fixed monthly demo quotas to keep runtime predictable/i,
+				),
 			).toBeInTheDocument();
 		});
 	});
@@ -170,15 +174,17 @@ describe("ProfileManagement Credits", () => {
 		render(<ProfileManagement />);
 
 		await waitFor(() => {
-			expect(screen.getByText("Usage Credits")).toBeInTheDocument();
+			expect(screen.getByText("Usage Limits")).toBeInTheDocument();
 		});
 
 		expect(
-			screen.queryByText("Critical: Less than 5% of credits remaining!"),
+			screen.queryByText(
+				"Critical: Less than 5% of this month's quota remains",
+			),
 		).not.toBeInTheDocument();
 	});
 
-	test("does not render billing actions for paid plans", async () => {
+	test("does not render dormant billing actions for paid tiers", async () => {
 		(sdk.getUserCredits as jest.Mock).mockResolvedValue({
 			data: {
 				status: "success",

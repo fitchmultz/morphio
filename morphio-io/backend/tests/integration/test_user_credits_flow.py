@@ -1,9 +1,9 @@
 """
-API E2E tests for the user credits flow.
+API E2E tests for the user usage-limits flow.
 
 Tests the GET /user/credits endpoint to verify:
-1. New user gets correct defaults (free tier, full credits)
-2. Usage rows are reflected in credits
+1. New user gets correct defaults (free tier, full quota)
+2. Usage rows are reflected in the usage summary
 3. Quota-tier changes update limits
 """
 
@@ -21,9 +21,9 @@ from app.models.user import User
 async def _register_user(async_client):
     """Register a new test user and return the access token."""
     user_data = {
-        "email": f"credits-test-{uuid.uuid4()}@example.com",
+        "email": f"usage-limits-test-{uuid.uuid4()}@example.com",
         "password": "StrongP@ssw0rd123!",
-        "display_name": "Credits Tester",
+        "display_name": "Usage Limits Tester",
     }
     response = await async_client.post("/auth/register", json=user_data)
     assert response.status_code == 200, response.json()
@@ -42,7 +42,7 @@ async def _get_user_id_from_token(async_client, access_token, db_session):
 
 
 class TestCreditsFlowNewUser:
-    """Test 1: New user gets correct default credits."""
+    """Test 1: New user gets correct default usage limits."""
 
     async def test_new_user_gets_default_credits(self, async_client):
         """Register a new user and verify GET /user/credits returns correct defaults."""
@@ -72,10 +72,10 @@ class TestCreditsFlowNewUser:
 
 
 class TestCreditsFlowWithUsage:
-    """Test 2: Usage rows are reflected in credits."""
+    """Test 2: Usage rows are reflected in the usage summary."""
 
     async def test_usage_reflected_in_credits(self, async_client, db_session):
-        """Insert a Usage row for the user and verify credits reflect it."""
+        """Insert a Usage row for the user and verify the usage summary reflects it."""
         access_token = await _register_user(async_client)
         headers = {"Authorization": f"Bearer {access_token}"}
         user_id = await _get_user_id_from_token(async_client, access_token, db_session)
@@ -109,7 +109,7 @@ class TestCreditsFlowWithQuotaTier:
     """Test 3: Active quota-tier assignments update limits."""
 
     async def test_pro_quota_tier_updates_credits(self, async_client, db_session):
-        """Insert an active QuotaTierAssignment(tier='pro') and verify credits reflect it."""
+        """Insert an active QuotaTierAssignment(tier='pro') and verify limits reflect it."""
         access_token = await _register_user(async_client)
         headers = {"Authorization": f"Bearer {access_token}"}
         user_id = await _get_user_id_from_token(async_client, access_token, db_session)

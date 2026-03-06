@@ -23,7 +23,7 @@ These items were completed in the documentation normalization work:
 - [x] Fill empty backend docs with real content
 - [x] Surface job stage progress in frontend UI
 - [x] Add `/user/credits` endpoint
-- [x] Add usage/credits panel to Profile page
+- [x] Add usage limits panel to Profile page
 
 ## Short-Term (Next Sprint)
 
@@ -33,7 +33,7 @@ These items were completed in the documentation normalization work:
 - [x] Add development troubleshooting FAQ
 
 ### Testing
-- [x] Add E2E tests for credits display flow
+- [x] Add E2E tests for usage limits display flow
 - [x] Add integration tests for stage progress updates
 - [x] Improve test coverage for usage tracking
 

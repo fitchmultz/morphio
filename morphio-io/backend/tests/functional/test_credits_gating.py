@@ -1,10 +1,10 @@
-"""Tests for credits gating / usage limit enforcement.
+"""Tests for demo quota gating / usage limit enforcement.
 
 These tests verify that the usage limit check (check_usage_limit) properly
-blocks operations BEFORE expensive LLM calls when credits are exhausted.
+blocks operations BEFORE expensive LLM calls when monthly quota is exhausted.
 
-This is a critical quota-enforcement protection - users should not be able to exceed
-their plan limits.
+This is a critical quota-enforcement protection for the public demo build.
+Users should not be able to exceed their assigned monthly limits.
 """
 
 import pytest
@@ -21,7 +21,7 @@ from app.utils.response_utils import utc_now
 
 @pytest.fixture
 async def test_user(db_session: AsyncSession) -> User:
-    """Create a test user with default free plan."""
+    """Create a test user with the default free quota tier."""
     user = User(
         email="test@example.com",
         hashed_password="test_hash",
@@ -88,7 +88,7 @@ class TestCheckUsageLimit:
 
     async def test_check_limit_fails_when_exceeded(self, db_session: AsyncSession, test_user: User):
         """User at/over limit should be blocked with 403."""
-        # Create usage that hits the limit (free plan = 50 credits)
+        # Create usage that hits the limit (free tier = 50 units)
         usage = Usage(
             user_id=test_user.id,
             usage_type=UsageType.OTHER.value,
@@ -105,7 +105,7 @@ class TestCheckUsageLimit:
             await check_usage_limit(db_session, test_user.id, UsageType.OTHER)
 
         assert exc_info.value.status_code == 403
-        assert "credit limit" in exc_info.value.message.lower()
+        assert "monthly usage limit" in exc_info.value.message.lower()
 
     async def test_admin_bypasses_limit(self, db_session: AsyncSession, admin_user: User):
         """Admin users should always pass, even with high usage."""
@@ -126,7 +126,7 @@ class TestCheckUsageLimit:
         assert result is True
 
     async def test_pro_user_has_higher_limit(self, db_session: AsyncSession, pro_user: User):
-        """Pro users should have access to higher limits (1000 credits)."""
+        """Pro users should have access to higher limits (1000 units)."""
         # Create usage that would fail free limit but pass pro limit
         usage = Usage(
             user_id=pro_user.id,
@@ -187,7 +187,7 @@ class TestIncrementUsage:
         assert exc_info.value.status_code == 403
 
     async def test_weighted_usage_costs_apply(self, db_session: AsyncSession, test_user: User):
-        """Video processing should cost 2 credits (based on USAGE_WEIGHTS)."""
+        """Video processing should cost 2 units (based on USAGE_WEIGHTS)."""
         await increment_usage(db_session, test_user.id, UsageType.VIDEO_PROCESSING)
 
         from sqlalchemy import select
@@ -200,4 +200,4 @@ class TestIncrementUsage:
         )
         usage = result.scalar_one()
         assert usage.usage_count == 1
-        assert usage.usage_credits == 2  # Video = 2 credits
+        assert usage.usage_credits == 2  # Video = 2 units

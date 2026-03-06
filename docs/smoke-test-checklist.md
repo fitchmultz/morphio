@@ -24,7 +24,7 @@ Use this checklist after local changes or before release candidates.
 ## Representative Workflow
 
 - Register/login
-- Profile: credits visible
+- Profile: usage limits visible
 - Create API key (copy once), then revoke it
 - Admin export CSV
 - Upload a small log file succeeds

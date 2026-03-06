@@ -13,7 +13,7 @@ API routes are organized by domain in `app/routes/`. OpenAPI docs are available 
 | `media.py` | `/media` | Video/audio processing + status |
 | `logs.py` | `/logs` | Log file processing + status |
 | `web.py` | `/web` | Web scraping + status |
-| `user.py` | `/user` | Profile, password change, credits |
+| `user.py` | `/user` | Profile, password change, usage limits |
 | `admin.py` | `/admin` | Usage stats, user management |
 | `template.py` | `/template` | Template CRUD |
 | `health.py` | `/health` | Health checks |

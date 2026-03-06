@@ -69,9 +69,9 @@ All core development phases have been completed as of 2025-12-23. See [phase-11-
 - Advanced reasoning examples and usage guides (Phase 9)
 - Technical risk documentation (Phase 10)
 
-**Usage & Billing:**
+**Usage & Demo Limits:**
 - LLM usage tracking end-to-end (Phase 11)
-- Quota-tier/credits gating with fail-fast behavior (Phase 12)
+- Quota-tier usage gating with fail-fast behavior (Phase 12)
 
 **User Experience:**
 - Processing progress with detailed stages (Phase 13)
@@ -113,7 +113,7 @@ Baseline alignment and wiring completed on 2025-12-25:
 ### UI Wiring ✅
 - [x] Surface job stage progress in frontend
 - [x] Add `/user/credits` endpoint
-- [x] Add usage/credits panel to Profile
+- [x] Add usage limits panel to Profile
 
 ## Product Features (Phase 4) ✅ Complete
 
@@ -125,7 +125,7 @@ Completed on 2025-12-23:
 - [x] Admin System Health panel with aggregated component status checks
 
 ### User Quotas ✅
-- [x] Usage alerts when credits < 20% (warning) or < 5% (critical)
+- [x] Usage alerts when remaining quota < 20% (warning) or < 5% (critical)
 
 ### Programmatic Access ✅
 - [x] API key model with SHA256 hashing

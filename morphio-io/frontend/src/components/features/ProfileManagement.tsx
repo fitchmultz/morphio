@@ -307,18 +307,19 @@ export const ProfileManagement: FC = () => {
 			{renderProfileSection("Change Password", <ChangePasswordForm />)}
 			{credits &&
 				renderProfileSection(
-					"Usage Credits",
+					"Usage Limits",
 					<div className="space-y-4">
-						{/* Warning banners for low credits */}
+						{/* Warning banners for low remaining monthly quota */}
 						{!credits.is_admin &&
 							credits.remaining_pct !== undefined &&
 							credits.remaining_pct < 5 && (
 								<div className="p-3 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg">
 									<p className="morphio-body-sm text-red-700 dark:text-red-300 font-medium">
-										Critical: Less than 5% of credits remaining!
+										Critical: Less than 5% of this month&apos;s quota remains
 									</p>
 									<p className="morphio-caption text-red-600 dark:text-red-400">
-										Upgrade your plan to continue using AI features.
+										Heavy processing will stay blocked until the next monthly
+										reset.
 									</p>
 								</div>
 							)}
@@ -328,11 +329,11 @@ export const ProfileManagement: FC = () => {
 							credits.remaining_pct < 20 && (
 								<div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700 rounded-lg">
 									<p className="morphio-body-sm text-yellow-700 dark:text-yellow-300 font-medium">
-										Warning: Less than 20% of credits remaining
+										Warning: Less than 20% of this month&apos;s quota remains
 									</p>
 									<p className="morphio-caption text-yellow-600 dark:text-yellow-400">
-										Plan your next run carefully to avoid exhausting this
-										month&apos;s quota.
+										Plan your next run carefully to stay within the demo limit
+										until the monthly reset.
 									</p>
 								</div>
 							)}
@@ -343,7 +344,7 @@ export const ProfileManagement: FC = () => {
 						</div>
 						{credits.is_admin ? (
 							<p className="morphio-body text-green-600 dark:text-green-400">
-								Unlimited credits (Admin)
+								Unlimited usage (Admin)
 							</p>
 						) : (
 							<>
@@ -371,7 +372,7 @@ export const ProfileManagement: FC = () => {
 								</div>
 								<div className="flex justify-between items-center text-sm">
 									<span className="text-gray-500 dark:text-gray-400">
-										{credits.remaining} credits remaining (
+										{credits.remaining} units remaining (
 										{credits.remaining_pct?.toFixed(0) ?? 0}%)
 									</span>
 									{credits.reset_date && (
@@ -383,9 +384,9 @@ export const ProfileManagement: FC = () => {
 
 								<div className="pt-4 border-t border-gray-200 dark:border-gray-600">
 									<p className="morphio-body-sm text-gray-600 dark:text-gray-300">
-										This public release uses fixed monthly quota tiers for demo
-										stability. When you hit the limit, access resumes on the
-										next monthly reset.
+										This public release uses fixed monthly demo quotas to keep
+										runtime predictable. When you hit the limit, access resumes
+										on the next monthly reset.
 									</p>
 								</div>
 							</>
