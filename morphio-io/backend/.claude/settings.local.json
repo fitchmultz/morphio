@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "mcp__fetch__fetch",
-      "mcp__perplexity-ask__perplexity_ask"
-    ]
-  }
-}

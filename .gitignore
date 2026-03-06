@@ -9,6 +9,11 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+.cursorrules
+.cursorignore
+CLAUDE.md
+GEMINI.md
+.claude/settings.local.json
 
 # Python
 __pycache__/
