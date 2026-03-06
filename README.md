@@ -4,15 +4,16 @@
   <img src="./docs/assets/portfolio/2026-03-05-morphio-readme-hero.jpg" alt="Morphio portfolio hero artwork" width="100%" />
 </p>
 
-Morphio is a portfolio-grade monorepo for AI-assisted content workflows. It pairs a polished full-stack application with a reusable core library and native acceleration layer, with the repo tuned to show strong engineering judgment around boundaries, local CI, security guardrails, and product finish.
+Morphio is a monorepo for AI-assisted content workflows. The main application is `morphio-io`, a FastAPI + Next.js system for turning media, web, and log inputs into structured outputs. The repo also includes `morphio-core`, which extracts reusable media, LLM, and security logic behind a strict adapter boundary, plus `morphio-native` for performance-sensitive native routines.
 
-## Reviewer Fast Path
+## Start Here
 
-If you want the highest-signal evaluation route, use this order:
+If you want the fastest path to understanding the project:
 
-1. Read the [Architecture Overview](./docs/architecture-overview.md) for the system boundary and trade-offs.
-2. Skim the [Release Readiness Report](./docs/release-readiness-report.md) for concrete verification receipts.
-3. Run:
+1. Read the [Architecture Overview](./docs/architecture-overview.md).
+2. Start with [`morphio-io/`](./morphio-io/) as the primary application surface.
+3. Use [`morphio-core/`](./morphio-core/) to inspect the reusable library boundary.
+4. Run:
 
 ```bash
 make env
@@ -31,20 +32,14 @@ make ci
 
 ## Documentation
 
-- **[Contributing](./CONTRIBUTING.md)** - Onboarding, workflow, and PR protocol
-- **[Shared Docs](./docs/)** - Cross-cutting guides
-- **[Architecture Overview](./docs/architecture-overview.md)** - Reviewer-friendly 1–2 page system overview
-- **[Using morphio-core](./docs/using-morphio-core.md)** - How to use morphio-core in your own projects
-- **[Architecture](./docs/architecture.md)** - How morphio-io uses morphio-core via adapters
-- **[Validation Commands](./docs/validation-commands.md)** - Local commands matching CI gates
-- **[Current State](./docs/current-state.md)** - One-page baseline snapshot
-- **[Takeover Backlog](./docs/takeover-backlog.md)** - Prioritized remediation plan
-- **[CI Strategy](./docs/ci-strategy.md)** - PR required vs nightly/manual checks
-- **[Release Readiness Report](./docs/release-readiness-report.md)** - Portfolio hardening outcomes and residual risk
-- **[Reviewer Checklist](./docs/reviewer-checklist.md)** - Exact skeptic validation sequence
-- **[Role Evidence Pack](./docs/role-evidence/)** - Evidence map + demo/workshop/cookbook/ops checklist
-- **[Troubleshooting](./docs/troubleshooting.md)** - Common setup and CI fixes
-- **[Security Policy](./SECURITY.md)** and **[Code of Conduct](./CODE_OF_CONDUCT.md)**
+- [Architecture Overview](./docs/architecture-overview.md) - system boundary and trade-offs
+- [Validation Commands](./docs/validation-commands.md) - local checks matching CI
+- [Reviewer Checklist](./docs/reviewer-checklist.md) - short verification path from a fresh clone
+- [Release Readiness Report](./docs/release-readiness-report.md) - hardening work and receipts
+- [Configuration Guide](./docs/configuration.md) - environment and runtime configuration
+- [Troubleshooting](./docs/troubleshooting.md) - common setup and CI fixes
+- [Shared Docs Index](./docs/) - the rest of the cross-cutting documentation
+- [Contributing](./CONTRIBUTING.md), [Security Policy](./SECURITY.md), [Code of Conduct](./CODE_OF_CONDUCT.md)
 
 ## Quick Start
 
@@ -64,8 +59,8 @@ make dev
 
 These visuals are based on the live application UI and current runtime screenshots, then composed into lighter README-friendly portfolio assets.
 
-- `morphio-io` demonstrates the end-user product surface: content generation, profile management, templates, logs, transcripts, and admin tooling.
-- `morphio-core` captures reusable primitives for media, LLM, and security workflows behind a clean adapter boundary.
+- `morphio-io` is the primary reviewer path: content generation, profile management, templates, logs, transcripts, and admin tooling.
+- `morphio-core` is where the reusable AI/media/security integration logic lives.
 - `morphio-native` provides focused native acceleration for performance-sensitive paths.
 
 ## Project Relationship

@@ -10,15 +10,13 @@ Shared documentation for the Morphio monorepo.
 
 ## Quick Links
 
-- **[Project Status](./status.md)** - Current state, completed work, and what's next
-- **[Current State](./current-state.md)** - One-page baseline of stack, flows, and top risks
-- **[Takeover Backlog](./takeover-backlog.md)** - Prioritized P0/P1/P2 hardening backlog
-- **[Configuration Guide](./configuration.md)** - Environment variables and setup
+- **[Architecture Overview](./architecture-overview.md)** - Reviewer-friendly system architecture and trade-offs
 - **[Validation Commands](./validation-commands.md)** - CI-equivalent local checks
+- **[Reviewer Checklist](./reviewer-checklist.md)** - Short external validation path
+- **[Release Readiness Report](./release-readiness-report.md)** - Concrete hardening outcomes and receipts
+- **[Configuration Guide](./configuration.md)** - Environment variables and setup
 - **[CI Strategy](./ci-strategy.md)** - PR required vs nightly/manual gate model
-- **[Release Readiness Report](./release-readiness-report.md)** - Hardening outcomes and residual risk
-- **[Reviewer Checklist](./reviewer-checklist.md)** - Fast skeptical-engineer validation path
-- **[Role Evidence Pack](./role-evidence/)** - Evidence map, demo script, workshop, cookbook, ops checklist
+- **[Project Status](./status.md)** - Current state, completed work, and what's next
 - **[Upgrade Procedures](./upgrade-procedures.md)** - How to run dependency and schema upgrades
 - **[Architecture Decision Records](./adrs/README.md)** - Key architectural decisions and rationale
 - **[Contributing](../CONTRIBUTING.md)** - Workflow, PR protocol, and non-negotiables
@@ -32,6 +30,13 @@ Shared documentation for the Morphio monorepo.
 | [Architecture Overview](./architecture-overview.md) | Reviewer-friendly system architecture and trade-offs |
 | [Using morphio-core](./using-morphio-core.md) | How to use morphio-core in your own projects |
 | [Architecture](./architecture.md) | Deep dive: adapter boundary and integration details |
+
+## Supplemental Historical Material
+
+These documents are still useful, but they are not the best first stop for understanding the project:
+
+- [Current State](./current-state.md)
+- [Takeover Backlog](./takeover-backlog.md)
 
 ## Project-Specific Docs
 

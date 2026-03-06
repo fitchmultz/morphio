@@ -1,6 +1,6 @@
-# Morphio - AI-Powered Content Generation Platform
+# morphio-io
 
-Morphio is a modern, full-stack web application designed for creating, managing, and processing content with the aid of artificial intelligence. Built with a NextJS frontend and a FastAPI backend, Morphio leverages cutting-edge technologies to provide users with a seamless experience for generating content from various media sources and web inputs.
+`morphio-io` is the primary Morphio application: a FastAPI + Next.js system for processing media, web, and log inputs into structured content outputs. It sits on top of `morphio-core`, which holds the reusable media, LLM, and security logic behind an explicit adapter boundary.
 
 ## Table of Contents
 
@@ -13,7 +13,6 @@ Morphio is a modern, full-stack web application designed for creating, managing,
 - [Secrets & Production](#secrets--production)
  - [Releases](#releases)
  - [Database](#database)
-- [Potential Use Cases](#potential-use-cases)
 - [Contributing](#contributing)
 
 ## Tech Stack
@@ -40,13 +39,13 @@ Morphio is a modern, full-stack web application designed for creating, managing,
 
 - **Docker**: Containerization for consistent deployment
 - **NGINX**: Reverse proxy for routing frontend/backend traffic
-- **Local CI**: Run `make ci` (GitHub Actions are disabled)
+- **Local CI**: `make ci` is the canonical release-parity gate
 
 ## Architecture
 
-Morphio follows a client-server architecture with a clear separation of concerns:
+`morphio-io` follows a client-server architecture with a clear separation of concerns:
 
-- **Frontend (NextJS)**:
+- **Frontend (Next.js)**:
 
   - Located in `frontend/`
   - Handles UI rendering, user interactions, and API calls
@@ -83,26 +82,21 @@ Morphio follows a client-server architecture with a clear separation of concerns
 
 ## AI and Machine Learning Integration
 
-Morphio integrates AI/ML capabilities primarily through its content generation services:
+The application integrates AI/ML capabilities primarily through its content generation and processing services:
 
-- **Content Generation Service (`generation_service.py`)**:
+- **Content generation and conversation services**:
 
   - Processes media inputs (audio, video, web) to generate structured content
-  - Likely interfaces with external AI models (e.g., LLMs like GPT or custom models) for text generation
+  - Routes model access through `morphio-core` rather than importing provider SDKs directly in the app layer
   - Uses templates to format output (e.g., `blog-post.json`, `linkedin-post.json`)
 
-- **Implementation Details**:
+- **Implementation details**:
 
   - Asynchronous job processing for scalability
   - Supports multiple input sources (YouTube, file uploads, web scraping)
   - Configurable via templates stored in `backend/templates/`
 
-- **Potential AI/ML Components**:
-  - Natural Language Processing (NLP) for summarizing or rewriting content
-  - Speech-to-text for audio/video transcription (`transcription_utils.py`)
-  - Text generation for creating titles or full articles
-
-While the exact AI models aren't specified in the codebase, the structure suggests integration with third-party APIs or local ML models, managed through the `generation_service.py` and related utilities.
+The current implementation routes model access through `morphio-core` and adapter layers rather than scattering provider SDK calls across the application.
 
 ## Current Functionality
 
@@ -286,41 +280,6 @@ docker compose -p morphio-blue down
 - Prod: PostgreSQL required. Set `DATABASE_URL` (e.g., `postgresql+asyncpg://user:pass@host:5432/db`).
   The backend refuses to start with SQLite when `APP_ENV=production`.
 
-## Potential Use Cases
-
-Beyond its current role as a content generation tool, Morphio's architecture and AI integration open up several possibilities:
-
-1. **Educational Platform**:
-
-   - Convert lectures or webinars into study notes or summaries
-   - Generate quizzes or flashcards from video/audio content
-
-2. **Marketing Automation**:
-
-   - Create bulk social media campaigns from a single source
-   - Analyze competitor content and generate optimized responses
-
-3. **Journalism Aid**:
-
-   - Transcribe interviews and generate draft articles
-   - Summarize press conferences into concise reports
-
-4. **E-commerce Enhancement**:
-
-   - Generate product descriptions from supplier videos or specs
-   - Create SEO-optimized content for product pages
-
-5. **Personal Knowledge Management**:
-
-   - Process personal media (podcasts, videos) into organized notes
-   - Build a searchable knowledge base with AI-tagged content
-
-6. **Corporate Training**:
-   - Transform training videos into written guides or manuals
-   - Generate compliance documentation from regulatory updates
-
-The modular design, with its template system and extensible backend services, makes Morphio adaptable to various domains requiring automated content processing.
-
 ## Contributing
 
 Contributions are welcome! Please:
@@ -335,12 +294,12 @@ For bugs or feature requests, open an issue with detailed information.
 
 ## Developer Tooling
 
-- Python linting uses `ruff`; type checking uses `basedpyright` (basic mode). Settings live in `backend/pyproject.toml` (line length 100, Python 3.13).
+- Python linting uses `ruff`; type checking uses `ty`. Settings live in `backend/pyproject.toml` (line length 100, Python 3.13).
 
   ```bash
   # From backend/
   uv run ruff check .
-  uv run basedpyright
+  uv run ty check
   ```
 
 - Project dependencies are declared in `backend/pyproject.toml`.
