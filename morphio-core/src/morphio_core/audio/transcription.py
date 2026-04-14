@@ -1,16 +1,12 @@
-"""
-Local Whisper transcription with hardware-optimized backends.
-
-Backend Selection (auto mode):
-1. Apple Silicon Mac -> MLX Whisper (uses Metal GPU, fastest on M-series)
-2. NVIDIA GPU available -> faster-whisper with CUDA
-3. Fallback -> faster-whisper on CPU
-
-Dependencies (optional extras):
-- mlx-whisper: For Apple Silicon
-- faster-whisper: For NVIDIA GPU or CPU fallback
+"""Purpose: Provide local Whisper transcription with hardware-aware backend selection.
+Responsibilities: Detect optional Whisper backends, load them lazily, and normalize transcription results.
+Scope: morphio-core audio transcription orchestration for MLX and faster-whisper backends.
+Usage: Imported by higher-level application code through `Transcriber` or `transcribe_audio`.
+Invariants/Assumptions: Optional backend packages may be absent and must be discovered without import-time failures.
 """
 
+import importlib
+import importlib.util
 import platform
 import shutil
 import sys
@@ -28,6 +24,16 @@ from .types import (
 # --- Hardware Detection ---
 
 
+def _import_optional_module(module_name: str) -> Any:
+    """Import an optional dependency lazily."""
+    return importlib.import_module(module_name)
+
+
+def _has_optional_module(module_name: str) -> bool:
+    """Check whether an optional dependency is installed without importing it eagerly."""
+    return importlib.util.find_spec(module_name) is not None
+
+
 def is_apple_silicon() -> bool:
     """Check if running on Apple Silicon Mac."""
     return sys.platform == "darwin" and platform.machine() == "arm64"
@@ -36,12 +42,12 @@ def is_apple_silicon() -> bool:
 def has_nvidia_gpu() -> bool:
     """Check if NVIDIA GPU with CUDA is available for CTranslate2."""
     # CTranslate2-native check (faster-whisper's backend)
-    try:
-        import ctranslate2  # type: ignore[import-not-found]
-
-        return "cuda" in ctranslate2.get_supported_compute_types("default")
-    except ImportError, Exception:
-        pass
+    if _has_optional_module("ctranslate2"):
+        try:
+            ctranslate2 = _import_optional_module("ctranslate2")
+            return "cuda" in ctranslate2.get_supported_compute_types("default")
+        except Exception:
+            pass
 
     # Fallback: check for nvidia-smi (indicates CUDA drivers present)
     return shutil.which("nvidia-smi") is not None
@@ -49,22 +55,12 @@ def has_nvidia_gpu() -> bool:
 
 def has_mlx_whisper() -> bool:
     """Check if mlx-whisper is installed."""
-    try:
-        import mlx_whisper  # type: ignore[import-not-found]  # noqa: F401
-
-        return True
-    except ImportError:
-        return False
+    return _has_optional_module("mlx_whisper")
 
 
 def has_faster_whisper() -> bool:
     """Check if faster-whisper is installed."""
-    try:
-        import faster_whisper  # type: ignore[import-not-found]  # noqa: F401
-
-        return True
-    except ImportError:
-        return False
+    return _has_optional_module("faster_whisper")
 
 
 def detect_optimal_backend() -> tuple[str, str]:
@@ -120,9 +116,7 @@ class MLXWhisperBackend:
 
     def __init__(self) -> None:
         try:
-            import mlx_whisper  # type: ignore[import-not-found]
-
-            self._mlx_whisper = mlx_whisper
+            self._mlx_whisper = _import_optional_module("mlx_whisper")
         except ImportError as e:
             raise BackendNotAvailableError(
                 "mlx-whisper not installed. Install with: uv add morphio-core[whisper-mlx]"
@@ -192,9 +186,11 @@ class FasterWhisperBackend:
 
     def __init__(self, device: str = "auto") -> None:
         try:
-            from faster_whisper import WhisperModel  # type: ignore[import-not-found]
-
-            self._WhisperModel = WhisperModel
+            faster_whisper = _import_optional_module("faster_whisper")
+            whisper_model = getattr(faster_whisper, "WhisperModel", None)
+            if whisper_model is None:
+                raise ImportError("faster_whisper.WhisperModel is unavailable")
+            self._WhisperModel = whisper_model
         except ImportError as e:
             raise BackendNotAvailableError(
                 "faster-whisper not installed. Install with: uv add morphio-core[whisper-cuda] or morphio-core[whisper-cpu]"

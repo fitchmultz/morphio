@@ -1,3 +1,11 @@
+/**
+ * Purpose: Provide frontend helpers for detecting media sources, file types, and picker MIME filters.
+ * Responsibilities: Classify URLs/files and generate browser-friendly accept attributes.
+ * Scope: Client-side media utility functions shared across upload and ingestion flows.
+ * Usage: Import these helpers from frontend forms and media-processing components.
+ * Invariants/Assumptions: Unknown inputs must fail closed to null or "unknown" classifications.
+ */
+
 import { ContentSource, MediaType } from "@/constants/media";
 
 // Default video extensions to use if the dynamic ones aren't available
@@ -74,7 +82,7 @@ export function autoSelectMediaTypeForUrl(url: string): MediaType | null {
  * @returns 'video', 'audio', or 'unknown'
  */
 export function detectFileType(file: File): "video" | "audio" | "unknown" {
-	if (!file || !file.type) return "unknown";
+	if (!file?.type) return "unknown";
 
 	if (file.type.startsWith("video/")) {
 		return "video";

@@ -1,13 +1,13 @@
-"""
-Audio adapter - wraps morphio-core audio processing functions.
-
-Handles audio chunking and transcription with type conversion between
-morphio-io schema types and morphio-core types.
+"""Purpose: Adapt morphio-core audio APIs for morphio-io backend workflows.
+Responsibilities: Validate transcription options, translate types, and normalize core exceptions.
+Scope: Backend adapter layer between morphio-io schemas and morphio-core audio primitives.
+Usage: Imported by backend audio services for chunking and local transcription.
+Invariants/Assumptions: Whisper model names are validated before reaching morphio-core.
 """
 
 import asyncio
 from pathlib import Path
-from typing import List, Tuple
+from typing import Final, List, Tuple
 
 from morphio_core.audio import chunking as core_chunking
 from morphio_core.audio import transcription as core_transcription
@@ -233,13 +233,36 @@ async def cleanup_chunks(chunk_paths: List[str]) -> None:
 # --- Transcription Functions ---
 
 
+_VALID_WHISPER_MODELS: Final[dict[str, core_types.WhisperModel]] = {
+    "tiny": "tiny",
+    "base": "base",
+    "small": "small",
+    "medium": "medium",
+    "large": "large",
+    "large-v3": "large-v3",
+    "turbo": "turbo",
+}
+
+
+def _resolve_whisper_model(model_name: str) -> core_types.WhisperModel:
+    """Return a validated Whisper model name for morphio-core."""
+    resolved_model = _VALID_WHISPER_MODELS.get(model_name)
+    if resolved_model is None:
+        valid_models = ", ".join(_VALID_WHISPER_MODELS)
+        raise ApplicationException(
+            message=f"Unsupported Whisper model '{model_name}'. Expected one of: {valid_models}",
+            status_code=400,
+        )
+    return resolved_model
+
+
 def _create_transcriber(
     model_name: str = "small",
     word_timestamps: bool = False,
 ) -> core_transcription.Transcriber:
     """Create a configured Transcriber instance."""
     config = core_types.TranscriptionConfig(
-        model=model_name,  # type: ignore[arg-type]
+        model=_resolve_whisper_model(model_name),
         backend="auto",
         device="auto",
         word_timestamps=word_timestamps,

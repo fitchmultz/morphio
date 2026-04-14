@@ -1,19 +1,56 @@
-"""
-Main CLI application for morphio-core.
-
-Commands:
-- transcribe: Transcribe audio files using local Whisper
-- validate-url: Validate URLs for SSRF protection
-- info: Show system information and available backends
+"""Purpose: Expose morphio-core command-line utilities for local workflows.
+Responsibilities: Parse CLI arguments, validate user input, and render human-friendly output.
+Scope: Optional CLI entrypoint for transcription, URL validation, and environment inspection.
+Usage: Installed as the `morphio` console script when the `cli` extra is available.
+Invariants/Assumptions: CLI-only dependencies are optional and should raise a clear install hint when missing.
 """
 
+import importlib
 from enum import StrEnum
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
 
-import typer
-from rich.console import Console
-from rich.table import Table
+from morphio_core.audio.types import WhisperModel
+from morphio_core.exceptions import OptionalDependencyError
+
+
+def _import_cli_dependency(module_name: str) -> Any:
+    """Import a CLI-only dependency with a clear extra-install hint."""
+    try:
+        return importlib.import_module(module_name)
+    except ImportError as e:
+        raise OptionalDependencyError(
+            package=module_name,
+            extra="cli",
+            pip_package="typer rich",
+        ) from e
+
+
+typer: Any = _import_cli_dependency("typer")
+Console = _import_cli_dependency("rich.console").Console
+Table = _import_cli_dependency("rich.table").Table
+
+_VALID_WHISPER_MODELS: dict[str, WhisperModel] = {
+    "tiny": "tiny",
+    "base": "base",
+    "small": "small",
+    "medium": "medium",
+    "large": "large",
+    "large-v3": "large-v3",
+    "turbo": "turbo",
+}
+
+
+def _resolve_whisper_model(model_name: str) -> WhisperModel:
+    """Return a validated Whisper model name for CLI configuration."""
+    resolved_model = _VALID_WHISPER_MODELS.get(model_name)
+    if resolved_model is None:
+        valid_models = ", ".join(_VALID_WHISPER_MODELS)
+        raise typer.BadParameter(
+            f"Unsupported Whisper model '{model_name}'. Expected one of: {valid_models}"
+        )
+    return resolved_model
+
 
 app = typer.Typer(
     name="morphio",
@@ -56,7 +93,7 @@ def transcribe(
         raise typer.Exit(1)
 
     config = TranscriptionConfig(
-        model=model,
+        model=_resolve_whisper_model(model),
         language=language,
         word_timestamps=word_timestamps,
         backend=backend.value,
@@ -80,7 +117,7 @@ def transcribe(
     if output:
         import json
 
-        output_data = {
+        output_data: dict[str, Any] = {
             "text": result.text,
             "language": result.language,
             "duration": result.duration,
@@ -122,7 +159,7 @@ def validate_url(
     """Validate a URL for SSRF protection."""
     from morphio_core.security import SSRFBlockedError, URLValidator, URLValidatorConfig
 
-    config = URLValidatorConfig(allow_private_ips=allow_private)
+    config = URLValidatorConfig(block_private=not allow_private)
     validator = URLValidator(config)
 
     try:

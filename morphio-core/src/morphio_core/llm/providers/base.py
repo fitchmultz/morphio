@@ -1,4 +1,9 @@
-"""Base protocol for LLM providers."""
+"""Purpose: Define the shared protocol for morphio-core LLM providers.
+Responsibilities: Specify generate/stream contracts and accepted provider kwargs.
+Scope: Protocol typing for router/provider interoperability.
+Usage: Implemented by concrete provider classes and consumed by router abstractions.
+Invariants/Assumptions: Providers must support both full-response and streaming workflows.
+"""
 
 from collections.abc import AsyncIterator
 from typing import Any, Protocol, runtime_checkable
@@ -48,7 +53,7 @@ class LLMProvider(Protocol):
         """
         ...
 
-    async def stream(
+    def stream(
         self,
         messages: list[Message],
         *,
@@ -70,5 +75,3 @@ class LLMProvider(Protocol):
             StreamDelta for content chunks, StreamDone at end
         """
         ...
-        # This is a protocol method signature - yield is for type hint only
-        yield  # type: ignore[misc]

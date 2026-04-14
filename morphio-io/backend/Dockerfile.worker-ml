@@ -45,9 +45,7 @@ COPY --from=builder /app/morphio-io/backend /app
 
 ENV PATH="/app/.venv/bin:$PATH"
 
-# Replace torch with CPU version to keep image size manageable in Docker
-RUN pip install torch torchaudio torchvision --index-url https://download.pytorch.org/whl/cpu
-
+# Keep the runtime environment lockfile-driven for reproducible ML builds.
 EXPOSE 8001
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
   CMD curl -fsS http://localhost:8001/health/ || exit 1

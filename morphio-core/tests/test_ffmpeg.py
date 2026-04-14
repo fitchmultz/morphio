@@ -1,5 +1,8 @@
-"""
-Tests for FFmpeg utilities.
+"""Purpose: Verify FFmpeg utility helpers behave correctly across common scenarios.
+Responsibilities: Cover detection, configuration, and command-execution behavior for FFmpeg helpers.
+Scope: Unit and integration-style tests for `morphio_core.media.ffmpeg`.
+Usage: Executed by pytest as part of morphio-core's media test suite.
+Invariants/Assumptions: Tests skip when FFmpeg binaries are unavailable on the host.
 """
 
 import shutil
@@ -203,7 +206,7 @@ class TestFFmpegConfig:
         """Test that FFmpegConfig is immutable."""
         config = FFmpegConfig()
         with pytest.raises(AttributeError):
-            config.ffmpeg_path = "/new/path"  # type: ignore[misc]
+            exec("config.ffmpeg_path = '/new/path'", {}, {"config": config})
 
     def test_ensure_ffmpeg_with_config(self):
         """Test ensure_ffmpeg_available accepts config."""

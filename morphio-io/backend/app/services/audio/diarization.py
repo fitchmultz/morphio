@@ -1,10 +1,8 @@
-"""
-Speaker diarization service using pyannote-audio.
-
-This module handles speaker diarization with subprocess isolation
-to prevent memory conflicts between PyTorch and MLX on Apple Silicon.
-The subprocess approach ensures that PyTorch's MPS backend doesn't
-compete with MLX for Metal GPU memory.
+"""Purpose: Run speaker diarization with optional pyannote-audio acceleration.
+Responsibilities: Load diarization pipelines lazily, isolate heavy ML execution, and normalize results.
+Scope: Backend diarization service paths for same-process and subprocess execution.
+Usage: Imported by audio-processing flows when speaker diarization is enabled.
+Invariants/Assumptions: Optional pyannote dependencies may be absent in baseline installs and must fail gracefully.
 """
 
 import asyncio
@@ -36,7 +34,10 @@ def _load_pipeline():
     global _diarization_pipeline
     if _diarization_pipeline is None:
         try:
-            from pyannote.audio import Pipeline  # type: ignore[import-untyped]
+            pyannote_audio = importlib.import_module("pyannote.audio")
+            pipeline_type = getattr(pyannote_audio, "Pipeline", None)
+            if pipeline_type is None:
+                raise ImportError("pyannote.audio.Pipeline is unavailable")
 
             hf_token = settings.HUGGING_FACE_TOKEN.get_secret_value()
             if not hf_token:
@@ -47,7 +48,10 @@ def _load_pipeline():
                 )
 
             logger.info(f"Loading diarization model: {settings.DIARIZATION_MODEL}")
-            loaded_pipeline = Pipeline.from_pretrained(settings.DIARIZATION_MODEL, token=hf_token)
+            loaded_pipeline = pipeline_type.from_pretrained(
+                settings.DIARIZATION_MODEL,
+                token=hf_token,
+            )
             if loaded_pipeline is None:
                 raise RuntimeError("Pipeline.from_pretrained returned None")
 

@@ -1,4 +1,9 @@
-"""Tests for LLM module."""
+"""Purpose: Validate morphio-core LLM models, router behavior, and parsing helpers.
+Responsibilities: Exercise message models, provider wiring, streaming types, and utility helpers.
+Scope: pytest coverage for the `morphio_core.llm` package.
+Usage: Executed by pytest as part of the morphio-core test suite.
+Invariants/Assumptions: Tests remain provider-agnostic unless explicitly mocking SDK-specific behavior.
+"""
 
 import pytest
 from pydantic import SecretStr
@@ -33,8 +38,8 @@ class TestMessage:
 
     def test_message_roles(self):
         """Test all valid roles."""
-        for role in ["system", "user", "assistant"]:
-            msg = Message(role=role, content="test")  # type: ignore[arg-type]
+        for role in ("system", "user", "assistant"):
+            msg = Message(role=role, content="test")
             assert msg.role == role
 
     def test_message_immutable(self):

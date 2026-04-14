@@ -4,8 +4,10 @@ FROM node:25-alpine AS builder
 WORKDIR /app
 
 # Install dependencies first (better layer caching)
-COPY frontend/package.json frontend/pnpm-lock.yaml ./
-RUN npm install -g "$(node -p "require('./package.json').packageManager.split('+')[0]")"
+COPY frontend/package.json frontend/pnpm-lock.yaml frontend/pnpm-workspace.yaml ./
+RUN npm install -g corepack --force \
+ && corepack enable \
+ && corepack prepare "$(node -p "require('./package.json').packageManager")" --activate
 RUN apk add --no-cache python3 make g++ \
  && pnpm install --frozen-lockfile
 
@@ -41,8 +43,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/src ./src
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 
-# Keep pnpm version aligned with packageManager from package.json
-RUN npm install -g "$(node -p "require('./package.json').packageManager.split('+')[0]")"
+# Keep pnpm bootstrap aligned with the integrity-pinned packageManager from package.json
+RUN npm install -g corepack --force \
+ && corepack enable \
+ && corepack prepare "$(node -p "require('./package.json').packageManager")" --activate
 
 USER nextjs
 

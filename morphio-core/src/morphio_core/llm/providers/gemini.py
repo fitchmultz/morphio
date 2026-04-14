@@ -1,4 +1,9 @@
-"""Google Gemini provider implementation."""
+"""Purpose: Implement Google Gemini support for morphio-core's provider interface.
+Responsibilities: Convert messages, configure Gemini requests, and normalize sync/stream responses.
+Scope: Gemini-specific API integration behind the generic LLM provider contract.
+Usage: Instantiated by the router when Gemini is configured as an available provider.
+Invariants/Assumptions: google-genai remains an optional dependency and thinking levels must respect model limits.
+"""
 
 import logging
 from collections.abc import AsyncIterator
@@ -71,7 +76,7 @@ class GeminiProvider:
     def provider_name(self) -> str:
         return "gemini"
 
-    def _convert_messages(self, messages: list[Message]) -> tuple[list[dict[str, Any]], str | None]:
+    def _convert_messages(self, messages: list[Message]) -> tuple[list[Any], str | None]:
         """Convert messages to Gemini format.
 
         Extracts system messages and converts the rest to Gemini's format.
@@ -82,7 +87,7 @@ class GeminiProvider:
         from google.genai import types  # type: ignore[import-not-found]
 
         system_parts: list[str] = []
-        contents: list[dict[str, Any]] = []
+        contents: list[Any] = []
 
         for msg in messages:
             if msg.role == "system":
@@ -144,8 +149,14 @@ class GeminiProvider:
                         f"Gemini Pro models only support {', '.join(sorted(PRO_THINKING_LEVELS))}, got '{level}'. "
                         f"Use 'high' or 'low' for Pro models."
                     )
+                thinking_levels = {
+                    "minimal": types.ThinkingLevel.MINIMAL,
+                    "low": types.ThinkingLevel.LOW,
+                    "medium": types.ThinkingLevel.MEDIUM,
+                    "high": types.ThinkingLevel.HIGH,
+                }
                 config_params["thinking_config"] = types.ThinkingConfig(
-                    thinking_level=level.upper()
+                    thinking_level=thinking_levels[level]
                 )
 
         return types.GenerateContentConfig(**config_params)

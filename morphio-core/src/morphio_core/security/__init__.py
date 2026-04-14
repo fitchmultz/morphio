@@ -1,9 +1,11 @@
+"""Purpose: Expose morphio-core security primitives as a cohesive public surface.
+Responsibilities: Re-export anonymization tools, URL validation types, and security exceptions.
+Scope: Package-level convenience imports for consumers of morphio-core security features.
+Usage: Import security helpers from `morphio_core.security`.
+Invariants/Assumptions: Public re-exports stay aligned with the underlying security modules.
 """
-Security utilities.
 
-Provides content anonymization and URL validation with SSRF protection.
-"""
-
+from morphio_core.exceptions import SSRFBlockedError
 from morphio_core.security.anonymizer import (
     Anonymizer,
     anonymize_content,
@@ -18,4 +20,5 @@ __all__ = [
     "deanonymize_content",
     "URLValidator",
     "URLValidatorConfig",
+    "SSRFBlockedError",
 ]

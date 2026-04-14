@@ -5,9 +5,10 @@ Usage: Imported by route and service modules that orchestrate web content ingest
 Invariants/Assumptions: Optional browser dependencies remain explicitly typed and failures are surfaced through service errors.
 """
 
+import importlib
 import json
 import logging
-from typing import Optional
+from typing import Any, Optional
 
 import httpx
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -65,7 +66,10 @@ async def scrape_webpage(url: str) -> str:
     else:
         # Local fallback using Playwright (requires crawler deps)
         try:
-            from playwright.async_api import async_playwright  # type: ignore[import-untyped]
+            playwright_async_api = importlib.import_module("playwright.async_api")
+            async_playwright: Any = getattr(playwright_async_api, "async_playwright", None)
+            if async_playwright is None:
+                raise ImportError("playwright.async_api.async_playwright is unavailable")
         except Exception as e:  # pragma: no cover
             logger.error(f"Playwright not available: {e}")
             raise ApplicationException("Crawler not available", 501)

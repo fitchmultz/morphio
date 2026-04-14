@@ -5,11 +5,12 @@ Usage: Imported by Uvicorn and ancillary tooling such as OpenAPI export flows.
 Invariants/Assumptions: Development startup should remain functional without optional services while reserving warning-level noise for production-significant degradations.
 """
 
+import importlib
 import logging
 import os
 import uuid
 from contextlib import asynccontextmanager
-from typing import Optional
+from typing import Any, Optional
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -93,8 +94,7 @@ async def lifespan(app: FastAPI):
 
         if sys.platform == "darwin" and platform.machine() in {"arm64", "aarch64"}:
             try:
-                import mlx.core as mx  # type: ignore[import-untyped]
-
+                mx: Any = importlib.import_module("mlx.core")
                 mx.eval(mx.array([1.0]))
                 logger.info("MLX Metal backend verified")
             except ImportError:
@@ -124,9 +124,8 @@ app = FastAPI(
 )
 
 # Add middleware using the standard pattern
-# ty false positive: https://github.com/astral-sh/ty/issues/1635
 app.add_middleware(
-    CORSMiddleware,  # ty: ignore[invalid-argument-type]
+    CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
     allow_origin_regex=settings.local_dev_origin_regex,
     allow_credentials=True,
@@ -141,9 +140,9 @@ app.add_middleware(
         "Pragma",
     ],
 )
-app.add_middleware(SecurityHeadersMiddleware)  # ty: ignore[invalid-argument-type]
-app.add_middleware(SecurityLoggingMiddleware)  # ty: ignore[invalid-argument-type]
-app.add_middleware(CSRFMiddleware)  # ty: ignore[invalid-argument-type]
+app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(SecurityLoggingMiddleware)
+app.add_middleware(CSRFMiddleware)
 
 init_limiter(app)
 logger.info("CSRF middleware registered (prod-only enforcement for cookie flows)")
