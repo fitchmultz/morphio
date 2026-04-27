@@ -1,3 +1,10 @@
+"""Purpose: Create, validate, revoke, and rotate JWT security tokens.
+Responsibilities: Normalize token subjects, apply expiry metadata, and emit security audit events.
+Scope: Backend authentication token helpers only.
+Usage: Called by auth routes and security services when issuing or validating JWTs.
+Invariants/Assumptions: Token subjects are persisted user IDs encoded as strings.
+"""
+
 import logging
 import secrets
 from datetime import timedelta
@@ -40,13 +47,11 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     if "jti" not in to_encode:
         to_encode["jti"] = secrets.token_hex(16)
 
-    # Ensure we're using the user's ID, not email
-    if "sub" in to_encode and isinstance(to_encode["sub"], User):
-        to_encode["sub"] = str(to_encode["sub"].id)
-    elif "sub" in to_encode and isinstance(to_encode["sub"], str):
-        # If it's already a string, assume it's the user ID
-        pass
-    else:
+    # Ensure we're using the user's ID, not email.
+    subject = to_encode.get("sub")
+    if isinstance(subject, User):
+        to_encode["sub"] = str(subject.id)
+    elif not isinstance(subject, str):
         error_msg = "Invalid subject for token"
 
         # Log token creation failure

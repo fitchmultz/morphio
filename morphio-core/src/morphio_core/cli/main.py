@@ -111,7 +111,8 @@ def transcribe(
     console.print("\n[green]Transcription complete![/green]")
     console.print(f"Backend: {result.backend_used} ({result.device_used})")
     console.print(f"Language: {result.language or 'auto-detected'}")
-    console.print(f"Duration: {result.duration:.1f}s" if result.duration else "")
+    if result.duration is not None:
+        console.print(f"Duration: {result.duration:.1f}s")
     console.print()
 
     if output:

@@ -1,3 +1,10 @@
+"""Purpose: Define API schemas for content comments.
+Responsibilities: Validate comment input and serialize comment responses.
+Scope: Pydantic models for comment route payloads only.
+Usage: Imported by content comment routes and services.
+Invariants/Assumptions: Comment text is non-empty and bounded to 5,000 characters.
+"""
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -9,8 +16,7 @@ class CommentCreate(CommentBase):
     parent_id: int | None = None
 
 
-class CommentUpdate(CommentBase):
-    pass
+class CommentUpdate(CommentBase): ...
 
 
 class CommentOut(CommentBase):

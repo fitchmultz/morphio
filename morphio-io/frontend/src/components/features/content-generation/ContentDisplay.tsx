@@ -193,8 +193,6 @@ const ContentDisplay: React.FC<ContentDisplayProps> = React.memo(
 									}: CodeProps) => {
 										const htmlProps =
 											props as React.HTMLAttributes<HTMLElement>;
-										// eslint-disable-next-line @typescript-eslint/no-unused-vars
-										const _match = /language-(\w+)/.exec(className || "");
 
 										if (inline) {
 											return (

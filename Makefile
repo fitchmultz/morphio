@@ -12,10 +12,10 @@
 	env install install-backend install-frontend install-full install-crawler install-ml install-ml-apple install-core-video install-core-whisper-cpu install-core-whisper-mlx \
 	update update-backend update-frontend \
 	dev dev-full dev-docker \
-	staging-secrets staging-up staging-down staging-logs staging-smoke \
+	staging-secrets staging-build staging-up staging-down staging-logs staging-smoke \
 	test test-native test-core test-io \
 	lint lint-native lint-core lint-io \
-	type-check type-check-native type-check-core type-check-io \
+	type-check type-check-core type-check-io \
 	format format-native format-core format-io \
 	generate build build-native build-frontend \
 	ci ci-fast check check-native check-core check-io audit-imports secrets-scan secrets-scan-history \

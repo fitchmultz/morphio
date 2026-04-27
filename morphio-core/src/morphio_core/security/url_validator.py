@@ -147,8 +147,8 @@ class URLValidator:
 
             return False
 
-        except Exception:
-            # Any parsing error - block by default
+        except TypeError, ValueError, UnicodeError:
+            # URL parsing/port-decoding errors are blocked by default (fail closed).
             return True
 
     def validate(self, url: str) -> None:

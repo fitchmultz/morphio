@@ -46,8 +46,9 @@ def has_nvidia_gpu() -> bool:
         try:
             ctranslate2 = _import_optional_module("ctranslate2")
             return "cuda" in ctranslate2.get_supported_compute_types("default")
-        except Exception:
-            pass
+        except ImportError, AttributeError, RuntimeError, OSError:
+            # Optional backend probes must never prevent the nvidia-smi fallback.
+            return shutil.which("nvidia-smi") is not None
 
     # Fallback: check for nvidia-smi (indicates CUDA drivers present)
     return shutil.which("nvidia-smi") is not None

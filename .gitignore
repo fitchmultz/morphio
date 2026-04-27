@@ -22,6 +22,9 @@ plans/
 
 # Python
 __pycache__/
+.pytest_cache/
+.ruff_cache/
+.benchmarks/
 *.py[cod]
 *$py.class
 .Python
@@ -44,6 +47,10 @@ node_modules/
 
 # Rust build artifacts
 morphio-native/target/
+
+# Local runtime outputs
+log_files/
+uploads/
 
 # Security scan outputs
 .gitleaks-report.json

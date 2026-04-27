@@ -17,10 +17,11 @@ This monorepo uses **uv workspaces** with a single `.venv` at the root.
 
 ```bash
 # From monorepo root (recommended)
-make install      # Install all deps (Python + frontend)
+make env          # Create/refresh local .env values
+make install      # Install baseline Python/Rust/frontend deps
+make ci-fast      # Fast local PR-parity checks
 make dev          # Start backend + frontend
-make ci           # Full CI gate (required for PRs)
-make test         # Run all tests
+make ci           # Full CI gate before PR/commit handoff
 
 # Or work in subdirectories
 cd morphio-io && make dev
@@ -58,7 +59,7 @@ morphio-core = { workspace = true }
 ### Working on morphio-io (web app)
 See `morphio-io/CLAUDE.md` for detailed guidelines. Key points:
 - Run `make ci` before commits (from root or `morphio-io/`)
-- Backend: FastAPI with Python 3.13+
+- Backend: FastAPI with Python 3.14+
 - Frontend: Next.js with TypeScript, pnpm, Biome
 
 ### Working on morphio-core (library)
@@ -70,7 +71,7 @@ See `morphio-core/CLAUDE.md` for detailed guidelines. Key points:
 ### Cross-Project Changes
 Since both projects share the same `.venv`, changes are immediately available:
 1. Update morphio-core
-2. Run tests: `make test` (runs both projects)
+2. Run tests: `make test` (runs native, core, and io checks)
 3. Update morphio-io adapters if needed
 
 ## Testing

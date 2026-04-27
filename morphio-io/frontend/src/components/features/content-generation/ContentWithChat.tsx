@@ -126,12 +126,11 @@ const ContentWithChat: React.FC<ContentWithChatProps> = ({
 	const error = conversation.error || chatMessages.error;
 
 	// Scroll to bottom when messages change
-	// biome-ignore lint/correctness/useExhaustiveDependencies: intentionally trigger on messages.length change
 	useEffect(() => {
 		if (listRef.current) {
 			listRef.current.scrollTop = listRef.current.scrollHeight;
 		}
-	}, [conversation.messages.length]);
+	});
 
 	return (
 		<div className={cn("space-y-4", className)}>

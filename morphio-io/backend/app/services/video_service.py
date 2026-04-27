@@ -1,3 +1,10 @@
+"""Purpose: Preserve the legacy video-processing facade used by cache-focused callers and tests.
+Responsibilities: Coordinate transcript caching, content generation, and persistence for video inputs.
+Scope: Compatibility orchestration layer only; new runtime video processing lives under app.services.video.
+Usage: Imported by tests and the app.services.video package as process_video.
+Invariants/Assumptions: YouTube transcript helpers return plain transcript text and must cache by video ID.
+"""
+
 from __future__ import annotations
 
 import json
@@ -23,13 +30,22 @@ from ..adapters.video import get_yt_video_id
 from .generation.core import generate_content_from_transcript
 from .generation.storage import save_generated_content
 from .job.status import update_job_status
-from .video.processing import process_local_video
+from .video.processing import process_local_video, process_online_video
 
 
 async def process_youtube_video(url: str, output_directory: Optional[str] = None) -> str:
-    """Thin wrapper used by tests; in production, handled by process_online_video elsewhere."""
-    # This function is expected by tests and is patched there.
-    raise NotImplementedError
+    """Return transcript text for a YouTube URL through the canonical online processor."""
+    result = await process_online_video(
+        url,
+        output_directory or settings.UPLOAD_DIR,
+        job_id="legacy-youtube-wrapper",
+        is_youtube=True,
+    )
+    if result.error or not result.text:
+        raise ApplicationException(
+            result.error or "YouTube transcript processing returned empty text", 500
+        )
+    return result.text
 
 
 async def load_template(template_id: int, db: AsyncSession) -> str:

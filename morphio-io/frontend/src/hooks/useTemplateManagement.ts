@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import {
 	deleteTemplate as deleteTemplateSdk,
 	saveTemplate,
@@ -25,11 +25,20 @@ export interface UseTemplateManagementReturn {
 	isPinned: (templateId: number) => boolean;
 }
 
+const sortTemplatesByPinned = (templates: TemplateOut[]): TemplateOut[] =>
+	templates.slice().sort((a, b) => {
+		const aPinned = isTemplatePinned(a.id);
+		const bPinned = isTemplatePinned(b.id);
+		if (aPinned && !bPinned) return -1;
+		if (!aPinned && bPinned) return 1;
+		return a.name.localeCompare(b.name);
+	});
+
 export function useTemplateManagement({
 	templates,
 	refetch,
 }: UseTemplateManagementOptions): UseTemplateManagementReturn {
-	const [pinnedRefresh, setPinnedRefresh] = useState(0);
+	const [, setPinnedRefresh] = useState(0);
 
 	const cloneDefaultTemplate = useCallback(
 		async (template: TemplateOut) => {
@@ -99,27 +108,8 @@ export function useTemplateManagement({
 		return isTemplatePinned(templateId);
 	}, []);
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: pinnedRefresh triggers recalculation when pins change (localStorage-based)
-	const pinnedDefault = useMemo(() => {
-		return templates.default.slice().sort((a, b) => {
-			const aPinned = isTemplatePinned(a.id);
-			const bPinned = isTemplatePinned(b.id);
-			if (aPinned && !bPinned) return -1;
-			if (!aPinned && bPinned) return 1;
-			return a.name.localeCompare(b.name);
-		});
-	}, [templates.default, pinnedRefresh]);
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies: pinnedRefresh triggers recalculation when pins change (localStorage-based)
-	const pinnedCustom = useMemo(() => {
-		return templates.custom.slice().sort((a, b) => {
-			const aPinned = isTemplatePinned(a.id);
-			const bPinned = isTemplatePinned(b.id);
-			if (aPinned && !bPinned) return -1;
-			if (!aPinned && bPinned) return 1;
-			return a.name.localeCompare(b.name);
-		});
-	}, [templates.custom, pinnedRefresh]);
+	const pinnedDefault = sortTemplatesByPinned(templates.default);
+	const pinnedCustom = sortTemplatesByPinned(templates.custom);
 
 	return {
 		pinnedDefault,

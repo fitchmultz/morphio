@@ -1,3 +1,10 @@
+"""Purpose: Stream job-status updates to authenticated clients over WebSockets.
+Responsibilities: Authenticate socket requests, authorize job ownership, and relay Redis status events.
+Scope: WebSocket route handlers for job status only.
+Usage: Mounted by the FastAPI application router.
+Invariants/Assumptions: Redis pub/sub payloads are JSON-compatible job status dictionaries.
+"""
+
 import json
 import logging
 from typing import Any
@@ -62,6 +69,7 @@ async def job_status_ws(
     try:
         current_user = await get_current_user(token=token, db=db)
     except Exception:
+        logger.debug("WebSocket authentication rejected", exc_info=True)
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
         return
 
@@ -131,5 +139,5 @@ async def job_status_ws(
         try:
             await pubsub.unsubscribe(channel)
         except Exception:
-            pass
+            logger.debug("Failed to unsubscribe job-status pubsub channel", exc_info=True)
         await pubsub.close()
