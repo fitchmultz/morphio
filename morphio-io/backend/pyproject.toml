@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling>=1.25"]
+requires = ["hatchling>=1.29.0"]
 build-backend = "hatchling.build"
 
 [project]
@@ -54,7 +54,7 @@ dependencies = [
   "moviepy",
 
   # Video summarization (scene detection only; Gemini via morphio-core[llm])
-  "scenedetect[opencv]>=0.6",
+  "scenedetect[opencv]>=0.6.7.1",
 ]
 
 [dependency-groups]
@@ -63,7 +63,7 @@ dev = [
   "pytest-asyncio",
   "pytest-cov",
   "ruff",
-  "ty>=0.0.21",
+  "ty>=0.0.32",
 ]
 
 # Crawler service - only needs playwright for web scraping
@@ -78,8 +78,8 @@ ml = [
   "torchvision",
   "openai-whisper",
   "pyannote-audio>=4.0.4",
-  "numba>=0.64.0",  # Keep the ML stack aligned with current Python 3.14 wheels.
-  "llvmlite>=0.46.0",  # Required by current numba releases.
+  "numba>=0.65.1",  # Keep the ML stack aligned with current Python 3.14 wheels.
+  "llvmlite>=0.47.0",  # Required by current numba releases.
 ]
 
 # Apple Silicon local dev only (not used in Docker)

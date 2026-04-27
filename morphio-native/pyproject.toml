@@ -6,7 +6,7 @@ requires-python = ">=3.14"
 license = "MIT"
 
 [build-system]
-requires = ["maturin>=1.12.6,<2.0"]
+requires = ["maturin>=1.13.1,<2.0"]
 build-backend = "maturin"
 
 [tool.maturin]

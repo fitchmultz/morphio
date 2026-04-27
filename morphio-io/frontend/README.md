@@ -7,7 +7,7 @@ This is the frontend application for Morphio, a platform for generating content 
 ### Prerequisites
 
 - Node.js v25 or higher (see `.nvmrc`)
-- pnpm v10.30.3 (managed via `packageManager` field)
+- pnpm v10.33.0 (managed via `packageManager` field)
 
 ### Installation
 

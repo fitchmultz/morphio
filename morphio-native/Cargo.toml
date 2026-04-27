@@ -10,8 +10,8 @@ name = "morphio_native"
 crate-type = ["cdylib"]
 
 [dependencies]
-pyo3 = "0.28.2"
-regex = "1.12"
+pyo3 = "0.28.3"
+regex = "1.12.3"
 intervaltree = "0.2.7"
 ahash = "0.8.12"
 xxhash-rust = { version = "0.8.15", features = ["xxh3"] }
