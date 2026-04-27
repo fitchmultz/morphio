@@ -29,7 +29,6 @@ from .protection import (
 from .tokens import (
     create_access_token,
     create_refresh_token,
-    create_token,
     verify_token,
 )
 
@@ -51,7 +50,6 @@ __all__ = [
     # Token management
     "create_access_token",
     "create_refresh_token",
-    "create_token",
     "verify_token",
     # Authorization
     "Permission",

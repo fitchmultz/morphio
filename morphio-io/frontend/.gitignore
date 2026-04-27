@@ -13,6 +13,7 @@ uploads
 # next.js
 /.next/
 /out/
+/.swc/
 
 # production
 /build
@@ -32,6 +33,7 @@ output_files
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+openapi-ts-error-*.log
 
 # local env files
 .env*.local

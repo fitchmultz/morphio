@@ -129,7 +129,7 @@ The current implementation routes model access through `morphio-core` and adapte
    From the repo root:
 
    ```bash
-   cp .env.example .env
+   make env
    make install
    make ci
    make dev
@@ -138,10 +138,10 @@ The current implementation routes model access through `morphio-core` and adapte
 4. **Manual backend setup (optional)**:
 
   ```bash
-  cp .env.example .env  # Edit with your credentials
+  make env             # Creates/refreshes the repo-root .env
   cd morphio-io/backend
-  uv sync --dev         # Install project deps + dev tools (ruff, pytest, etc.)
-  alembic upgrade head  # Run database migrations
+  uv sync --dev        # Install project deps + dev tools (ruff, pytest, etc.)
+  alembic upgrade head # Run database migrations
   ```
 
 5. **Manual frontend setup (optional)**:
@@ -155,7 +155,7 @@ The current implementation routes model access through `morphio-core` and adapte
 6. **Docker Setup**:
 
    ```bash
-   cp .env.example .env  # Configure environment variables
+   make env  # Configure the repo-root environment file
    make -C morphio-io dev-docker
    ```
 

@@ -75,7 +75,7 @@ morphio-io/backend
     |       video.py        # Uses morphio_core.video
     |       url_validation.py  # Uses morphio_core.security
     |
-    +-- pyproject.toml      # Has morphio-core as path dependency
+    +-- pyproject.toml      # Uses morphio-core as a uv workspace dependency
             |
             v
 morphio-core/
@@ -119,7 +119,7 @@ See `morphio-io/README.md` for full documentation.
 
 | Command | Description |
 |---------|-------------|
-| `uv run pytest` | Run all 133 tests |
+| `uv run pytest` | Run morphio-core tests |
 | `uv run ruff check .` | Lint |
 | `uv run ruff format .` | Format |
 

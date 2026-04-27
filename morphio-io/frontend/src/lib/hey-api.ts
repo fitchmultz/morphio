@@ -6,9 +6,7 @@
  */
 
 import { client } from "@/client/client.gen";
-
-const API_BASE_URL =
-	process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8005";
+import { API_BASE_URL } from "@/utils/constants";
 
 // Track whether we've fired a logout event to avoid duplicates
 let logoutEventFired = false;

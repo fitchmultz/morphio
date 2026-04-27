@@ -6,8 +6,8 @@ This is the frontend application for Morphio, a platform for generating content 
 
 ### Prerequisites
 
-- Node.js v25 or higher (see `.nvmrc`)
-- pnpm v10.33.0 (managed via `packageManager` field)
+- Node.js v25 or higher (source of truth: `package.json` `engines.node`)
+- pnpm v10.33.0 (managed via `package.json` `packageManager` field)
 
 ### Installation
 
@@ -16,7 +16,6 @@ This is the frontend application for Morphio, a platform for generating content 
 3. Use Node 25 (Corepack-enabled):
 
 ```bash
-nvm use
 corepack enable
 # pnpm version is managed via package.json packageManager field
 ```

@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Any, Dict, Optional
+from typing import Any
 
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,7 +10,6 @@ from ..services.job.status import get_job_status
 from ..services.security import get_current_user
 from ..utils.cache_utils import get_redis_client, is_redis_available
 from ..utils.enums import JobStatus
-from ..utils.error_handlers import ApplicationException
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +22,7 @@ TERMINAL_STATUSES = {
 }
 
 
-def _extract_token(websocket: WebSocket) -> Optional[str]:
+def _extract_token(websocket: WebSocket) -> str | None:
     token = websocket.query_params.get("token")
     if token:
         return token
@@ -36,7 +35,7 @@ def _extract_token(websocket: WebSocket) -> Optional[str]:
     return auth_header
 
 
-def _normalize_status_payload(payload: Dict[str, Any]) -> Dict[str, Any]:
+def _normalize_status_payload(payload: dict[str, Any]) -> dict[str, Any]:
     return {
         "job_id": payload.get("job_id"),
         "status": payload.get("status"),
@@ -62,7 +61,7 @@ async def job_status_ws(
 
     try:
         current_user = await get_current_user(token=token, db=db)
-    except ApplicationException, Exception:
+    except Exception:
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
         return
 
@@ -106,7 +105,7 @@ async def job_status_ws(
             raw_data = message.get("data")
             if isinstance(raw_data, (bytes, bytearray)):
                 raw_data = raw_data.decode("utf-8", errors="ignore")
-            payload: Optional[Dict[str, Any]] = None
+            payload: dict[str, Any] | None = None
             if isinstance(raw_data, str):
                 try:
                     payload = json.loads(raw_data)

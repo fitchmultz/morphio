@@ -379,6 +379,13 @@ def sanitize_markdown(text: str) -> str:
     return core_sanitize_markdown(text)
 
 
+def strip_code_fences(text: str) -> str:
+    """Strip surrounding markdown code fences inside the adapter boundary."""
+    from morphio_core.llm import strip_code_fences as core_strip_code_fences
+
+    return core_strip_code_fences(text)
+
+
 __all__ = [
     # Core functions
     "get_llm_router",
@@ -387,6 +394,7 @@ __all__ = [
     "simple_completion",
     "convert_to_messages",
     "sanitize_markdown",
+    "strip_code_fences",
     # Response types
     "GenerationWithUsage",
     # Model resolution

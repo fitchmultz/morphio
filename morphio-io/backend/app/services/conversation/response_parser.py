@@ -4,29 +4,14 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import List, Optional, Tuple
 
+from ...adapters.llm import strip_code_fences
 from ..generation.core import sanitize_markdown
 
 logger = logging.getLogger(__name__)
 
 
-def strip_code_fences(raw: str) -> str:
-    """Remove surrounding code fences from LLM response."""
-    text = raw.strip()
-    if text.startswith("```") and text.endswith("```"):
-        lines = text.splitlines()
-        if lines and lines[0].startswith("```"):
-            lines = lines[1:]
-        while lines and lines[-1].strip() == "```":
-            lines = lines[:-1]
-        return "\n".join(lines).strip()
-    return text
-
-
-def parse_model_response(
-    raw: str, original_content: str = ""
-) -> Tuple[str, List[str], Optional[str]]:
+def parse_model_response(raw: str, original_content: str = "") -> tuple[str, list[str], str | None]:
     """Parse structured JSON response from LLM.
 
     Args:
@@ -79,7 +64,7 @@ def parse_model_response(
 
 
 def render_assistant_message(
-    updated_content: str, change_summary: List[str], notes: Optional[str]
+    updated_content: str, change_summary: list[str], notes: str | None
 ) -> str:
     """Format assistant message for display.
 
@@ -91,7 +76,7 @@ def render_assistant_message(
     Returns:
         Formatted message string
     """
-    parts: List[str] = []
+    parts: list[str] = []
     if change_summary:
         summary_block = "\n".join(f"- {item}" for item in change_summary)
         parts.append(f"### Change Summary\n{summary_block}")

@@ -1,6 +1,7 @@
 """Video downloading via yt-dlp."""
 
 import asyncio
+from importlib.util import find_spec
 from pathlib import Path
 from typing import Any
 
@@ -103,9 +104,4 @@ def has_ytdlp() -> bool:
         if has_ytdlp():
             result = await download_video_audio(url, output_dir)
     """
-    try:
-        import yt_dlp  # type: ignore[import-not-found]  # noqa: F401
-
-        return True
-    except ImportError:
-        return False
+    return find_spec("yt_dlp") is not None
