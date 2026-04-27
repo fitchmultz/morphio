@@ -1,3 +1,9 @@
+# syntax=docker/dockerfile:1.7
+# Purpose: Build the production Next.js frontend image.
+# Responsibilities: Install pnpm dependencies, compile the Next.js app, and package the runtime server as a non-root user.
+# Scope: Frontend production image only; development compose uses frontend/Dockerfile.dev.
+# Usage: docker buildx build --load -f morphio-io/frontend/Dockerfile -t morphio-io-frontend:local morphio-io
+# Invariants/Assumptions: pnpm-lock.yaml and packageManager are dependency sources of truth; Docker/BuildKit caches may be reused because lockfiles and copied source layers invalidate stale inputs.
 # Stage 1: Build the Next.js application
 FROM node:25-alpine AS builder
 
@@ -8,8 +14,9 @@ COPY frontend/package.json frontend/pnpm-lock.yaml frontend/pnpm-workspace.yaml 
 RUN npm install -g corepack --force \
  && corepack enable \
  && corepack prepare "$(node -p "require('./package.json').packageManager")" --activate
-RUN apk add --no-cache python3 make g++ \
- && pnpm install --frozen-lockfile
+RUN apk add --no-cache python3 make g++
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
+    pnpm install --frozen-lockfile
 
 # Set build env vars
 ENV NODE_ENV=production

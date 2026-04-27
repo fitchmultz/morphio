@@ -1,3 +1,9 @@
+# syntax=docker/dockerfile:1.7
+# Purpose: Build the production FastAPI API image for local CI and deployment.
+# Responsibilities: Install Python/Rust dependencies, build morphio-native, copy the backend app, and run as a non-root user.
+# Scope: Backend API runtime only; crawler and worker-ml images have separate Dockerfiles.
+# Usage: docker buildx build --load -f morphio-io/backend/Dockerfile.api -t morphio-io-backend-api:local .
+# Invariants/Assumptions: uv.lock is the dependency source of truth; Docker/BuildKit caches may be reused because lockfiles and copied source layers invalidate stale inputs.
 # Stage 1: Build with Rust and uv
 FROM python:3.14-slim AS builder
 
@@ -23,7 +29,8 @@ COPY morphio-io/backend/ morphio-io/backend/
 
 # Install dependencies (including building morphio-native)
 # --no-editable ensures runtime doesn't need source paths
-RUN uv sync --project morphio-io/backend --frozen --no-dev --no-editable
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --project morphio-io/backend --frozen --no-dev --no-editable
 
 # Stage 2: Runtime
 FROM python:3.14-slim

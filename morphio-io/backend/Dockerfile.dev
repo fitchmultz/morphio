@@ -1,3 +1,9 @@
+# syntax=docker/dockerfile:1.7
+# Purpose: Build the Docker Compose development backend image used by local smoke validation.
+# Responsibilities: Install backend dependencies, include ffmpeg, and run the development entrypoint with watch support.
+# Scope: Local development/smoke backend image; production API, crawler, and worker-ml images have separate Dockerfiles.
+# Usage: docker compose --env-file .env -f morphio-io/docker-compose.watch.yml up -d --build backend
+# Invariants/Assumptions: uv.lock is the dependency source of truth; Docker/BuildKit caches may be reused because lockfiles and copied source layers invalidate stale inputs.
 FROM python:3.14-slim AS builder
 
 WORKDIR /app
@@ -22,7 +28,8 @@ COPY morphio-io/backend/ morphio-io/backend/
 
 # Install dependencies (including building morphio-native)
 # --no-editable ensures runtime doesn't need source paths
-RUN uv sync --project morphio-io/backend --frozen --no-dev --no-editable
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --project morphio-io/backend --frozen --no-dev --no-editable
 
 # Stage 2: Runtime
 FROM python:3.14-slim
