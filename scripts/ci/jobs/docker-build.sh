@@ -45,8 +45,6 @@ if [[ "${PRUNE}" -eq 1 ]]; then
   docker image prune -af >/dev/null
 fi
 
-docker image rm -f morphio-io-backend-api:local morphio-io-crawler:local >/dev/null 2>&1 || true
-
 docker buildx build --load -f morphio-io/backend/Dockerfile.api -t morphio-io-backend-api:local .
 docker run --rm --entrypoint python -e APP_ENV=development morphio-io-backend-api:local -c "import app.services.logs; print('ok')"
 docker buildx build --load -f morphio-io/backend/Dockerfile.crawler -t morphio-io-crawler:local .
