@@ -3,7 +3,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 REPO_ROOT="$(cd "$ROOT/.." && pwd)"
-COMPOSE=(docker compose --env-file "$REPO_ROOT/.env" -f "$ROOT/docker-compose.watch.yml")
+COMPOSE=(docker compose --env-file "$REPO_ROOT/.env" -f "$ROOT/docker-compose.watch.yml" -f "$ROOT/docker-compose.ci-smoke.yml")
 
 cleanup() {
   "${COMPOSE[@]}" down -v --remove-orphans
@@ -24,7 +24,7 @@ wait_for() {
     if curl -fsS --max-time 5 "$url" >/dev/null 2>&1; then
       return 0
     fi
-    sleep 2
+    sleep 0.5
   done
   echo "Timeout waiting for $url"
   return 1

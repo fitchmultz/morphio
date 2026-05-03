@@ -1,0 +1,22 @@
+# Purpose: Provide a deterministic, faster Docker Compose overlay for local CI smoke tests.
+# Responsibilities: Remove development hot-reload bind/named volumes and shorten health probes so smoke containers run freshly built images directly.
+# Scope: Used only by morphio-io/scripts/smoke_docker.sh; interactive development continues to use docker-compose.watch.yml.
+# Usage: docker compose -f docker-compose.watch.yml -f docker-compose.ci-smoke.yml up -d --build
+# Invariants/Assumptions: The image build context contains the current source, dependencies, and generated files; avoiding dev volumes preserves Docker runtime signal without copying node_modules/.venv into transient volumes.
+services:
+  frontend:
+    volumes: !reset []
+  backend:
+    volumes: !reset []
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8005/health/"]
+      interval: 1s
+      timeout: 2s
+      retries: 60
+      start_period: 1s
+  redis:
+    healthcheck:
+      test: ["CMD", "redis-cli", "-p", "6384", "ping"]
+      interval: 1s
+      timeout: 1s
+      retries: 30
