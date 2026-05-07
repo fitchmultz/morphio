@@ -69,7 +69,7 @@ def detect_scenes(video_path: str, threshold: float = 30.0) -> list[tuple[float,
             logger.warning("No scene changes detected, using fixed intervals")
             return get_fixed_intervals(video_path)
 
-        result = [(s.get_seconds(), e.get_seconds()) for s, e in scenes]
+        result = [(s.seconds, e.seconds) for s, e in scenes]
         logger.info(f"Detected {len(result)} scenes")
         return result
 
