@@ -72,7 +72,8 @@ class User(Base, SoftDeleteMixin):
     def check_password(self, password: str) -> bool:
         try:
             return bcrypt.checkpw(password.encode("utf-8"), self.hashed_password.encode("utf-8"))
-        except Exception:
+        except (ValueError, TypeError) as exc:
+            logger.warning("Password hash verification failed for user %s: %s", self.id, exc)
             return False
 
     @hybrid_property

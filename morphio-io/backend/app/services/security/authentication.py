@@ -13,7 +13,7 @@ from ...config import settings
 from ...database import get_db
 from ...models.user import User
 from ...schemas.security_schema import PasswordComplexity
-from ...utils.error_handlers import ApplicationException, handle_application_exception
+from ...utils.error_handlers import ApplicationException
 from ...utils.security_logger import (
     SECURITY_ALERT,
     SECURITY_AUDIT,
@@ -37,14 +37,13 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
     try:
         return bcrypt.checkpw(plain_password.encode("utf-8"), hashed_password.encode("utf-8"))
-    except Exception as e:
-        logger.error(f"Error verifying password: {str(e)}")
-        # Never log password hashes - security sensitive material
+    except (ValueError, TypeError) as exc:
+        logger.error("Error verifying password hash: %s", exc)
         log_security_event(
             event_type=SecurityEventType.SUSPICIOUS_ACTIVITY,
             message="Error verifying password hash",
             level=SECURITY_ALERT,
-            details={"error": str(e)},
+            details={"error_type": type(exc).__name__},
         )
         return False
 
@@ -278,14 +277,19 @@ async def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication credentials",
         )
-    except Exception as e:
-        logger.error(f"Unexpected error in get_current_user: {str(e)}", exc_info=True)
+    except ApplicationException, HTTPException:
+        raise
+    except (TypeError, ValueError) as e:
+        logger.warning("Invalid authentication token subject", exc_info=True)
         log_security_event(
             event_type=SecurityEventType.ACCESS_DENIED,
-            message=f"Unexpected error in authentication: {str(e)}",
+            message="Invalid authentication token subject",
             level=SECURITY_ALERT,
         )
-        raise handle_application_exception(e)
+        raise ApplicationException(
+            message="Invalid authentication credentials",
+            status_code=status.HTTP_401_UNAUTHORIZED,
+        ) from e
 
 
 async def get_optional_current_user(

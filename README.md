@@ -100,7 +100,7 @@ morphio-core/
 | `make dev` | Start morphio-io dev servers |
 | `make ci-fast` | Fast local checks (same scope as PR gate) |
 | `make ci` | Full local CI gate (required before commits) |
-| `make test` | Run all tests (morphio-core + morphio-io) |
+| `make test` | Run all tests (morphio-native + morphio-core + morphio-io) |
 | `make lint` | Lint everything |
 | `make clean` | Clean all build artifacts |
 

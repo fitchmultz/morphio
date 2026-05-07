@@ -10,13 +10,14 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { getAdminUsage, getLlmUsageSummary } from "@/client";
+import { exportLlmUsage, getAdminUsage, getLlmUsageSummary } from "@/client";
 import { Skeleton } from "@/components/common/Skeleton";
 import { SystemHealthPanel } from "@/components/features/admin/SystemHealthPanel";
 import { useAuth } from "@/contexts/AuthContext";
+import { getApiErrorMessage } from "@/lib/apiError";
 import logger from "@/lib/logger";
 import { notifyError, notifySuccess } from "@/lib/toast";
-import { API_BASE_URL } from "@/utils/constants";
+import { downloadBlob } from "@/utils/export";
 
 type UsageStat = {
 	usage_id: number;
@@ -31,6 +32,15 @@ type UsageStat = {
 	updated_at?: string;
 };
 
+const isUsageStat = (value: Record<string, unknown>): value is UsageStat =>
+	typeof value.usage_id === "number" &&
+	typeof value.user_id === "number" &&
+	(value.user_email === null || typeof value.user_email === "string") &&
+	(value.display_name === null || typeof value.display_name === "string") &&
+	typeof value.usage_type === "string" &&
+	typeof value.usage_calls === "number" &&
+	typeof value.usage_points === "number";
+
 type LLMUsageSummary = {
 	total_requests: number;
 	total_tokens: number;
@@ -44,7 +54,7 @@ type LLMUsageSummary = {
 };
 
 export default function AdminPage() {
-	const { isAuthenticated, userData, loading, getToken } = useAuth();
+	const { isAuthenticated, userData, loading } = useAuth();
 	const router = useRouter();
 	const [usageData, setUsageData] = useState<UsageStat[]>([]);
 	const [isLoadingUsage, setIsLoadingUsage] = useState(true);
@@ -67,61 +77,41 @@ export default function AdminPage() {
 		}
 	}, [loading, isAuthenticated, userData, router]);
 
-	// Helper to extract error message
-	const toUserMessage = useCallback(
-		(err: unknown, fallback: string): string =>
-			err instanceof Error ? err.message : fallback,
-		[],
-	);
-
 	const handleExportCSV = useCallback(async () => {
 		if (!userData || userData.role?.toLowerCase() !== "admin") return;
 		setIsExporting(true);
 		try {
-			const params = new URLSearchParams();
-			if (exportStartDate) params.append("start", exportStartDate);
-			if (exportEndDate) params.append("end", exportEndDate);
-			params.append("format", "csv");
-			const token = getToken();
-			const headers: HeadersInit = {};
-			if (token) {
-				headers.Authorization = `Bearer ${token}`;
-			}
-
-			const response = await fetch(
-				`${API_BASE_URL}/admin/usage/export?${params.toString()}`,
-				{
-					credentials: "include",
-					headers,
+			const { data, error, response } = await exportLlmUsage({
+				parseAs: "blob",
+				query: {
+					start: exportStartDate || undefined,
+					end: exportEndDate || undefined,
+					format: "csv",
 				},
-			);
-
-			if (!response.ok) {
-				throw new Error("Failed to export usage data");
+			});
+			if (error) {
+				throw new Error(
+					getApiErrorMessage(error, "Failed to export usage data"),
+				);
 			}
-
-			const blob = await response.blob();
-			const url = window.URL.createObjectURL(blob);
-			const a = document.createElement("a");
-			a.href = url;
-			a.download =
-				response.headers
+			if (!(data instanceof Blob)) {
+				throw new Error("Usage export returned an unexpected response");
+			}
+			const filename =
+				response?.headers
 					.get("Content-Disposition")
 					?.match(/filename="(.+)"/)?.[1] || "llm_usage.csv";
-			document.body.appendChild(a);
-			a.click();
-			window.URL.revokeObjectURL(url);
-			a.remove();
+			downloadBlob(data, filename);
 
 			notifySuccess("Usage data exported successfully");
 		} catch (err) {
-			const message = toUserMessage(err, "Failed to export usage data");
+			const message = getApiErrorMessage(err, "Failed to export usage data");
 			logger.warn("Export failed", { error: message });
 			notifyError(message);
 		} finally {
 			setIsExporting(false);
 		}
-	}, [userData, exportStartDate, exportEndDate, getToken, toUserMessage]);
+	}, [userData, exportStartDate, exportEndDate]);
 
 	useEffect(() => {
 		const fetchUsageStats = async () => {
@@ -131,17 +121,23 @@ export default function AdminPage() {
 				const { data, error } = await getAdminUsage();
 				if (error) {
 					throw new Error(
-						(error as { detail?: string }).detail ||
-							"Failed to retrieve usage data",
+						getApiErrorMessage(error, "Failed to retrieve usage data"),
 					);
 				}
 				if (data?.status === "success" && data.data) {
-					setUsageData(data.data as unknown as UsageStat[]);
+					const usageStats = data.data.filter(isUsageStat);
+					if (usageStats.length !== data.data.length) {
+						throw new Error("Usage data response had an unexpected shape");
+					}
+					setUsageData(usageStats);
 				} else {
 					throw new Error(data?.message || "Failed to retrieve usage data");
 				}
 			} catch (err) {
-				const message = toUserMessage(err, "Failed to retrieve usage data");
+				const message = getApiErrorMessage(
+					err,
+					"Failed to retrieve usage data",
+				);
 				logger.warn("Usage data fetch failed", { error: message });
 				notifyError(message);
 			} finally {
@@ -156,8 +152,7 @@ export default function AdminPage() {
 				const { data, error } = await getLlmUsageSummary();
 				if (error) {
 					throw new Error(
-						(error as { detail?: string }).detail ||
-							"Failed to retrieve LLM usage summary",
+						getApiErrorMessage(error, "Failed to retrieve LLM usage summary"),
 					);
 				}
 				const responseData = data as {
@@ -168,7 +163,7 @@ export default function AdminPage() {
 					setLLMSummary(responseData.data);
 				}
 			} catch (err) {
-				const message = toUserMessage(
+				const message = getApiErrorMessage(
 					err,
 					"Failed to retrieve LLM usage summary",
 				);
@@ -181,7 +176,7 @@ export default function AdminPage() {
 
 		fetchUsageStats();
 		fetchLLMSummary();
-	}, [userData, toUserMessage]);
+	}, [userData]);
 
 	if (loading) {
 		return (

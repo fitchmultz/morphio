@@ -1,6 +1,5 @@
 import logging
 from datetime import UTC, datetime, timedelta
-from typing import Dict
 
 from fastapi import Request, status
 
@@ -11,17 +10,16 @@ from ...utils.security_logger import (
     SECURITY_AUDIT,
     SecurityEventType,
     log_security_event,
+    redact_identity,
 )
 
 logger = logging.getLogger(__name__)
 
-# Simple rate limiting
-ip_request_count: Dict[str, int] = {}
-ip_request_reset: Dict[str, datetime] = {}
+ip_request_count: dict[str, int] = {}
+ip_request_reset: dict[str, datetime] = {}
 
-# Login attempt tracking
-login_attempts: Dict[str, int] = {}
-login_attempt_reset: Dict[str, datetime] = {}
+login_attempts: dict[str, int] = {}
+login_attempt_reset: dict[str, datetime] = {}
 
 
 async def rate_limit_by_ip(request: Request, limit: int = 100, window: int = 60) -> bool:
@@ -96,14 +94,16 @@ def track_login_attempts(
         if remaining_time > 0:
             log_security_event(
                 event_type=SecurityEventType.ACCOUNT_LOCKED,
-                message=f"Login attempt on locked account: {username}",
+                message="Login attempt on locked account",
                 level=SECURITY_ALERT,
                 details={
-                    "username": username,
+                    "username_fingerprint": redact_identity(username),
                     "remaining_lockout_seconds": int(remaining_time),
                 },
             )
-            logger.warning(f"Account locked for user: {username}")
+            logger.warning(
+                "Login attempt on locked account fingerprint: %s", redact_identity(username)
+            )
             raise ApplicationException(
                 message=f"Account temporarily locked. Try again in {int(remaining_time)} seconds.",
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -114,10 +114,10 @@ def track_login_attempts(
         if username in login_attempts and login_attempts[username] > 0:
             log_security_event(
                 event_type=SecurityEventType.LOGIN_SUCCESS,
-                message=f"Successful login after {login_attempts[username]} failed attempts: {username}",
+                message=f"Successful login after {login_attempts[username]} failed attempts",
                 level=SECURITY_AUDIT,
                 details={
-                    "username": username,
+                    "username_fingerprint": redact_identity(username),
                     "previous_failed_attempts": login_attempts[username],
                 },
             )
@@ -131,12 +131,13 @@ def track_login_attempts(
         login_attempts[username] += 1
 
     # Log failed login attempt
+    username_fingerprint = redact_identity(username)
     log_security_event(
         event_type=SecurityEventType.LOGIN_FAILURE,
-        message=f"Failed login attempt for user: {username}",
+        message="Failed login attempt",
         level=SECURITY_AUDIT,
         details={
-            "username": username,
+            "username_fingerprint": username_fingerprint,
             "attempt_number": login_attempts[username],
             "max_attempts": max_attempts,
         },
@@ -147,15 +148,15 @@ def track_login_attempts(
         login_attempt_reset[username] = now + timedelta(seconds=lockout_time)
         log_security_event(
             event_type=SecurityEventType.ACCOUNT_LOCKED,
-            message=f"Account locked after {max_attempts} failed login attempts: {username}",
+            message=f"Account locked after {max_attempts} failed login attempts",
             level=SECURITY_ALERT,
             details={
-                "username": username,
+                "username_fingerprint": username_fingerprint,
                 "lockout_duration_seconds": lockout_time,
                 "lockout_until": (now + timedelta(seconds=lockout_time)).isoformat(),
             },
         )
-        logger.warning(f"Account locked for user: {username}")
+        logger.warning("Account locked for user fingerprint: %s", username_fingerprint)
         raise ApplicationException(
             message=f"Account temporarily locked for {lockout_time} seconds after too many failed attempts.",
             status_code=status.HTTP_403_FORBIDDEN,
@@ -171,10 +172,6 @@ def validate_headers(request: Request) -> bool:
     :param request: The FastAPI request
     :return: True if valid, raises exception otherwise
     """
-    # Check for common security headers (placeholder implementation)
-    # Add validation based on your security requirements
-
-    # Example: Check for missing or insecure headers
     if (
         bool(getattr(settings, "SECURITY_STRICT_TRANSPORT", False))
         and request.url.scheme != "https"
@@ -189,7 +186,6 @@ def validate_headers(request: Request) -> bool:
                 details={
                     "scheme": request.url.scheme,
                     "path": request.url.path,
-                    "headers": dict(request.headers),
                 },
             )
             logger.warning("Insecure transport detected")
@@ -234,12 +230,11 @@ def sanitize_input(input_data: str) -> str:
                 level=SECURITY_ALERT,
                 details={
                     "suspicious_pattern": pattern,
-                    "input_sample": input_data[:100] + ("..." if len(input_data) > 100 else ""),
+                    "input_length": len(input_data),
                 },
             )
             break
 
-    # Simple sanitization (in a real app, use a proper library)
     sanitized = input_data.replace("<", "&lt;").replace(">", "&gt;")
 
     return sanitized

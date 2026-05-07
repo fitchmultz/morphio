@@ -116,4 +116,4 @@ class MorphioAdapter(Protocol):
     - Thin wrappers: minimal logic, delegate to morphio-core
     """
 
-    pass
+    ...

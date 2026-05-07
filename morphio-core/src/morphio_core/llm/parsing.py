@@ -115,10 +115,8 @@ def extract_json_from_response(content: str) -> str:
             _, end = json.JSONDecoder().raw_decode(content, idx)
             return content[idx:end].strip()
     except json.JSONDecodeError:
-        # If parsing fails, fall through to returning the original content
-        pass
+        return content.strip()
 
-    # Return original content if no JSON found
     return content.strip()
 
 

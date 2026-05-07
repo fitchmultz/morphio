@@ -26,6 +26,7 @@ from ...utils.security_logger import (
     SecurityEventType,
     audit,
     log_security_event,
+    redact_identity,
     redact_token_id,
 )
 
@@ -81,7 +82,7 @@ logger = logging.getLogger(__name__)
 )
 @rate_limit("60/minute")
 @handle_route_errors
-@audit(SecurityEventType.LOGIN_ATTEMPT, "Login attempt for user: {user_login.email}")
+@audit(SecurityEventType.LOGIN_ATTEMPT, "Login attempt")
 async def login(
     request: Request,
     response: Response,
@@ -91,15 +92,16 @@ async def login(
         examples=[{"email": "user1@example.com", "password": "Str0ngP@ssword!"}],
     ),
 ):
-    logger.debug(f"Attempting login for user: {user_login.email}")
+    email_fingerprint = redact_identity(user_login.email)
+    logger.debug("Attempting login for user fingerprint: %s", email_fingerprint)
     user = await db.scalar(select(User).where(User.email == user_login.email))
     if not user:
-        logger.warning(f"Login attempt for non-existent user: {user_login.email}")
+        logger.warning("Login attempt for non-existent user fingerprint: %s", email_fingerprint)
         log_security_event(
             event_type=SecurityEventType.LOGIN_FAILURE,
-            message=f"Login attempt for non-existent user: {user_login.email}",
+            message="Login attempt for non-existent user",
             level=SECURITY_AUDIT,
-            details={"email": user_login.email, "reason": "user_not_found"},
+            details={"email_fingerprint": email_fingerprint, "reason": "user_not_found"},
         )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -110,10 +112,10 @@ async def login(
     if not user.is_active:
         log_security_event(
             event_type=SecurityEventType.LOGIN_FAILURE,
-            message=f"Login attempt for inactive account: {user_login.email}",
+            message="Login attempt for inactive account",
             level=SECURITY_AUDIT,
             user_id=user.id,
-            details={"email": user_login.email, "reason": "account_inactive"},
+            details={"email_fingerprint": email_fingerprint, "reason": "account_inactive"},
         )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -121,13 +123,16 @@ async def login(
         )
 
     if not verify_password(user_login.password, user.hashed_password):
-        logger.warning(f"Login attempt with incorrect password for user: {user_login.email}")
+        logger.warning(
+            "Login attempt with incorrect password for user id %s",
+            user.id,
+        )
         log_security_event(
             event_type=SecurityEventType.LOGIN_FAILURE,
-            message=f"Login attempt with incorrect password: {user_login.email}",
+            message="Login attempt with incorrect password",
             level=SECURITY_AUDIT,
             user_id=user.id,
-            details={"email": user_login.email, "reason": "incorrect_password"},
+            details={"email_fingerprint": email_fingerprint, "reason": "incorrect_password"},
         )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -149,18 +154,18 @@ async def login(
     # Set refresh token in secure HTTP-only cookie
     set_refresh_cookie(response, refresh_token)
 
-    logger.info(f"User logged in: {user.email}")
+    logger.info("User logged in: %s", user.id)
 
     # Log successful login
     log_security_event(
         event_type=SecurityEventType.LOGIN_SUCCESS,
-        message=f"User logged in successfully: {user.email}",
+        message="User logged in successfully",
         level=SECURITY_AUDIT,
         user_id=user.id,
         details={
-            "email": user.email,
-            "token_id": token_id,
-            "token_family": token_family,
+            "email_fingerprint": email_fingerprint,
+            "token_id": redact_token_id(token_id),
+            "token_family": redact_token_id(token_family),
         },
     )
 
@@ -224,7 +229,7 @@ async def logout(
     # Clear all auth cookies with consistent attributes
     clear_auth_cookies(response)
 
-    logger.info(f"User logged out: {current_user.email}")
+    logger.info("User logged out: %s", current_user.id)
     return create_response(
         status=ResponseStatus.SUCCESS,
         message="Logged out successfully.",

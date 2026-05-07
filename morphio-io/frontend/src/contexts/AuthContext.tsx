@@ -14,7 +14,12 @@ import {
 } from "react";
 import type { UserOut } from "@/client/types.gen";
 import eventEmitter from "@/lib/eventEmitter";
-import { resetLogoutEventFlag } from "@/lib/hey-api";
+import {
+	clearAuthToken,
+	getAuthToken,
+	resetLogoutEventFlag,
+	setAuthToken,
+} from "@/lib/hey-api";
 import logger from "@/lib/logger";
 import { notifyError, notifySuccess } from "@/lib/toast";
 import { API_BASE_URL } from "@/utils/constants";
@@ -57,7 +62,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 	const clearUserData = useCallback(() => {
 		setUserData(null);
 		setIsAuthenticated(false);
-		localStorage.removeItem("access_token");
+		clearAuthToken();
 		localStorage.removeItem("userData");
 		eventEmitter.emit("userDataCleared");
 		logger.info("User data cleared");
@@ -75,7 +80,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 					pendingLogoutRef.current = null;
 
 					// Call server logout to revoke refresh token cookie
-					const token = localStorage.getItem("access_token");
+					const token = getAuthToken();
 					if (token) {
 						try {
 							await fetch(`${API_BASE_URL}/auth/logout`, {
@@ -136,7 +141,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		// Guard against SSR - localStorage is not available on server
 		if (typeof window === "undefined") return false;
 
-		const token = localStorage.getItem("access_token");
+		const token = getAuthToken();
 		if (!token) return false;
 
 		try {
@@ -163,7 +168,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 	}, []);
 
 	useEffect(() => {
-		const token = localStorage.getItem("access_token");
+		const token = getAuthToken();
 		if (token) {
 			if (checkTokenValidity()) {
 				setIsAuthenticated(true);
@@ -203,7 +208,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 				clearTimeout(pendingLogoutRef.current);
 				pendingLogoutRef.current = null;
 			}
-			localStorage.setItem("access_token", token);
+			setAuthToken(token);
 			localStorage.setItem("userData", JSON.stringify(newUserData));
 			setIsAuthenticated(true);
 			setUserData(newUserData);
@@ -226,7 +231,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 		logger.info("User data updated", { updatedFields: Object.keys(newData) });
 	}, []);
 
-	const getToken = useCallback(() => localStorage.getItem("access_token"), []);
+	const getToken = useCallback(() => getAuthToken() ?? null, []);
 
 	// Clean up pending logout timeout on unmount
 	useEffect(() => {
@@ -284,7 +289,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
 		const refreshAccessToken = async () => {
 			try {
-				const token = localStorage.getItem("access_token");
+				const token = getAuthToken();
 				if (!token) return;
 
 				// Decode token to check when it expires
@@ -319,7 +324,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 							data.status === "success" &&
 							data.data?.access_token
 						) {
-							localStorage.setItem("access_token", data.data.access_token);
+							setAuthToken(data.data.access_token);
 							logger.info("Access token refreshed proactively");
 						} else if (response.status === 403) {
 							// CSRF token may have expired, clear and retry on next interval

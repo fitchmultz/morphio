@@ -2,19 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getAdminHealth } from "@/client";
+import type { SystemHealthOut } from "@/client/types.gen";
 import { Skeleton } from "@/components/common/Skeleton";
+import { getApiErrorMessage } from "@/lib/apiError";
 import logger from "@/lib/logger";
-
-type HealthComponent = {
-	status: string;
-	latency_ms?: number | null;
-	detail?: string | null;
-};
-
-type SystemHealthData = {
-	overall_status: string;
-	components: Record<string, HealthComponent>;
-};
 
 const STATUS_STYLES: Record<string, { label: string; className: string }> = {
 	ok: {
@@ -54,7 +45,7 @@ const formatName = (key: string) => {
 };
 
 export function SystemHealthPanel() {
-	const [health, setHealth] = useState<SystemHealthData | null>(null);
+	const [health, setHealth] = useState<SystemHealthOut | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
@@ -65,18 +56,16 @@ export function SystemHealthPanel() {
 			const { data, error: apiError } = await getAdminHealth();
 			if (apiError) {
 				throw new Error(
-					(apiError as { detail?: string }).detail ||
-						"Failed to load system health",
+					getApiErrorMessage(apiError, "Failed to load system health"),
 				);
 			}
 			if (data?.status === "success" && data.data) {
-				setHealth(data.data as SystemHealthData);
+				setHealth(data.data);
 				return;
 			}
 			throw new Error(data?.message || "Failed to load system health");
 		} catch (err) {
-			const message =
-				err instanceof Error ? err.message : "Failed to load system health";
+			const message = getApiErrorMessage(err, "Failed to load system health");
 			logger.warn("System health fetch failed", { error: message });
 			setError(message);
 		} finally {

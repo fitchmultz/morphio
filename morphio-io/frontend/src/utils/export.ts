@@ -29,6 +29,17 @@ const downloadFile = (
 	URL.revokeObjectURL(url);
 };
 
+export const downloadBlob = (blob: Blob, filename: string): void => {
+	const url = URL.createObjectURL(blob);
+	const link = document.createElement("a");
+	link.href = url;
+	link.download = sanitizeFilename(filename) || "download";
+	document.body.appendChild(link);
+	link.click();
+	document.body.removeChild(link);
+	URL.revokeObjectURL(url);
+};
+
 export const exportAsMarkdown = (content: string, title: string): void => {
 	downloadFile(content, `${sanitizeFilename(title)}.md`, "text/markdown");
 };

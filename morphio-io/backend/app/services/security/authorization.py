@@ -1,10 +1,13 @@
 import logging
 from enum import Enum
-from typing import List
 
 from fastapi import status
+from sqlalchemy import select
 
 from ...dependencies import CurrentUser, DbSession
+from ...models.comment import Comment
+from ...models.content import Content
+from ...models.template import Template
 from ...utils.error_handlers import ApplicationException
 
 logger = logging.getLogger(__name__)
@@ -15,7 +18,6 @@ class Permission(str, Enum):
 
     ADMIN = "admin"
     USER = "user"
-    # Add more permissions as needed
 
 
 async def check_permission(
@@ -29,7 +31,6 @@ async def check_permission(
     :param user: The user to check
     :return: True if authorized, raises exception otherwise
     """
-    # This is a placeholder implementation - customize based on your permission model
     if required_permission == Permission.ADMIN and not user.is_admin:
         raise ApplicationException(
             message="You do not have permission to perform this action",
@@ -53,32 +54,45 @@ async def check_resource_owner(
     :param db: The database session
     :return: True if authorized, raises exception otherwise
     """
-    # This is a placeholder implementation - customize based on your data model
-    # Example:
-    # if resource_type == "content":
-    #     resource = await db.scalar(
-    #         select(Content).where(Content.id == resource_id)
-    #     )
-    #     if not resource or resource.user_id != user.id:
-    #         raise ApplicationException(
-    #             message="You do not have permission to access this resource",
-    #             status_code=status.HTTP_403_FORBIDDEN,
-    #         )
+    if user.is_admin:
+        return True
 
-    # For now, just return True as a placeholder
+    normalized_type = resource_type.lower()
+    if normalized_type == "content":
+        owner_id = await db.scalar(select(Content.user_id).where(Content.id == resource_id))
+    elif normalized_type == "comment":
+        owner_id = await db.scalar(select(Comment.user_id).where(Comment.id == resource_id))
+    elif normalized_type == "template":
+        owner_id = await db.scalar(select(Template.user_id).where(Template.id == resource_id))
+        if owner_id is None:
+            is_default = await db.scalar(
+                select(Template.is_default).where(Template.id == resource_id)
+            )
+            if is_default:
+                return True
+    else:
+        raise ApplicationException(
+            message=f"Unsupported resource type: {resource_type}",
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if owner_id != user.id:
+        raise ApplicationException(
+            message="You do not have permission to access this resource",
+            status_code=status.HTTP_403_FORBIDDEN,
+        )
     return True
 
 
 async def get_user_permissions(
     user: CurrentUser,
-) -> List[Permission]:
+) -> list[Permission]:
     """
     Get the list of permissions for the user.
 
     :param user: The user
     :return: List of permissions
     """
-    # This is a placeholder implementation - customize based on your permission model
     permissions = [Permission.USER]
     if user.is_admin:
         permissions.append(Permission.ADMIN)

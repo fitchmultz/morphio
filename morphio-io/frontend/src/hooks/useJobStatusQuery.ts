@@ -11,6 +11,7 @@ import type {
 	LogsProcessingStatusResponse,
 	MediaProcessingStatusResponse,
 } from "@/client/types.gen";
+import { getAuthToken } from "@/lib/hey-api";
 import { API_BASE_URL } from "@/utils/constants";
 
 // Unified status type that covers both media and logs processing
@@ -42,7 +43,7 @@ export function useJobStatusQuery(
 			return;
 		}
 
-		const token = localStorage.getItem("access_token");
+		const token = getAuthToken();
 		if (!token) {
 			setUsePolling(true);
 			return;

@@ -144,8 +144,8 @@ def rate_limit(
                         if isinstance(var_value, Request):
                             request = var_value
                             break
-                except Exception:
-                    pass
+                except RuntimeError:
+                    logger.debug("Request lookup through contextvars failed", exc_info=True)
             # Last resort: try to get from kwargs using Depends pattern
             if not request:
                 try:
@@ -153,7 +153,7 @@ def rate_limit(
 
                     request = next((arg for arg in args if isinstance(arg, StarletteRequest)), None)
                 except ImportError:
-                    pass
+                    logger.debug("Starlette Request type unavailable during rate-limit lookup")
             if not isinstance(request, Request):
                 logger.error("Couldn't find request object in function arguments or context")
                 return create_error_response(

@@ -4,6 +4,7 @@ import logging
 import os
 import time
 import uuid
+import hashlib
 from collections.abc import Callable
 from datetime import UTC, datetime
 from functools import wraps
@@ -27,6 +28,13 @@ def redact_token_id(token_id: str | None) -> str | None:
     if len(token_id) < 8:
         return "***"
     return f"{token_id[:4]}...{token_id[-4:]}"
+
+
+def redact_identity(value: str | None) -> str | None:
+    """Return a stable, non-reversible fingerprint for user-provided identifiers."""
+    if not value:
+        return None
+    return hashlib.sha256(value.strip().lower().encode("utf-8")).hexdigest()[:16]
 
 
 # Flag to track if security logging has been initialized
@@ -186,7 +194,7 @@ def audit(
         async def change_user_role(user_id: int, new_role: str, db: AsyncSession):
             ...
 
-        @audit("LOGIN_ATTEMPT", "Login attempt for user: {user_login.email}")
+        @audit("LOGIN_ATTEMPT", "Login attempt")
         async def login(request: Request, user_login: UserLogin, db: AsyncSession):
             ...
     """
@@ -204,7 +212,6 @@ def audit(
         async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
             start_time = time.time()
             result: R | None = None
-            error = None
 
             # Bind args and kwargs to the function signature to get a mapping of all arguments
             bound_args = sig.bind(*args, **kwargs)
@@ -255,11 +262,10 @@ def audit(
                 return result
 
             except Exception as e:
-                error = str(e)
                 # Log failure
                 log_security_event(
                     event_type=f"{event_type}_ERROR",
-                    message=f"Error in {func_name}: {error}",
+                    message=f"Error in {func_name}",
                     level=SECURITY_ALERT,
                     user_id=user_id,
                     request=request,
@@ -267,7 +273,7 @@ def audit(
                         "function": func_name,
                         "duration_ms": int((time.time() - start_time) * 1000),
                         "success": False,
-                        "error": error,
+                        "error_type": type(e).__name__,
                     },
                 )
                 raise

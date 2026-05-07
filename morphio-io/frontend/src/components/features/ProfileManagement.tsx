@@ -17,27 +17,20 @@ import {
 	listApiKeys,
 	revokeApiKey,
 } from "@/client/sdk.gen";
-import type { UserCredits, UserOut } from "@/client/types.gen";
+import type {
+	ApiKeyCreatedOut,
+	ApiKeyOut,
+	UserCredits,
+	UserOut,
+} from "@/client/types.gen";
 import { Skeleton } from "@/components/common/Skeleton";
 import { ChangeDisplayNameForm } from "@/components/forms/ChangeDisplayNameForm";
 import { ChangeEmailForm } from "@/components/forms/ChangeEmailForm";
 import { ChangePasswordForm } from "@/components/forms/ChangePasswordForm";
 import { useAuth } from "@/contexts/AuthContext";
+import { getApiErrorMessage } from "@/lib/apiError";
 import logger from "@/lib/logger";
 import { notifyError, notifySuccess } from "@/lib/toast";
-
-type ApiKey = {
-	id: number;
-	name: string;
-	key_prefix: string;
-	scopes: string[];
-	last_used_at: string | null;
-	created_at: string;
-};
-
-type ApiKeyCreated = ApiKey & {
-	key: string;
-};
 
 export const ProfileManagement: FC = () => {
 	const { updateUserData } = useAuth();
@@ -45,12 +38,12 @@ export const ProfileManagement: FC = () => {
 	const [credits, setCredits] = useState<UserCredits | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [fetchError, setFetchError] = useState<string | null>(null);
-	const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
+	const [apiKeys, setApiKeys] = useState<ApiKeyOut[]>([]);
 	const [apiKeysLoading, setApiKeysLoading] = useState(true);
 	const [apiKeyError, setApiKeyError] = useState<string | null>(null);
 	const [apiKeyName, setApiKeyName] = useState("");
 	const [isCreatingKey, setIsCreatingKey] = useState(false);
-	const [newApiKey, setNewApiKey] = useState<ApiKeyCreated | null>(null);
+	const [newApiKey, setNewApiKey] = useState<ApiKeyCreatedOut | null>(null);
 	const [revokingKeyId, setRevokingKeyId] = useState<number | null>(null);
 
 	const fetchUserProfile = useCallback(async () => {
@@ -86,8 +79,7 @@ export const ProfileManagement: FC = () => {
 				// Non-fatal - profile can still display without credits
 			}
 		} catch (error) {
-			const message =
-				error instanceof Error ? error.message : "Failed to load user profile";
+			const message = getApiErrorMessage(error, "Failed to load user profile");
 			logger.warn("Failed to fetch user profile", { error });
 			setFetchError(message);
 			notifyError("Failed to load user profile. Please try again.");
@@ -106,20 +98,15 @@ export const ProfileManagement: FC = () => {
 			setApiKeyError(null);
 			const { data, error } = await listApiKeys();
 			if (error) {
-				throw new Error(
-					typeof error === "object" && error && "detail" in error
-						? String((error as { detail?: string }).detail)
-						: "Failed to load API keys",
-				);
+				throw new Error(getApiErrorMessage(error, "Failed to load API keys"));
 			}
 			if (data?.status === "success" && data.data) {
-				setApiKeys(data.data as ApiKey[]);
+				setApiKeys(data.data);
 			} else {
 				throw new Error(data?.message || "Failed to load API keys");
 			}
 		} catch (error) {
-			const message =
-				error instanceof Error ? error.message : "Failed to load API keys";
+			const message = getApiErrorMessage(error, "Failed to load API keys");
 			setApiKeyError(message);
 			logger.warn("Failed to fetch API keys", { error });
 		} finally {
@@ -155,14 +142,10 @@ export const ProfileManagement: FC = () => {
 				body: { name: trimmedName },
 			});
 			if (error) {
-				throw new Error(
-					typeof error === "object" && error && "detail" in error
-						? String((error as { detail?: string }).detail)
-						: "Failed to create API key",
-				);
+				throw new Error(getApiErrorMessage(error, "Failed to create API key"));
 			}
 			if (data?.status === "success" && data.data) {
-				setNewApiKey(data.data as ApiKeyCreated);
+				setNewApiKey(data.data);
 				setApiKeyName("");
 				await fetchApiKeys();
 				notifySuccess("API key created. Store it securely.");
@@ -182,14 +165,8 @@ export const ProfileManagement: FC = () => {
 			await navigator.clipboard.writeText(key);
 			notifySuccess("API key copied to clipboard.");
 		} catch (error) {
-			logger.warn("Clipboard copy failed, falling back", { error });
-			const input = document.createElement("input");
-			input.value = key;
-			document.body.appendChild(input);
-			input.select();
-			document.execCommand("copy");
-			input.remove();
-			notifySuccess("API key copied to clipboard.");
+			logger.warn("Clipboard copy failed", { error });
+			notifyError("Could not copy API key. Select and copy it manually.");
 		}
 	};
 
@@ -206,11 +183,7 @@ export const ProfileManagement: FC = () => {
 				path: { key_id: keyId },
 			});
 			if (error) {
-				throw new Error(
-					typeof error === "object" && error && "detail" in error
-						? String((error as { detail?: string }).detail)
-						: "Failed to revoke API key",
-				);
+				throw new Error(getApiErrorMessage(error, "Failed to revoke API key"));
 			}
 			if (data?.status === "success") {
 				await fetchApiKeys();

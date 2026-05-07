@@ -17,18 +17,4 @@ function logMessage(level: LogLevel, message: string, meta?: object) {
 	}
 }
 
-// Uncomment and implement when ready to send logs to a service
-// async function sendLogsToService(logObject: object) {
-//   try {
-//     const response = await fetch('/api/logs', {
-//       method: 'POST',
-//       headers: { 'Content-Type': 'application/json' },
-//       body: JSON.stringify(logObject)
-//     });
-//     if (!response.ok) throw new Error('Failed to send logs');
-//   } catch (error) {
-//     console.error('Error sending logs:', error);
-//   }
-// }
-
 export default logger;
