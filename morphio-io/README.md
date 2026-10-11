@@ -250,7 +250,7 @@ Publish a GitHub Release and attach the pinned compose + SBOMs (see `docs/releas
 ### Deploy (pinned)
 
 ```bash
-curl -fsSLO https://github.com/<org>/<repo>/releases/download/v1.0.0/docker-compose.release.yml
+curl -fsSLO https://github.com/<org>/<repo>/releases/latest/download/docker-compose.release.yml
 docker compose -f docker-compose.release.yml up -d
 ```
 

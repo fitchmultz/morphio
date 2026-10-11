@@ -15,7 +15,7 @@ This script checks for all required tools. If it fails, it will tell you exactly
 | Tool | Install |
 |------|---------|
 | uv | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
-| pnpm | `corepack enable && corepack use pnpm@10.33.0` |
+| pnpm | `corepack enable` |
 | cargo/rustc | `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \| sh` |
 | gh | `brew install gh` (macOS) or see [GitHub CLI docs](https://cli.github.com/) |
 | docker | Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) |
@@ -23,7 +23,8 @@ This script checks for all required tools. If it fails, it will tell you exactly
 ### Python 3.14 not found
 
 ```bash
-uv python install 3.14
+# From the repository root
+uv python install
 ```
 
 Then restart your shell or run `hash -r` to refresh PATH.
@@ -121,7 +122,6 @@ If you see "Python newer than supported" PyO3 errors, the build script sets `PYO
 
 ```bash
 corepack enable
-corepack use pnpm@10.33.0
 ```
 
 ### TypeScript errors after backend changes
@@ -229,7 +229,7 @@ docker ps | grep redis
 cd morphio-io && docker compose up redis -d
 
 # Direct Docker
-docker run -d -p 6384:6379 redis:7-alpine
+docker run -d -p 6384:6379 redis:alpine
 ```
 
 ### Redis connection string format
